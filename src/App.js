@@ -13,7 +13,7 @@ app.get("/", function(req, res) {
 
 app.get("/users", async function(req, res) {
   const allUsers = await User.find();
-  const names = allUsers.map(user => user.name);
+  const names = allUsers.map(user => user.username);
   res.send(names);
 });
 
