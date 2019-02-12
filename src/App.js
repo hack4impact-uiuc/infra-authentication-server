@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
-const Item = require("./models/Item");
+const User = require("./models/User");
 
 const app = express();
 app.use(cors());
@@ -11,17 +11,17 @@ app.get("/", function(req, res) {
   res.send("Hello World");
 });
 
-app.get("/items", async function(req, res) {
-  const allItems = await Item.find();
-  const names = allItems.map(item => item.name);
+app.get("/users", async function(req, res) {
+  const allUsers = await User.find();
+  const names = allUsers.map(user => user.name);
   res.send(names);
 });
 
 app.get("/put/:name", function(req, res) {
-  var item = new Item({ name: req.params.name });
-  item.save();
-  console.log("Added Item " + req.params.name);
-  res.send("Added Item " + req.params.name);
+  var user = new User({ username: req.params.name, passord:"demo" });
+  user.save();
+  console.log("Added User " + req.params.name);
+  res.send("Added User " + req.params.name);
 });
 
 app.listen(8000, function() {
