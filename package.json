@@ -7,6 +7,7 @@
   "dependencies": {
     "cors": "^2.8.5",
     "docz": "^0.13.7",
+    "docz-theme-default": "^0.13.7",
     "express": "^4.16.4",
     "mongoose": "^5.4.11"
   }
