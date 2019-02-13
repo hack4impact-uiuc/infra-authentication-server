@@ -1,11 +1,16 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+<<<<<<< HEAD
 const bodyParser = require("body-parser");
 
+=======
+>>>>>>> added forgot route
 const User = require("./models/User");
-
+var bodyParser = require('body-parser')
 const app = express();
+
+app.use(bodyParser.urlencoded())
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -55,6 +60,22 @@ app.post("/register", async function(req, res, next) {
     });
   res.send("email: " + req.body.email + "\nusername: " + req.body.username);
 });
+app.post("/forgot/", async function (req, res) {
+  console.log(req.body);
+  const user = await User.findOne({ email: req.body.email }).catch(e => console.log(e));
+  if (user) {
+    //user found, update pin
+    user.pin = Math.floor(Math.random() * (100000000 - 100000 + 1)) + 100000;
+    var date = new Date();
+    // add a day to the current date
+    date.setDate(date.getDate() + 1);
+    user.expiration = date;
+    console.log(user);
+    await user.save();
+  }
+  res.send({ "status": 200, "message": "user updated" });
+});
+
 
 app.listen(8000, function() {
   console.log("Listening on http://localhost:8000");
