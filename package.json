@@ -5,6 +5,7 @@
     "docs:dev": "docz dev"
   },
   "dependencies": {
+    "@sendgrid/mail": "^6.3.1",
     "cors": "^2.8.5",
     "docz": "^0.13.7",
     "docz-theme-default": "^0.13.7",
