@@ -17,13 +17,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-const msg = {
-  to: 'test@example.com',
-  from: 'test@example.com',
-  subject: 'Sending with SendGrid is Fun',
-  text: 'and easy to do anywhere, even with Node.js',
-  html: '<strong>and easy to do anywhere, even with Node.js</strong>',
-};
 
 app.get("/", function(req, res) {
   res.send("Hello World");
@@ -61,7 +54,6 @@ app.post("/register", async function(req, res, next) {
   res.send("email: " + req.body.email + "\nusername: " + req.body.username);
 });
 app.post("/forgot/", async function (req, res) {
-  console.log(req.body);
   const user = await User.findOne({ email: req.body.email }).catch(e => console.log(e));
   if (user) {
     //user found, update pin
@@ -70,10 +62,20 @@ app.post("/forgot/", async function (req, res) {
     // add a day to the current date
     date.setDate(date.getDate() + 1);
     user.expiration = date;
-    console.log(user);
     await user.save();
+    const msg = {
+      to: user.email,
+      from: 'test@example.com',
+      subject: 'Forgot Password',
+      text: `You recently requested a change in password. 
+      Please enter the following PIN which expires in 24 hours: ${user.pin}`,
+      html: `You recently requested a change in password. <br/> 
+      Please enter the following PIN which expires in 24 hours: ${user.pin}<br/>`,
+    };
+    sgMail.send(msg).catch(e => console.log(e.response.body));
+
   }
-  res.send({ "status": 200, "message": "user updated" });
+  res.send({ "status": 200, "message": "Sent password reset PIN to user if they exist in the database." });
 });
 
 
