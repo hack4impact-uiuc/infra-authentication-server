@@ -13,26 +13,26 @@ app.get("/", function(req, res) {
 
 app.get("/users", async function(req, res) {
   const allUsers = await User.find();
-  const names = allUsers.map(user => user.name);
+  const names = allUsers.map(user => user.username);
   res.send(names);
 });
 
 app.get("/put/:name", function(req, res) {
-  var user = new User({ username: req.params.name, passord:"demo" });
+  var user = new User({ username: req.params.name, password:"demo" });
   user.save();
   console.log("Added User " + req.params.name);
   res.send("Added User " + req.params.name);
 });
 
-app.get("/login", async function(req, res) {
+app.get("/login/:username/:password", async function(req, res) {
   const allUsers = await User.find();
   throwError = true;
   allUsers.forEach(function(user) {
-    if (user.username === req.username){
+    if (user.username === req.params.username){
       throwError = false;
-      if(user.password === req.password){
-        console.log("Welcome back " + req.username)
-        res.send("Welcome back " + req.username)
+      if(user.password === req.params.password){
+        console.log("Welcome back " + req.params.username)
+        res.send("Welcome back " + req.params.username)
       }
       else{
         console.log("Incorrect password")
