@@ -2,3 +2,10 @@
 
 
 
+# Instructions
+
+```
+yarn
+yarn start
+```
+

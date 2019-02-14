@@ -11,9 +11,14 @@ app.get("/", function(req, res) {
   res.send("Hello World");
 });
 
+app.post("/auth", async function(req, res) {
+  console.log("auth")
+  res.send({"result":"success","token": "magic"})
+});
+
 app.get("/users", async function(req, res) {
   const allUsers = await User.find();
-  const names = allUsers.map(user => user.name);
+  const names = allUsers.map(user => user.username);
   res.send(names);
 });
 
