@@ -29,6 +29,10 @@ app.get("/put/:name", function(req, res) {
   res.send("Added User " + req.params.name);
 });
 
+app.get("signup", async function(req, res) {
+
+});
+
 app.listen(8000, function() {
   console.log("Listening on http://localhost:8000");
 });
