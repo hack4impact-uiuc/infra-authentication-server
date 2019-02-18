@@ -34,31 +34,45 @@ app.get("/users", async function (req, res) {
   res.send(names);
 });
 
+app.get('/levels', async function (req, res) {
+  if (!req.headers.token) { res.send({ error: 'token not provided' }) }
+  const authenticated = verifyJWT(req.headers.token)
+  // only allow admin
+  if (authenticated.success && validLevels[authenticated.userLevel] === validLevels[superAdmin]) {
+    const levelsData = Object.keys(validLevels)
+    res.send({levels: levelsData})
+  } else {
+    res.send({error: 'Unable to Authenticate'})
+  }
+})
+
 app.post("/levelchange", async function (req, res) {
   if (!req.headers.token) { res.send({ error: 'token not provided' }) }
   const authenticated = verifyJWT(req.headers.token)
   if (authenticated.success) {
     const { userLevel } = authenticated
     const { usersToLevelChange } = req.body
-    if(!usersToLevelChange) {
-      res.send({error: 'No data provided'})
+    if (!usersToLevelChange) {
+      res.send({ error: 'No data provided' })
     } else {
       const failedPromotions = []
       Object.keys(usersToLevelChange).forEach((user) => {
         const levelToChange = usersToLevelChange[user]
         // the lower the integer value returned by validLevels the higher the level
-        if(!!validLevels[levelToChange] && validLevels[levelToChange] >= validLevels[userLevel]) {
+        if (!!validLevels[levelToChange] && validLevels[levelToChange] >= validLevels[userLevel]) {
           levelChange(user, levelToChange)
         } else {
           failedPromotions.push(user)
         }
       })
       console.log(failedPromotions)
-      if(!!failedPromotions.length) {
-        res.send({ error: 'the following users were failed to be granted privileges for the following reason(s): input of incorrect userID / input of incorrect userLevel'
-        , failedPromotions})
+      if (!!failedPromotions.length) {
+        res.send({
+          error: 'the following users were failed to be granted privileges for the following reason(s): input of incorrect userID / input of incorrect userLevel'
+          , failedPromotions
+        })
       } else {
-        res.send({message: 'all user level changes granted'})
+        res.send({ message: 'all user level changes granted' })
       }
     }
   } else {
