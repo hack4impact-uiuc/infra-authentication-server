@@ -1,12 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-<<<<<<< HEAD
 const bodyParser = require("body-parser");
-=======
-const bodyParser = requre("body-parser");
-var urlencodedParser = bodyParser.urlencoded({ extended: false })
->>>>>>> 98ed1a643a22e74cb0595cc72f680049b62fdbca
 
 const User = require("./models/User");
 
@@ -38,7 +33,6 @@ app.get("/put/:name", function(req, res) {
 });
 
 app.get("/signup",  function(req, res) {
-<<<<<<< HEAD
   res.send("this is /signup, where you can create an account");
 });
 
