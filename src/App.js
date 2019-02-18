@@ -1,7 +1,12 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+<<<<<<< HEAD
 const bodyParser = require("body-parser");
+=======
+const bodyParser = requre("body-parser");
+var urlencodedParser = bodyParser.urlencoded({ extended: false })
+>>>>>>> 98ed1a643a22e74cb0595cc72f680049b62fdbca
 
 const User = require("./models/User");
 
@@ -33,6 +38,7 @@ app.get("/put/:name", function(req, res) {
 });
 
 app.get("/signup",  function(req, res) {
+<<<<<<< HEAD
   res.send("this is /signup, where you can create an account");
 });
 
@@ -48,7 +54,6 @@ app.post("/signup", async function(req, res, next) {
     //   res.status(400).send("Unable to save to database. Please check that the input fields are filled in correctly.");
     // });
   res.send("email: " + req.body.email + "\nusername: " + req.body.username);
-  // res.redirect("/login") // supposedly the login page to enter account credentials to get to /login/:username/:password
 });
 
 app.listen(8000, function() {
