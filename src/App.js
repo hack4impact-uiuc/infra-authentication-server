@@ -1,6 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const bodyParser = requre("body-parser");
+var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
 const User = require("./models/User");
 
@@ -29,8 +31,19 @@ app.get("/put/:name", function(req, res) {
   res.send("Added User " + req.params.name);
 });
 
-app.get("signup", async function(req, res) {
+app.get("/signup",  function(req, res) {
+  res.render("SignUp", {title: "Create an account with us!"});
+  res.send("this is /signup, where you can create an account");
+});
 
+app.post("/signup", urlencodedParser, async function(req, res, next) {
+  if (!req.body) return res.sendStatus(400);
+  var email = req.body.email;
+  var username = req.body.username;
+  var password = req.body.password;
+  console.log({"email": email, "username": username});
+  res.send({"status": 200, "message": "User account successfully created"})
+  // res.redirect("/login") // supposedly the login page to enter account credentials to get to /login/:username/:password
 });
 
 app.listen(8000, function() {
