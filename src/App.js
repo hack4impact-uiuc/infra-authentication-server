@@ -32,16 +32,17 @@ app.get("/put/:name", function(req, res) {
   res.send("Added User " + req.params.name);
 });
 
-// app.get("/signup",  function(req, res) {
-//   res.send("this is /signup, where you can create an account");
-// });
+app.get("/signup",  function(req, res) {
+  res.send("this is /signup, where you can create an account");
+});
 
 app.post("/signup", async function(req, res, next) {
   if (!req.body) return res.sendStatus(400);
   const user = new User(req.body);
-  user.save()
+  await user.save()
     .then(user => {
-       console.log('User added successfully');
+       console.log("User added successfully");
+      //  res.status(200).send("User added to database.");
     })
     // .catch(err => {
     //   res.status(400).send("Unable to save to database. Please check that the input fields are filled in correctly.");
