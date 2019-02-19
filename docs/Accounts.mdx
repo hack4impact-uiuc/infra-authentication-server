@@ -1,0 +1,37 @@
+---
+name: Create an account
+route: /accounts
+---
+
+# Create an account
+Here's an outline of what will be described on this page:
+- technologies used
+- endpoints created
+- database models
+- workflow
+- data flow
+- wireframes for the frontend
+- how to use (software dev)
+- how to use (client user)
+- some helpful resources
+
+## Technologies used
+We are using Express.js for the server side in combination with Next.js for frontend.
+
+## Endpoint: /register [GET]
+This endpoint displays the default sign-up form for users to interact with. The frontend should be validating the values that a user puts in. Clicking a "register" button prompts the next endpoint to fire.
+
+## Endpoint: /register [POST]
+This endpoint takes in the values that a user has put into the default form in the endpoint above, and sends it to our auth server. The server will make sure that the values passed in are valid and eligible to make a new user.
+
+## Endpoint: /login [GET]
+This endpoint displays the default login form for users to interact with. The frontend should validate the values put into the form to see if they are syntactically eligble to be login credentials.
+
+## Endpoint: /login [POST]???
+This endpoint is fired when the "log in" button is clicked in the previous endpoint.  The server takes in the input values and checks its database to see if this is a real user.
+
+## Endpoint: /logout [GET]???
+This endpoint will log the user out of the application, (cookies blah blah blah), and redirect to the home page, where no user credentials are required???
+
+
+
