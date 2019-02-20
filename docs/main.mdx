@@ -1,8 +1,46 @@
 ---
-name: Hello world
+name: Google Auth
 route: /
 ---
 
-# Hello world!
+# Google OAuth
 
-I'm a documentation page, using MDX, created using [docz](https://docz.site) and deployed with [ZEIT Now](https://zeit.co/now)!
+Confused? Don't worry, me too.
+
+## Some nice links:
+More will be added over time :)
+
+* [Flask API](https://www.flaskapi.org/#example)
+* [OAuth](https://developers.google.com/identity/protocols/OAuth2)
+
+## Development:
+* Google OAuth stuff. Flask to handle endpoints.
+* Endpoint to talk to Google server. Special endpoints to accomodate for lack of password in server.
+
+## Diagrams:
+### Backend
+* Client sends a login request to Google.
+* Google authenticates everything, sends a token back. Client stores this token as cookies.
+* Auth server stores some flag. Don't need to keep password; Google takes care of this.
+* The token is then passed around to the API/auth server to check permissions.
+* Token is passed back to Google auth to make sure nothing fishy is going on. They can also be cycled.
+<img src={require('./Workflow.png')} width="500"/>
+
+### Frontend
+"Sign In With Google" button. Google can handle the rest. 
+
+<img src={require('./GButton.png')} width="150"/>
+
+You know the great thing about buttons? They can be anywhere you want them to!
+
+## Usage:
+### Devs
+* Enable whether or not to use this feature and have it appear on frontend. 
+Hopefully won't have to do much else with their API.
+### Users
+| You | Appropriate Response |
+| :--- | :--- |
+| See Google button and want to use | Move mouse. Click Button. |
+| See Google button and don't want to use | Continue on like you never saw it. |
+| Don't see Google button and want to use | You're fucked. |
+| Don't see Google button and don't want to use | Nothing happens. |
