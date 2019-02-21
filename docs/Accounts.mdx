@@ -1,25 +1,50 @@
 ---
-name: Create an account
+name: Accounts
 route: /accounts
 ---
 
-# Create an account
-Here's an outline of what will be described on this page:
-- technologies used
-- endpoints created
-- database models
-- workflow
-- data flow
-- wireframes for the frontend
-- how to use (software dev)
-- how to use (client user)
-- some helpful resources
+# Accounts
+Here is everything about
+1. creating an account,
+2. logging in, and
+3. logging out
 
-## Technologies used
-We are using Express.js for the server side in combination with Next.js for frontend.
+## 1. Creating an account
+On the frontend, the client would see an empty form for them to input the required
+and preferred information to create an account with our dev team client's application. 
+This will include fields to put in an email, username, password (twice for good measure), 
+optional security questions (which can be customized by the dev team client), and an 
+optional phone number. Clients also have the option to sign into the application with 
+their Google accounts. 
 
-## Endpoint: /register [GET]
-This endpoint displays the default sign-up form for users to interact with. The frontend should be validating the values that a user puts in. Clicking a "register" button prompts the next endpoint to fire.
+Dev team clients will be able to customize this to indicate what fields they want for their 
+users.
+
+### /register [GET]
+This endpoint displays the default sign-up form for user clients to interact with. 
+The frontend will validate the values that a user puts in. Clicking a "register" button 
+prompts the next endpoint to fire.
+
+### /register [POST]
+This endpoint takes in the values that a user puts into the frontend. in the endpoint 
+above, and sends it to our auth server. The server will make sure that the values passed in are 
+valid and eligible to make a new user.
+
+
+
+## 2. Logging in
+
+## 3. Logging out
+
+## Endpoint Examples:
+
+
+
+
+
+
+
+
 
 ## Endpoint: /register [POST]
 This endpoint takes in the values that a user has put into the default form in the endpoint above, and sends it to our auth server. The server will make sure that the values passed in are valid and eligible to make a new user.
@@ -34,4 +59,14 @@ This endpoint is fired when the "log in" button is clicked in the previous endpo
 This endpoint will log the user out of the application, (cookies blah blah blah), and redirect to the home page, where no user credentials are required???
 
 
-
+# outline
+Here's an outline of what will be described on this page:
+- technologies used
+- endpoints created
+- database models
+- workflow
+- data flow
+- wireframes for the frontend
+- how to use (software dev)
+- how to use (client user)
+- some helpful resources
