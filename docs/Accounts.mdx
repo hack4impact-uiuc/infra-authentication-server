@@ -65,7 +65,7 @@ This endpoint will log the user out of the application, (cookies blah blah blah)
 
 * Give them a template they can use, otherwise do it themsleves
 
-
+Signup: 
 POST for signup
 sends the
 * email
@@ -85,6 +85,13 @@ Validation
         *** have a link to verify 
     ** account is already associated with this email
 * validate the password is strong
+
+
+Login:
+* Sends email and password
+* hash password on both frontend and backend
+* checks if user exists, is validated, and password matches
+* send back permission levels, userid, and a token
 
 
 Logout: delete token from cookies, no requests
