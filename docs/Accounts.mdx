@@ -20,11 +20,6 @@ their Google accounts.
 Dev team clients will be able to customize this to indicate what fields they want for their 
 users.
 
-### /register [GET]
-This endpoint displays the default sign-up form for user clients to interact with. 
-The frontend will validate the values that a user puts in. Clicking a "register" button 
-prompts the next endpoint to fire.
-
 ### /register [POST]
 This endpoint takes in the values that a user puts into the frontend. in the endpoint 
 above, and sends it to our auth server. The server will make sure that the values passed in are 
@@ -36,6 +31,7 @@ The user client would be shown a simple form to input their login information. T
 is then passed into our server to confirm that 1. the user exists and 2. the credentials match.
 
 ## 3. Logging out
+When the user logs out, the token will be deleted from the cookies.
 
 ## Endpoint Examples:
 
@@ -47,16 +43,16 @@ is then passed into our server to confirm that 1. the user exists and 2. the cre
 
 
 
-## Endpoint: /register [POST]
+## /register [POST]
 This endpoint takes in the values that a user has put into the default form in the endpoint above, and sends it to our auth server. The server will make sure that the values passed in are valid and eligible to make a new user.
 
-## Endpoint: /login [GET]
+## /login [GET]
 This endpoint displays the default login form for users to interact with. The frontend should validate the values put into the form to see if they are syntactically eligble to be login credentials.
 
-## Endpoint: /login [POST]???
+## /login [POST]???
 This endpoint is fired when the "log in" button is clicked in the previous endpoint.  The server takes in the input values and checks its database to see if this is a real user.
 
-## Endpoint: /logout [GET]???
+## /logout [GET]???
 This endpoint will log the user out of the application, (cookies blah blah blah), and redirect to the home page, where no user credentials are required???
 
 
