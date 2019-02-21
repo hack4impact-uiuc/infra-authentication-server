@@ -58,3 +58,36 @@ This endpoint is fired when the "log in" button is clicked in the previous endpo
 
 ## Endpoint: /logout [GET]???
 This endpoint will log the user out of the application, (cookies blah blah blah), and redirect to the home page, where no user credentials are required???
+
+
+
+# Feedback 
+
+* Give them a template they can use, otherwise do it themsleves
+
+
+POST for signup
+sends the
+* email
+* password
+* security questions (optional)
+* phone numbers (optional)
+* google auth
+* permission level (specified in config file, a part of login form in a dropdown or default on client side)
+
+Validation
+* validate in the signup that it is a base permission levels
+* validate the email is valid 
+    ** regex check
+    ** validation email
+        *** have something in your db that says verified
+        *** should send an email 
+        *** have a link to verify 
+    ** account is already associated with this email
+* validate the password is strong
+
+
+Logout: delete token from cookies, no requests
+
+
+* we (the dev team) create the super admin account (gmail) that can promote admins, heiarchy defined in the config file
