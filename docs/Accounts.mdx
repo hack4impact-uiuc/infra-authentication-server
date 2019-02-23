@@ -17,80 +17,32 @@ optional security questions (which can be customized by the dev team client), an
 optional phone number. Clients also have the option to sign into the application with 
 their Google accounts. 
 
-Dev team clients will be able to customize this to indicate what fields they want for their 
-users.
+There is a default form template for our dev team clients to use. They can choose to customize 
+the module or create their own to integrate with our authentication model.
 
 ### /register [POST]
-This endpoint takes in the values that a user puts into the frontend. in the endpoint 
-above, and sends it to our auth server. The server will make sure that the values passed in are 
-valid and eligible to make a new user.
+This sends the email, password, optional security questions, optional phone numbers, 
+google auth, and permission level to our server. The permission level(s) will be specified 
+by the dev team in a config file or as a dropdown onthe default client side.
 
+### Validation
+For signing up, we will validate a few things:
+* sign up has base permission levels
+* email is valid -- follows our regex pattern, isn't already in our database
+* email is valid pt 2 -- check that the link sent to their email has been clicked to set the account to validated in the database
+* strong password
 
 ## 2. Logging in
-The user client would be shown a simple form to input their login information. This i nformation 
-is then passed into our server to confirm that 1. the user exists and 2. the credentials match.
+For user clients, there will be a simple form to take in email and password or google auth 
+to sign them in.
+
+### /login [POST]
+This sends the email and password to our server. From there, the password will be hashed on both 
+the frontend and backend for extra security. Our server will check if the user is a valid, existing user with
+the correct password, and then send permission level, userid, and token to the dev team client's API.
 
 ## 3. Logging out
 When the user logs out, the token will be deleted from the cookies.
 
-## Endpoint Examples:
 
-
-
-
-
-
-
-
-
-## /register [POST]
-This endpoint takes in the values that a user has put into the default form in the endpoint above, and sends it to our auth server. The server will make sure that the values passed in are valid and eligible to make a new user.
-
-## /login [GET]
-This endpoint displays the default login form for users to interact with. The frontend should validate the values put into the form to see if they are syntactically eligble to be login credentials.
-
-## /login [POST]???
-This endpoint is fired when the "log in" button is clicked in the previous endpoint.  The server takes in the input values and checks its database to see if this is a real user.
-
-## /logout [GET]???
-This endpoint will log the user out of the application, (cookies blah blah blah), and redirect to the home page, where no user credentials are required???
-
-
-
-# Feedback 
-
-* Give them a template they can use, otherwise do it themsleves
-
-Signup: 
-POST for signup
-sends the
-* email
-* password
-* security questions (optional)
-* phone numbers (optional)
-* google auth
-* permission level (specified in config file, a part of login form in a dropdown or default on client side)
-
-Validation
-* validate in the signup that it is a base permission levels
-* validate the email is valid 
-    ** regex check
-    ** validation email
-        *** have something in your db that says verified
-        *** should send an email 
-        *** have a link to verify 
-    ** account is already associated with this email
-* validate the password is strong
-
-
-Login:
-* Sends email and password
-* hash password on both frontend and backend
-* checks if user exists, is validated, and password matches
-* send back permission levels, userid, and a token
-
-
-Logout: delete token from cookies, no requests
-
-
-* we (the dev team) create the super admin account (gmail) that can promote admins, heiarchy defined in the config file
+# Endpoint Examples:
