@@ -1,0 +1,48 @@
+---
+name: Accounts
+route: /accounts
+---
+
+# Accounts
+Here is everything about
+1. creating an account,
+2. logging in, and
+3. logging out
+
+## 1. Creating an account
+On the frontend, the client would see an empty form for them to input the required
+and preferred information to create an account with our dev team client's application. 
+This will include fields to put in an email, username, password (twice for good measure), 
+optional security questions (which can be customized by the dev team client), and an 
+optional phone number. Clients also have the option to sign into the application with 
+their Google accounts. 
+
+There is a default form template for our dev team clients to use. They can choose to customize 
+the module or create their own to integrate with our authentication model.
+
+### /register [POST]
+This sends the email, password, optional security questions, optional phone numbers, 
+google auth, and permission level to our server. The permission level(s) will be specified 
+by the dev team in a config file or as a dropdown onthe default client side.
+
+### Validation
+For signing up, we will validate a few things:
+* sign up has base permission levels
+* email is valid -- follows our regex pattern, isn't already in our database
+* email is valid pt 2 -- check that the link sent to their email has been clicked to set the account to validated in the database
+* strong password
+
+## 2. Logging in
+For user clients, there will be a simple form to take in email and password or google auth 
+to sign them in.
+
+### /login [POST]
+This sends the email and password to our server. From there, the password will be hashed on both 
+the frontend and backend for extra security. Our server will check if the user is a valid, existing user with
+the correct password, and then send permission level, userid, and token to the dev team client's API.
+
+## 3. Logging out
+When the user logs out, the token will be deleted from the cookies.
+
+
+# Endpoint Examples:

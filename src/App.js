@@ -1,11 +1,14 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const bodyParser = require("body-parser");
 
 const User = require("./models/User");
 
 const app = express();
 app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/", function(req, res) {
   res.send("Hello World");
@@ -27,6 +30,20 @@ app.get("/put/:name", function(req, res) {
   user.save();
   console.log("Added User " + req.params.name);
   res.send("Added User " + req.params.name);
+});
+
+app.get("/register",  function(req, res) {
+  res.send("this is /register, where you can put your information in a form to create an account");
+});
+
+app.post("/register", async function(req, res, next) {
+  if (!req.body) return res.sendStatus(400);
+  const user = new User(req.body);
+  await user.save()
+    .then(user => {
+       console.log("User added successfully");
+    });
+  res.send("email: " + req.body.email + "\nusername: " + req.body.username);
 });
 
 app.listen(8000, function() {
