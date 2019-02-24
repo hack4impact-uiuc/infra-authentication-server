@@ -1,0 +1,45 @@
+---
+name: Login and Logout
+route: /loginandlogout
+---
+
+# Login and Logout
+
+
+## Endpoints 
+
+| Endpoint | /login [POST] |
+| ------ | ----------- |
+| body   | email, hashed password |
+| response | success or error message, jwt token if the account is authenticated |
+
+
+
+## Login Workflow
+
+### Step 1: Filling out the form on the client side
+
+This will include fields for 
+* email
+* password
+* an option to sign up using their google accounts
+
+We will provide an example of the login pages, but let the team customize it towards their needs and integrate it in. 
+
+### Step 2: Sends the login request to the API, redirected by the API to the authentication server. 
+
+### Step 3: Authentication Server Validation
+
+* password matches
+* email is verified
+
+### Step 4: Authentication Server Response
+If valid, the authentication server will encrypt a jwt token that contains the user id and permision level, and send it back to the API.
+
+### Step 5: API Response
+If valid, the API will respond to the client with a success message and the jwt token sent from the Authentication Server. This token is storred in cookies and sent with every request. 
+
+
+## Logout Workflow
+
+Step 1: Delete the jwt token from cookies
