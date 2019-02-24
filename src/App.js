@@ -1,11 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-<<<<<<< HEAD
-const bodyParser = require("body-parser");
-
-=======
->>>>>>> added forgot route
 const User = require("./models/User");
 var bodyParser = require('body-parser')
 const app = express();
