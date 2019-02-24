@@ -1,0 +1,7 @@
+roles:
+    heirarchy:
+        - superAdmin
+        - admin
+        - orgUser
+        - generalUser
+

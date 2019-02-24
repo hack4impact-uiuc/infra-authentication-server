@@ -3,17 +3,24 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 var bodyParser = require('body-parser');
 const User = require("./models/User");
+const configParse = require('./utils/config-helpers')
+
+/*
+  Before init the app: 
+    go through the configuration file and initialize the global vars.
+
+*/
+global.roles = {}
+const configRet = configParse()
+if (!configRet.success) {
+  console.log(configRet.error)
+  throw new Error(configRet.error)
+}
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-const superAdmin = 'superAdmin'
-const generalUser = 'generalUser'
-const validLevels = {
-  [superAdmin]: -1,
-  [generalUser]: 0
-}
 
 app.listen(8000, function () {
   console.log("Listening on http://localhost:8000");
@@ -34,21 +41,30 @@ app.get("/users", async function (req, res) {
   res.send(names);
 });
 
-app.get('/levels', async function (req, res) {
+app.get('/roles', async function (req, res) {
   if (!req.headers.token) { res.send({ error: 'token not provided' }) }
   const authenticated = verifyJWT(req.headers.token)
-  // only allow admin
-  if (authenticated.success && validLevels[authenticated.userLevel] === validLevels[superAdmin]) {
-    const levelsData = Object.keys(validLevels)
-    res.send({levels: levelsData})
+  // only allow super admin or second level admin?
+  if (!authenticated.success) {
+    if (!!authenticated.error) {
+      res.send({ error: authenticated.error })
+    } else {
+      res.send({ error: 'Unable to Authenticate' })
+    }
   } else {
-    res.send({error: 'Unable to Authenticate'})
+    const { list: rolesList, dict: rolesDict } = global.roles
+    if (authenticated.success && rolesDict[rolesList[1]] >= rolesDict[authenticated.userLevel]) {
+      res.send({ roles: rolesList })
+    } else {
+      res.send({ error: 'You do not have the role to view this' })
+    }
   }
 })
 
-app.post("/levelchange", async function (req, res) {
+app.post("/roleschange", async function (req, res) {
   if (!req.headers.token) { res.send({ error: 'token not provided' }) }
   const authenticated = verifyJWT(req.headers.token)
+  const { dict: rolesDict } = global.roles
   if (authenticated.success) {
     const { userLevel } = authenticated
     const { usersToLevelChange } = req.body
@@ -59,13 +75,12 @@ app.post("/levelchange", async function (req, res) {
       Object.keys(usersToLevelChange).forEach((user) => {
         const levelToChange = usersToLevelChange[user]
         // the lower the integer value returned by validLevels the higher the level
-        if (!!validLevels[levelToChange] && validLevels[levelToChange] >= validLevels[userLevel]) {
+        if (!!validLevels[levelToChange] && rolesDict[levelToChange] >= rolesDict[userLevel]) {
           levelChange(user, levelToChange)
         } else {
           failedPromotions.push(user)
         }
       })
-      console.log(failedPromotions)
       if (!!failedPromotions.length) {
         res.send({
           error: 'the following users were failed to be granted privileges for the following reason(s): input of incorrect userID / input of incorrect userLevel'
@@ -103,7 +118,7 @@ const verifyJWT = (token) => {
   // i mean here someone would do some bullshit to the token like authenticating it and grabbing data from it
   return {
     success: true,
-    userLevel: superAdmin
+    userLevel: 'superAdmin'
   }
 }
 const levelChange = (userID, level) => {
