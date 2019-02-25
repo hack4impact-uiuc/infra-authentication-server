@@ -47,11 +47,14 @@ app.post("/register", async function(req, res, next) {
   });
   res.send("email: " + req.body.email + "\nusername: " + req.body.username);
 });
-app.post("/forgot/", async function(req, res) {
+
+app.post("/forgotPassword", async function(req, res) {
   const user = await User.findOne({ email: req.body.email }).catch(e =>
     console.log(e)
   );
-  if (user) {
+  console.log(user.expiration);
+  // TODO: handle the config file change in security question 
+  if (user && req.body.answer && user.answer === req.body.answer.toLowerCase()) {
     //user found, update pin
     user.pin = Math.floor(Math.random() * (100000000 - 100000 + 1)) + 100000;
     var date = new Date();
@@ -67,14 +70,13 @@ app.post("/forgot/", async function(req, res) {
         clientId: process.env.INFRA_CLIENT_ID,
         clientSecret: process.env.INFRA_CLIENT_SECRET,
         refreshToken: process.env.INFRA_REFRESH_TOKEN
-      },
-      logger: true
+      }
     });
     console.log("Created transport with nodemailer");
     transporter
       .sendMail({
         from: "hack4impact.infra@gmail.com",
-        to: user,
+        to: user.email,
         subject: "Forgot Password",
         text: "Enter the following pin on the reset page: " + user.pin
       })
@@ -90,11 +92,13 @@ app.post("/forgot/", async function(req, res) {
       status: 200,
       message: "Sent password reset PIN to user if they exist in the database."
     });
+  } else {
+    res.send({
+      status: 400,
+      message: "User does not exist in the DB."
+    }); 
   }
-  res.send({
-    status: 400,
-    message: "User does not exist in the DB."
-  }); 
+  
 });
 
 app.listen(8000, function() {

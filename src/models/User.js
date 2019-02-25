@@ -6,6 +6,7 @@ const schema = mongoose.Schema({
   username: "string",
   password: "string",
   email: "string",
+  answer: "string",
   pin: "number",
   expiration: "date"
 });
