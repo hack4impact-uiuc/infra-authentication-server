@@ -10,9 +10,6 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
 app.get("/", function(req, res) {
   res.send("Hello World");
 });
@@ -67,7 +64,6 @@ app.post("/forgot/", async function (req, res) {
       html: `You recently requested a change in password. <br/> 
       Please enter the following PIN which expires in 24 hours: ${user.pin}<br/>`,
     };
-    sgMail.send(msg).catch(e => console.log(e.response.body));
 
   }
   res.send({ "status": 200, "message": "Sent password reset PIN to user if they exist in the database." });
