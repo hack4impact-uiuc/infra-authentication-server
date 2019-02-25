@@ -11,7 +11,9 @@
     "docz": "^0.13.7",
     "docz-theme-default": "^0.13.7",
     "express": "^4.16.4",
+    "googleapis": "27",
     "mongoose": "^5.4.11",
+    "nodemailer": "^5.1.1",
     "nodemon": "^1.18.10"
   }
 }
