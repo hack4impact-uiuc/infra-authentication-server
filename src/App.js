@@ -105,6 +105,13 @@ app.post("/passwordReset", async function(req, res) {
   const user = await User.findOne({ email: req.body.email }).catch(e =>
     console.log(e)
   );
+  if(!user){
+    res.send({
+      status: 400,
+      message: "User does not exist in the database"
+    }); 
+    return;
+  }
   if(user.pin != req.body.pin){
     res.send({
       status: 400,
@@ -131,6 +138,32 @@ app.post("/passwordReset", async function(req, res) {
     status:200,
     message:"Password successfully reset"
   })
+  
+});
+
+
+app.post("/getSecurityQuestion", async function(req, res) {
+  const user = await User.findOne({ email: req.body.email }).catch(e => {
+    console.log(e);
+  });
+  if(!user){
+    res.send({
+      status: 400,
+      message: "User does not exist in the database"
+    }); 
+    return;
+  }
+  if(!user.question){
+    res.send({
+      status: 400,
+      message: "No security question set"
+    }); 
+    return;
+  }
+  res.send({
+    status:200,
+    question:user.question
+  });
   
 });
 
