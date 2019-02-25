@@ -101,6 +101,40 @@ app.post("/forgotPassword", async function(req, res) {
   
 });
 
+app.post("/passwordReset", async function(req, res) {
+  const user = await User.findOne({ email: req.body.email }).catch(e =>
+    console.log(e)
+  );
+  if(user.pin != req.body.pin){
+    res.send({
+      status: 400,
+      message: "PIN does not match"
+    }); 
+    return;
+  }
+  if(user.expiration.getTime() < (new Date()).getTime()){
+    res.send({
+      status: 400,
+      message: "PIN is expired"
+    }); 
+    return;
+  } 
+  //user matches, change expiration
+  var date = new Date();
+  // remove a day to the current date to expire it
+  date.setDate(date.getDate() - 1);
+  user.expiration = date;
+  user.password = req.body.password;
+  await user.save();
+ 
+  res.send({
+    status:200,
+    message:"Password successfully reset"
+  })
+  
+});
+
+
 app.listen(8000, function() {
   console.log("Listening on http://localhost:8000");
 });
