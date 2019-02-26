@@ -8,7 +8,7 @@ const app = express();
 
 app.use(bodyParser.urlencoded());
 app.use(cors());
-app.use(bodyParser.json());
+// app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/", function(req, res) {
@@ -33,19 +33,25 @@ app.get("/put/:name", function(req, res) {
   res.send("Added User " + req.params.name);
 });
 
-app.get("/register", function(req, res) {
-  res.send(
-    "this is /register, where you can put your information in a form to create an account"
-  );
-});
-
 app.post("/register", async function(req, res, next) {
-  if (!req.body) return res.sendStatus(400);
+  if (!req.body.email) {
+    console.log("Please enter valid arguemtns for the fields provided");
+    res.status(400);
+    return res.send({status: 400, message: "Please enter valid arguments for the fields provided."});
+  }
+  if (await User.findOne({ email: req.body.email })) {
+    console.log("User already exists. Please try again.");
+    res.status(400);
+    return res.send({status: 400, message: "User already exists. Please try again."});
+  }
   const user = new User(req.body);
-  await user.save().then(user => {
-    console.log("User added successfully");
+  await user.save()
+  .then(user => {
+      console.log("User added successfully");
   });
-  res.send("email: " + req.body.email + "\nusername: " + req.body.username);
+  res.status(200);
+  return res.send("email: " + req.body.email + "\nusername: " + req.body.username);
+  
 });
 
 app.post("/forgotPassword", async function(req, res) {
