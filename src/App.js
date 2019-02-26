@@ -53,8 +53,12 @@ app.post("/forgotPassword", async function(req, res) {
     console.log(e)
   );
   console.log(user.expiration);
-  // TODO: handle the config file change in security question 
-  if (user && req.body.answer && user.answer === req.body.answer.toLowerCase()) {
+  // TODO: handle the config file change in security question
+  if (
+    user &&
+    req.body.answer &&
+    user.answer === req.body.answer.toLowerCase()
+  ) {
     //user found, update pin
     user.pin = Math.floor(Math.random() * (100000000 - 100000 + 1)) + 100000;
     var date = new Date();
@@ -84,10 +88,10 @@ app.post("/forgotPassword", async function(req, res) {
         console.log(e);
         res.send({
           status: 500,
-          message: "An internal server error occured and the email could not be sent."
-         });
-        }
-      );
+          message:
+            "An internal server error occured and the email could not be sent."
+        });
+      });
     res.send({
       status: 200,
       message: "Sent password reset PIN to user if they exist in the database."
@@ -96,80 +100,75 @@ app.post("/forgotPassword", async function(req, res) {
     res.send({
       status: 400,
       message: "User does not exist in the DB."
-    }); 
+    });
   }
-  
 });
 
 app.post("/passwordReset", async function(req, res) {
   const user = await User.findOne({ email: req.body.email }).catch(e =>
     console.log(e)
   );
-  if(!user){
+  if (!user) {
     res.send({
       status: 400,
       message: "User does not exist in the database"
-    }); 
+    });
     return;
   }
-  if(user.pin != req.body.pin){
+  if (user.pin != req.body.pin) {
     res.send({
       status: 400,
       message: "PIN does not match"
-    }); 
+    });
     return;
   }
-  if(user.expiration.getTime() < (new Date()).getTime()){
+  if (user.expiration.getTime() < new Date().getTime()) {
     res.send({
       status: 400,
       message: "PIN is expired"
-    }); 
+    });
     return;
-  } 
+  }
   //user matches, change expiration
   var date = new Date();
   // remove a day to the current date to expire it
-  // set date to 24 hours before because we don't want 
+  // set date to 24 hours before because we don't want
   // concurrent requests happening in the same second to both go through
   // (i.e. if the user presses change password button twice)
   date.setDate(date.getDate() - 1);
   user.expiration = date;
   user.password = req.body.password;
   await user.save();
- 
-  res.send({
-    status:200,
-    message:"Password successfully reset"
-  })
-  
-});
 
+  res.send({
+    status: 200,
+    message: "Password successfully reset"
+  });
+});
 
 app.post("/getSecurityQuestion", async function(req, res) {
   const user = await User.findOne({ email: req.body.email }).catch(e => {
     console.log(e);
   });
-  if(!user){
+  if (!user) {
     res.send({
       status: 400,
       message: "User does not exist in the database"
-    }); 
+    });
     return;
   }
-  if(!user.question){
+  if (!user.question) {
     res.send({
       status: 400,
       message: "No security question set"
-    }); 
+    });
     return;
   }
   res.send({
-    status:200,
-    question:user.question
+    status: 200,
+    question: user.question
   });
-  
 });
-
 
 app.listen(8000, function() {
   console.log("Listening on http://localhost:8000");
