@@ -5,10 +5,15 @@
     "docs:dev": "docz dev"
   },
   "dependencies": {
+    "@sendgrid/mail": "^6.3.1",
+    "body-parser": "^1.18.3",
     "cors": "^2.8.5",
     "docz": "^0.13.7",
     "docz-theme-default": "^0.13.7",
     "express": "^4.16.4",
-    "mongoose": "^5.4.11"
+    "googleapis": "27",
+    "mongoose": "^5.4.11",
+    "nodemailer": "^5.1.1",
+    "nodemon": "^1.18.10"
   }
 }
