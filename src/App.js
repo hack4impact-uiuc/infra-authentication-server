@@ -3,7 +3,7 @@ const nodemailer = require("nodemailer");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const User = require("./models/User");
-var bodyParser = require("body-parser");
+const bodyParser = require("body-parser");
 const app = express();
 
 app.use(bodyParser.urlencoded());
@@ -129,6 +129,9 @@ app.post("/passwordReset", async function(req, res) {
   //user matches, change expiration
   var date = new Date();
   // remove a day to the current date to expire it
+  // set date to 24 hours before because we don't want 
+  // concurrent requests happening in the same second to both go through
+  // (i.e. if the user presses change password button twice)
   date.setDate(date.getDate() - 1);
   user.expiration = date;
   user.password = req.body.password;
