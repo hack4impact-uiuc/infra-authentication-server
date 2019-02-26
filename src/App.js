@@ -34,24 +34,58 @@ app.get("/put/:name", function(req, res) {
 });
 
 app.post("/register", async function(req, res, next) {
-  if (!req.body.email) {
+  // no email provided
+  if (!req.body.email | !req.body.password) {
     console.log("Please enter valid arguemtns for the fields provided");
     res.status(400);
-    return res.send({status: 400, message: "Please enter valid arguments for the fields provided."});
+    return res.send({
+      status: 400,
+      message: "Please enter valid arguments for the fields provided."
+    });
   }
+
+  // email already in database
   if (await User.findOne({ email: req.body.email })) {
     console.log("User already exists. Please try again.");
     res.status(400);
-    return res.send({status: 400, message: "User already exists. Please try again."});
+    return res.send({
+      status: 400,
+      message: "User already exists. Please try again."
+    });
   }
+
+  // email follows regex patterns LOL lord help me
+  let email_regex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  if (!email_regex.test(req.body.email)) {
+    console.log("Email is not valid. Please try again.");
+    res.status(400);
+    return res.send({
+      status: 400,
+      message: "Email is not valid. Please try again."
+    });
+  }
+
+  // strong password regex (this should be on fronend as form validation, then send hashed password to backend)
+  // endpoint doesn't need to validate password
+  let pass_regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/;
+  if (!pass_regex.test(req.body.password)) {
+    console.log("Password is not secure enough. Please try again.");
+    res.status(400);
+    return res.send({
+      status: 400,
+      message: "Password is not secure enough. Please try again."
+    });
+  }
+
+  // create user with given form input data
   const user = new User(req.body);
-  await user.save()
-  .then(user => {
-      console.log("User added successfully");
+  await user.save().then(user => {
+    console.log("User added successfully");
   });
   res.status(200);
-  return res.send("email: " + req.body.email + "\nusername: " + req.body.username);
-  
+  return res.send(
+    "email: " + req.body.email + "\nusername: " + req.body.username
+  );
 });
 
 app.post("/forgotPassword", async function(req, res) {
