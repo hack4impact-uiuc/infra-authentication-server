@@ -49,6 +49,8 @@ app.post("/register", async function(req, res, next) {
   });
   res.send("email: " + req.body.email + "\nusername: " + req.body.username);
 });
-app.listen(8000, function() {
+const server = app.listen(8000, function() {
   console.log("Listening on http://localhost:8000");
 });
+
+module.exports = { app: app, server: server };

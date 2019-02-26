@@ -2,19 +2,23 @@
   "name": "infra-authentication-server",
   "scripts": {
     "start": "node src/app.js",
-    "docs:dev": "docz dev"
+    "docs:dev": "docz dev",
+    "test": "mocha \"./{,!(node_modules)/**/}*.test.js\""
   },
   "dependencies": {
     "@sendgrid/mail": "^6.3.1",
     "body-parser": "^1.18.3",
+    "chai": "^4.2.0",
     "cors": "^2.8.5",
     "docz": "^0.13.7",
     "docz-theme-default": "^0.13.7",
     "express": "^4.16.4",
     "googleapis": "27",
+    "mocha": "^6.0.2",
     "mongoose": "^5.4.11",
     "nodemailer": "^5.1.1",
-    "nodemon": "^1.18.10"
+    "nodemon": "^1.18.10",
+    "supertest": "^3.4.2"
   },
   "husky": {
     "hooks": {
