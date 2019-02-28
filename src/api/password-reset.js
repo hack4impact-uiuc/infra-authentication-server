@@ -8,7 +8,6 @@ router.post("/forgotPassword", async function(req, res) {
   const user = await User.findOne({ email: req.body.email }).catch(e =>
     console.log(e)
   );
-  console.log(user.expiration);
   // TODO: handle the config file change in security question
   if (!user) {
     res.status(400).send({

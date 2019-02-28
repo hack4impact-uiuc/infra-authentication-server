@@ -5,12 +5,15 @@ const cors = require("cors");
 const User = require("./models/User");
 const bodyParser = require("body-parser");
 const app = express();
+require("dotenv").config();
 
 app.use(bodyParser.urlencoded());
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
 const router = require("./api/password-reset.js");
+
 app.use("/", router);
 
 app.get("/", function(req, res) {

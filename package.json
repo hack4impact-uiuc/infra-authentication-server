@@ -12,6 +12,7 @@
     "cors": "^2.8.5",
     "docz": "^0.13.7",
     "docz-theme-default": "^0.13.7",
+    "dotenv": "^6.2.0",
     "express": "^4.16.4",
     "googleapis": "27",
     "mocha": "^6.0.2",
