@@ -88,8 +88,9 @@ app.post("/register", async function(req, res, next) {
   });
 });
 
+// TODO: take password from frontend, compare tokens??? or hashed password
 app.post("/login", async function(req, res) {
-  // nothing
+  // un-jwt-ify the given password, see if it's a match with the token associated with the email.
 });
 
 app.post("/forgotPassword", async function(req, res) {
