@@ -38,6 +38,7 @@ app.get("/put/:name", function(req, res) {
   res.send("Added User " + req.params.name);
 });
 
+// TODO: send token into user db
 app.post("/register", async function(req, res, next) {
   // no email provided --> invalid
   if (!req.body.email | !req.body.password) {
@@ -64,23 +65,31 @@ app.post("/register", async function(req, res, next) {
    * {
    *    //uuid: automatically done in when sent to db? i think
    *    email: string,
-   *    token: string
+   *    token: string, generated in a more secure way than what i have rn lol
    * }
    */
+  // token generated with email and password with our "secret_token"
+  const jwt_token = jwt.sign(
+    { id: req.body.email, password: req.body.password },
+    SECRET_TOKEN
+  );
+  const user_data = {
+    email: req.body.email,
+    token: jwt_token
+  };
   const user = new User(req.body);
   await user.save().then(user => {
     console.log("User added successfully");
   });
   res.status(200);
-  const token = jwt.sign(
-    { id: req.body.email, password: req.body.password },
-    SECRET_TOKEN
-  );
-  console.log(token);
   return res.send({
     status: 200,
     message: "email: " + req.body.email + "\npassword: " + token
   });
+});
+
+app.post("/login", async function(req, res) {
+  // nothing
 });
 
 app.post("/forgotPassword", async function(req, res) {
