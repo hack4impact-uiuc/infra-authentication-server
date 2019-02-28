@@ -11,7 +11,7 @@ router.post("/forgotPassword", async function(req, res) {
   console.log(user.expiration);
   // TODO: handle the config file change in security question
   if (!user) {
-    res.send({
+    res.status(400).send({
       status: 400,
       message: "User does not exist in the DB."
     });
@@ -51,12 +51,12 @@ router.post("/forgotPassword", async function(req, res) {
             "An internal server error occured and the email could not be sent."
         });
       });
-    res.send({
+    res.status(200).send({
       status: 200,
       message: "Sent password reset PIN to user if they exist in the database."
     });
   } else {
-    res.send({
+    res.status(400).send({
       status: 400,
       message: "No answer specified."
     });
@@ -66,7 +66,6 @@ router.post("/forgotPassword", async function(req, res) {
 router.post("/passwordReset", async function(req, res) {
   console.log(req.body);
   if (!req.body || !req.body.email) {
-    console.log("HERE");
     res.status(400).send({
       status: 400,
       message: "Malformed request"
@@ -77,44 +76,41 @@ router.post("/passwordReset", async function(req, res) {
     console.log(e)
   );
   if (!user) {
-    res.send({
+    res.status(400).send({
       status: 400,
       message: "User does not exist in the database"
     });
     return;
   }
   if (user.pin && user.pin != req.body.pin) {
-    res.send({
+    res.status(400).send({
       status: 400,
       message: "PIN does not match"
     });
     return;
-
-    console.log(user.expiration.getTime());
-    console.log(new Date().getTime());
-    if (user.expiration && user.expiration.getTime() < new Date().getTime()) {
-      res.send({
-        status: 400,
-        message: "PIN is expired"
-      });
-      return;
-    }
-    // user matches, change expiration
-    var date = new Date();
-    // remove a day to the current date to expire it
-    // set date to 24 hours before because we don't want
-    // concurrent requests happening in the same second to both go through
-    // (i.e. if the user presses change password button twice)
-    date.setDate(date.getDate() - 1);
-    user.expiration = date;
-    user.password = req.body.password;
-    await user.save();
-
-    res.send({
-      status: 200,
-      message: "Password successfully reset"
-    });
   }
+  if (!user.expiration || user.expiration.getTime() < new Date().getTime()) {
+    res.status(400).send({
+      status: 400,
+      message: "PIN is expired or expiration field doesn't exist in the DB"
+    });
+    return;
+  }
+  // user matches, change expiration
+  var date = new Date();
+  // remove a day to the current date to expire it
+  // set date to 24 hours before because we don't want
+  // concurrent requests happening in the same second to both go through
+  // (i.e. if the user presses change password button twice)
+  date.setDate(date.getDate() - 1);
+  user.expiration = date;
+  user.password = req.body.password;
+  await user.save();
+
+  res.status(200).send({
+    status: 200,
+    message: "Password successfully reset"
+  });
 });
 
 router.post("/getSecurityQuestion", async function(req, res) {
@@ -122,20 +118,20 @@ router.post("/getSecurityQuestion", async function(req, res) {
     console.log(e);
   });
   if (!user) {
-    res.send({
+    res.status(400).send({
       status: 400,
       message: "User does not exist in the database"
     });
     return;
   }
   if (!user.question) {
-    res.send({
+    res.status(400).send({
       status: 400,
       message: "No security question set"
     });
     return;
   }
-  res.send({
+  res.status(200).send({
     status: 200,
     question: user.question
   });

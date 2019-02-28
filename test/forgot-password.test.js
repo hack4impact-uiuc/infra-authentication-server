@@ -9,7 +9,7 @@ after(done => {
 });
 
 describe("POST /passwordReset", function() {
-  it("respond with json containing a list of all users", async () => {
+  it("returns a 400 on an empty body", async () => {
     const response = await request(app)
       .post("/passwordReset")
       .set("Accept", "application/json")
