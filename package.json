@@ -1,14 +1,18 @@
 {
   "name": "infra-authentication-server",
   "scripts": {
-    "start": "node src/app.js",
+    "start": "node src/App.js",
     "docs:dev": "docz dev"
   },
   "dependencies": {
+    "body-parser": "^1.18.3",
     "cors": "^2.8.5",
     "docz": "^0.13.7",
     "docz-theme-default": "^0.13.7",
     "express": "^4.16.4",
-    "mongoose": "^5.4.11"
+    "jsonwebtoken": "^8.5.0",
+    "jwt-decode": "^2.2.0",
+    "mongoose": "^5.4.11",
+    "node-fetch": "^2.3.0"
   }
 }
