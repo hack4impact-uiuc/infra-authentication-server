@@ -27,7 +27,6 @@ const config = 'src/config/roles.yml'
 const parseRolesConfig = () => {
     const parseRet = { success: false, roles: {dict: {}, list: []}, error: undefined }
     try {
-        console.log(fs.existsSync(config))
         contents = fs.existsSync(config) ?  fs.readFileSync(config, 'utf8') : fs.readFileSync(defaultConfig, 'utf8')
         data = yaml.load(contents);
         if(!data.roles) {
@@ -66,6 +65,5 @@ module.exports = () => {
         }
     }
     // more parse
-    console.log(global.roles)
     return { success: true, error: ''}
 }

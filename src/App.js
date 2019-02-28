@@ -37,13 +37,13 @@ app.post("/auth", async function (req, res) {
 
 app.get("/users", async function (req, res) {
   const allUsers = await User.find();
-  const names = allUsers.map(user => user.username);
+  const names = allUsers.map(user => user);
   res.send(names);
 });
 
 app.get('/roles', async function (req, res) {
   if (!req.headers.token) { res.send({ error: 'token not provided' }) }
-  const authenticated = verifyJWT(req.headers.token)
+  const authenticated = await verifyJWT(req.headers.token)
   // only allow super admin or second level admin?
   if (!authenticated.success) {
     if (!!authenticated.error) {
@@ -72,11 +72,15 @@ app.post("/roleschange", async function (req, res) {
       res.send({ error: 'No data provided' })
     } else {
       const failedPromotions = []
-      Object.keys(usersToLevelChange).forEach((user) => {
+      Object.keys(usersToLevelChange).forEach(async (user) => {
         const levelToChange = usersToLevelChange[user]
-        // the lower the integer value returned by validLevels the higher the level
-        if (!!validLevels[levelToChange] && rolesDict[levelToChange] >= rolesDict[userLevel]) {
-          levelChange(user, levelToChange)
+        console.log(levelToChange)
+        if (!!rolesDict[levelToChange] && rolesDict[levelToChange] >= rolesDict[userLevel]) {
+          const levelChangeOutcome = await levelChange(user, levelToChange)
+          console.log(levelChangeOutcome)
+          if (!levelChangeOutcome.success) {
+            failedPromotions.push(user)
+          }
         } else {
           failedPromotions.push(user)
         }
@@ -99,11 +103,11 @@ app.post("/roleschange", async function (req, res) {
   }
 })
 
-app.get("/put/:name", function (req, res) {
-  var user = new User({ username: req.params.name, passord: "demo" });
+app.get("/put/:level", function (req, res) {
+  var user = new User({ username: 'nithins2', password: "demo", userLevel: req.params.level });
   user.save();
-  console.log("Added User " + req.params.name);
-  res.send("Added User " + req.params.name);
+  console.log("Added User " + req.params.level);
+  res.send("Added User " + req.params.level);
 });
 
 /*
@@ -114,13 +118,33 @@ app.get("/put/:name", function (req, res) {
     userLevel: one of keys in validLevels
   }
 */
-const verifyJWT = (token) => {
-  // i mean here someone would do some bullshit to the token like authenticating it and grabbing data from it
-  return {
-    success: true,
-    userLevel: 'superAdmin'
-  }
+const verifyJWT = async(id) => {
+  console.log(userID, 'nithin')
+  User.findById(id, function (err, doc) {
+    console.log(id)
+    console.log(doc.userLevel)
+    if (err) {
+      return {
+        success: false,
+        userLevel: 'generalUser'
+      }
+    }
+    return {
+      success: true,
+      userLevel: doc.userLevel
+    }
+  })
 }
-const levelChange = (userID, level) => {
-  console.log(`${userID} level changed to ${level}`)
+
+const levelChange = async (userID, level) => {
+  User.findById(userID, function (err, user) {
+    console.log(userID, 'level change')
+    if (err) {
+      return { success: false, message: err }
+    }
+    user.userLevel = level
+    user.save();
+    console.log(`${userID} level changed to ${level}`)
+    return { success: true }
+  });
 }
