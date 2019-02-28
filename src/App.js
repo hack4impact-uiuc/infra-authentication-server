@@ -5,6 +5,11 @@ const cors = require("cors");
 const User = require("./models/User");
 const bodyParser = require("body-parser");
 const app = express();
+const jwt = require("jsonwebtoken");
+const exjwt = require("express-jwt");
+
+// var SECRET_TOKEN = process.env.SECRET_TOKEN;
+var SECRET_TOKEN = "helga_has_n000000_idea_what_she_doin";
 
 app.use(bodyParser.urlencoded());
 app.use(cors());
@@ -34,7 +39,7 @@ app.get("/put/:name", function(req, res) {
 });
 
 app.post("/register", async function(req, res, next) {
-  // no email provided
+  // no email provided --> invalid
   if (!req.body.email | !req.body.password) {
     console.log("Please enter valid arguemtns for the fields provided");
     res.status(400);
@@ -44,7 +49,7 @@ app.post("/register", async function(req, res, next) {
     });
   }
 
-  // email already in database
+  // email already in database --> invalid
   if (await User.findOne({ email: req.body.email })) {
     console.log("User already exists. Please try again.");
     res.status(400);
@@ -54,38 +59,28 @@ app.post("/register", async function(req, res, next) {
     });
   }
 
-  // email follows regex patterns LOL lord help me
-  let email_regex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-  if (!email_regex.test(req.body.email)) {
-    console.log("Email is not valid. Please try again.");
-    res.status(400);
-    return res.send({
-      status: 400,
-      message: "Email is not valid. Please try again."
-    });
-  }
-
-  // strong password regex (this should be on fronend as form validation, then send hashed password to backend)
-  // endpoint doesn't need to validate password
-  let pass_regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/;
-  if (!pass_regex.test(req.body.password)) {
-    console.log("Password is not secure enough. Please try again.");
-    res.status(400);
-    return res.send({
-      status: 400,
-      message: "Password is not secure enough. Please try again."
-    });
-  }
-
   // create user with given form input data
+  /**
+   * {
+   *    //uuid: automatically done in when sent to db? i think
+   *    email: string,
+   *    token: string
+   * }
+   */
   const user = new User(req.body);
   await user.save().then(user => {
     console.log("User added successfully");
   });
   res.status(200);
-  return res.send(
-    "email: " + req.body.email + "\nusername: " + req.body.username
+  const token = jwt.sign(
+    { id: req.body.email, password: req.body.password },
+    SECRET_TOKEN
   );
+  console.log(token);
+  return res.send({
+    status: 200,
+    message: "email: " + req.body.email + "\npassword: " + token
+  });
 });
 
 app.post("/forgotPassword", async function(req, res) {
