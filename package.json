@@ -1,7 +1,7 @@
 {
   "name": "infra-authentication-server",
   "scripts": {
-    "start": "node src/app.js",
+    "start": "nodemon src/startServer.js",
     "docs:dev": "docz dev",
     "test": "mocha \"./{,!(node_modules)/**/}*.test.js\""
   },

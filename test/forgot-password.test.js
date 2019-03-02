@@ -1,6 +1,19 @@
-const { app, server } = require("../src/App");
+const { app } = require("../src/App");
 const request = require("supertest");
+const User = require("../src/models/User.js");
 const { mongoose, db } = require("./../src/utils/index");
+var server;
+
+before(done => {
+  server = app.listen(8000);
+  // Make a DB connection before starting the tests so the first test
+  // doesn't throw off timing if doing performance testing
+  User.startSession(() => {
+    console.log("Successfully started session on port 8000");
+    done();
+  });
+});
+
 after(done => {
   server.close();
   mongoose.connection.close();
@@ -9,35 +22,35 @@ after(done => {
 
 describe("POST /forgotPassword", function() {
   it("returns 400 on an empty body", async () => {
-    const response = await request(app)
+    const response = await request(server)
       .post("/forgotPassword")
       .type("form")
       .send("")
       .expect(400, /malformed request/gi);
   });
   it("returns 400 on missing required information", async () => {
-    const response = await request(app)
+    const response = await request(server)
       .post("/forgotPassword")
       .type("form")
       .send("abc=def")
       .expect(400, /malformed request/gi);
   });
   it("returns 400 on invalid email lookup", async () => {
-    const response = await request(app)
+    const response = await request(server)
       .post("/forgotPassword")
       .type("form")
       .send("email=userthatdoesntexist@notgmail.com")
       .expect(400, /"status":400.+User does not exist/gi);
   });
   it("returns 400 on no answer specified in the request", async () => {
-    const response = await request(app)
+    const response = await request(server)
       .post("/forgotPassword")
       .type("form")
       .send("email=nosecurityq@example.com")
       .expect(400, /"status":400.+No answer sent/gi);
   });
   it("returns 400 on no answer specified in the DB", async () => {
-    const response = await request(app)
+    const response = await request(server)
       .post("/forgotPassword")
       .type("form")
       .send("email=nosecurityq@example.com")
@@ -48,28 +61,28 @@ describe("POST /forgotPassword", function() {
 
 describe("POST /passwordReset", function() {
   it("returns 400 on an empty body", async () => {
-    const response = await request(app)
+    const response = await request(server)
       .post("/passwordReset")
       .type("form")
       .send("")
       .expect(400, /malformed request/gi);
   });
   it("returns 400 on missing required information", async () => {
-    const response = await request(app)
+    const response = await request(server)
       .post("/passwordReset")
       .type("form")
       .send("abc=def")
       .expect(400, /malformed request/gi);
   });
   it("returns 400 on invalid email lookup", async () => {
-    const response = await request(app)
+    const response = await request(server)
       .post("/passwordReset")
       .type("form")
       .send("email=userthatdoesntexist@notgmail.com")
       .expect(400, /"status":400.+User does not exist/gi);
   });
   it("returns 400 on invalid PIN", async () => {
-    const response = await request(app)
+    const response = await request(server)
       .post("/passwordReset")
       .type("form")
       .send("email=nosecurityq@example.com")
@@ -77,7 +90,7 @@ describe("POST /passwordReset", function() {
       .expect(400, /"status":400.+PIN does not match/gi);
   });
   it("returns 400 if the PIN is valid but expired", async () => {
-    const response = await request(app)
+    const response = await request(server)
       .post("/passwordReset")
       .type("form")
       .send("email=nosecurityq@example.com")
@@ -88,14 +101,14 @@ describe("POST /passwordReset", function() {
 
 describe("GET /getSecurityQuestion", function() {
   it("returns 400 on an empty body", async () => {
-    const response = await request(app)
+    const response = await request(server)
       .get("/getSecurityQuestion")
       .set("Accept", "application/json")
       .expect(400);
   });
 
   it("returns 400 on an invalid email address", async () => {
-    const response = await request(app)
+    const response = await request(server)
       .get("/getSecurityQuestion")
       .type("form")
       .send("email=joshb1050@gmail.coms")
@@ -106,7 +119,7 @@ describe("GET /getSecurityQuestion", function() {
   });
 
   it("returns 400 on a user without security question set", async () => {
-    const response = await request(app)
+    const response = await request(server)
       .get("/getSecurityQuestion")
       .type("form")
       .send("email=nosecurityq@example.com")
@@ -114,7 +127,7 @@ describe("GET /getSecurityQuestion", function() {
   });
 
   it("returns 200 for a user with a valid email address", async () => {
-    const response = await request(app)
+    const response = await request(server)
       .get("/getSecurityQuestion")
       .type("form")
       .send("email=joshb1050@gmail.com")

@@ -7,7 +7,7 @@ const bodyParser = require("body-parser");
 const app = express();
 require("dotenv").config();
 
-app.use(bodyParser.urlencoded());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -53,8 +53,4 @@ app.post("/register", async function(req, res, next) {
   res.send("email: " + req.body.email + "\nusername: " + req.body.username);
 });
 
-const server = app.listen(8000, function() {
-  console.log("Listening on http://localhost:8000");
-});
-
-module.exports = { app, server };
+module.exports = { app };
