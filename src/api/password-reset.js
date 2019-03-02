@@ -4,7 +4,18 @@ const cors = require("cors");
 const User = require("../models/User");
 const bodyParser = require("body-parser");
 
+sendMalformedRequest = res => {
+  res.status(400).send({
+    status: 400,
+    message: "Malformed request"
+  });
+};
+
 router.post("/forgotPassword", async function(req, res) {
+  if (!req.body || !req.body.email) {
+    sendMalformedRequest(res);
+    return;
+  }
   const user = await User.findOne({ email: req.body.email }).catch(e =>
     console.log(e)
   );
@@ -54,21 +65,27 @@ router.post("/forgotPassword", async function(req, res) {
       status: 200,
       message: "Sent password reset PIN to user if they exist in the database."
     });
+  } else if (!req.body.answer) {
+    res.status(400).send({
+      status: 400,
+      message: "No answer sent in the request."
+    });
+  } else if (!user.answer) {
+    res.status(400).send({
+      status: 400,
+      message: "No answer specified in the DB"
+    });
   } else {
     res.status(400).send({
       status: 400,
-      message: "No answer specified."
+      message: "Answer didn't match what was specified in the DB"
     });
   }
 });
 
 router.post("/passwordReset", async function(req, res) {
-  console.log(req.body);
   if (!req.body || !req.body.email) {
-    res.status(400).send({
-      status: 400,
-      message: "Malformed request"
-    });
+    sendMalformedRequest(res);
     return;
   }
   const user = await User.findOne({ email: req.body.email }).catch(e =>
@@ -112,7 +129,11 @@ router.post("/passwordReset", async function(req, res) {
   });
 });
 
-router.post("/getSecurityQuestion", async function(req, res) {
+router.get("/getSecurityQuestion", async function(req, res) {
+  if (!req.body || !req.body.email) {
+    sendMalformedRequest(res);
+    return;
+  }
   const user = await User.findOne({ email: req.body.email }).catch(e => {
     console.log(e);
   });
