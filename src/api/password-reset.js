@@ -1,18 +1,27 @@
 const router = require("express").Router();
 const nodemailer = require("nodemailer");
-const mongoose = require("mongoose");
 const cors = require("cors");
 const User = require("../models/User");
 const bodyParser = require("body-parser");
 
+sendMalformedRequest = res => {
+  res.status(400).send({
+    status: 400,
+    message: "Malformed request"
+  });
+};
+
 router.post("/forgotPassword", async function(req, res) {
+  if (!req.body || !req.body.email) {
+    sendMalformedRequest(res);
+    return;
+  }
   const user = await User.findOne({ email: req.body.email }).catch(e =>
     console.log(e)
   );
-  console.log(user.expiration);
   // TODO: handle the config file change in security question
   if (!user) {
-    res.send({
+    res.status(400).send({
       status: 400,
       message: "User does not exist in the DB."
     });
@@ -52,44 +61,58 @@ router.post("/forgotPassword", async function(req, res) {
             "An internal server error occured and the email could not be sent."
         });
       });
-    res.send({
+    res.status(200).send({
       status: 200,
       message: "Sent password reset PIN to user if they exist in the database."
     });
-  } else {
-    res.send({
+  } else if (!req.body.answer) {
+    res.status(400).send({
       status: 400,
-      message: "No answer specified."
+      message: "No answer sent in the request."
+    });
+  } else if (!user.answer) {
+    res.status(400).send({
+      status: 400,
+      message: "No answer specified in the DB"
+    });
+  } else {
+    res.status(400).send({
+      status: 400,
+      message: "Answer didn't match what was specified in the DB"
     });
   }
 });
 
 router.post("/passwordReset", async function(req, res) {
+  if (!req.body || !req.body.email) {
+    sendMalformedRequest(res);
+    return;
+  }
   const user = await User.findOne({ email: req.body.email }).catch(e =>
     console.log(e)
   );
   if (!user) {
-    res.send({
+    res.status(400).send({
       status: 400,
       message: "User does not exist in the database"
     });
     return;
   }
-  if (user.pin != req.body.pin) {
-    res.send({
+  if (user.pin && user.pin != req.body.pin) {
+    res.status(400).send({
       status: 400,
       message: "PIN does not match"
     });
     return;
   }
-  if (user.expiration.getTime() < new Date().getTime()) {
-    res.send({
+  if (!user.expiration || user.expiration.getTime() < new Date().getTime()) {
+    res.status(400).send({
       status: 400,
-      message: "PIN is expired"
+      message: "PIN is expired or expiration field doesn't exist in the DB"
     });
     return;
   }
-  //user matches, change expiration
+  // user matches, change expiration
   var date = new Date();
   // remove a day to the current date to expire it
   // set date to 24 hours before because we don't want
@@ -100,31 +123,35 @@ router.post("/passwordReset", async function(req, res) {
   user.password = req.body.password;
   await user.save();
 
-  res.send({
+  res.status(200).send({
     status: 200,
     message: "Password successfully reset"
   });
 });
 
-router.post("/getSecurityQuestion", async function(req, res) {
+router.get("/getSecurityQuestion", async function(req, res) {
+  if (!req.body || !req.body.email) {
+    sendMalformedRequest(res);
+    return;
+  }
   const user = await User.findOne({ email: req.body.email }).catch(e => {
     console.log(e);
   });
   if (!user) {
-    res.send({
+    res.status(400).send({
       status: 400,
       message: "User does not exist in the database"
     });
     return;
   }
   if (!user.question) {
-    res.send({
+    res.status(400).send({
       status: 400,
       message: "No security question set"
     });
     return;
   }
-  res.send({
+  res.status(200).send({
     status: 200,
     question: user.question
   });
