@@ -1,14 +1,14 @@
 /*
-import {fetch} from 'node-fetch';
+
 import {jwt} from 'jsonwebtoken';
 import {jwt_decode} from 'jwt-decode'; 
 */
-
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser")
 const User = require("./models/User");
+const fetch = require("node-fetch")
 
 const app = express();
 app.use(cors());
@@ -35,23 +35,30 @@ app.get("/put/:name", function(req, res) {
 app.post("/post/google", async function(req, res) {
   if (!req.body) return res.sendStatus(400)
 
+  const tokenInfoRes = await fetch(`https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${req.body.tokenId}`);
+  const payload = await tokenInfoRes.json();
+
   addUser = true
   const allUsers = await User.find()
   allUsers.forEach(function(user) {
-    if (user.email === req.body.email && user.googleAuth){
+    if (user.email === payload.email && user.googleAuth){
       console.log("Welcome back " + user.username)
-      user.tokenId = req.body.tokenId
       res.send("Welcome back " + user.username)
       addUser = false
     }
   })
-  
+
   if(addUser){
-    const user = new User(req.body);
+    const user = new User({
+      email: payload.email,
+      username: payload.name,
+      password: null,
+      googleAuth: true
+    });
     await user.save().then(user => {
       console.log("Google user added successfully");
     });
-    res.send("email: " + req.body.email);
+    res.send("email: " + payload.email);
   }
 });
 
