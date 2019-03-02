@@ -33,14 +33,26 @@ app.get("/put/:name", function(req, res) {
 });
 
 app.post("/post/google", async function(req, res) {
-  console.log(req.body)
-  if (!req.body) return res.sendStatus(400);
-  const user = new User(req.body);
-  await user.save().then(user => {
-    console.log("Google user added successfully");
-  });
-  res.send("email: " + req.body.email);
+  if (!req.body) return res.sendStatus(400)
 
+  addUser = true
+  const allUsers = await User.find()
+  allUsers.forEach(function(user) {
+    if (user.email === req.body.email && user.googleAuth){
+      console.log("Welcome back " + user.username)
+      user.tokenId = req.body.tokenId
+      res.send("Welcome back " + user.username)
+      addUser = false
+    }
+  })
+  
+  if(addUser){
+    const user = new User(req.body);
+    await user.save().then(user => {
+      console.log("Google user added successfully");
+    });
+    res.send("email: " + req.body.email);
+  }
 });
 
 app.listen(8000, function() {
