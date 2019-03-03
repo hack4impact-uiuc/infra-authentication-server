@@ -41,18 +41,23 @@ app.get("/users", async function(req, res) {
 });
 
 app.get("/roles", async function(req, res) {
-  let statusCode = 400;
+  let status = 400;
   if (!req.headers.token) {
-    res.send({ statusCode, error: "token not provided" });
+    res.send({ status, error: "token not provided" });
+    return;
   }
-  statusCode = 401;
+  status = 401;
   const authenticated = await verifyJWT(req.headers.token);
   // only allow super admin or second level admin?
+  console.log(authenticated, "authenticated");
+
   if (!authenticated.success) {
     if (!!authenticated.error) {
-      res.send({ statusCode, error: authenticated.error });
+      res.send({ status, error: authenticated.error });
+      return;
     } else {
-      res.send({ statusCode, error: "Unable to Authenticate" });
+      res.send({ status, error: "Unable to Authenticate" });
+      return;
     }
   } else {
     const { list: rolesList, dict: rolesDict } = global.roles;
@@ -60,28 +65,33 @@ app.get("/roles", async function(req, res) {
       authenticated.success &&
       rolesDict[rolesList[1]] >= rolesDict[authenticated.userLevel]
     ) {
-      statusCode = 200;
-      res.send({ statusCode, data: { roles: rolesList } });
+      status = 200;
+      res.send({ status, data: { roles: rolesList } });
+      return;
     } else {
-      res.send({ statusCode, error: "You do not have the role to view this" });
+      res.send({ status, error: "You do not have the role to view this" });
+      return;
     }
   }
 });
 
 app.post("/roleschange", async function(req, res) {
-  let statusCode = 400;
+  let status = 400;
   if (!req.headers.token) {
-    res.send({ statusCode, error: "token not provided" });
+    res.send({ status, error: "token not provided" });
+    return;
   }
-  statusCode = 401;
+  status = 401;
   const authenticated = verifyJWT(req.headers.token);
   const { dict: rolesDict } = global.roles;
+  console.log(authenticated);
   if (authenticated.success) {
     const { userLevel } = authenticated;
     const { usersToLevelChange } = req.body;
     if (!usersToLevelChange) {
-      statusCode = 400;
-      res.send({ statusCode, error: "No data provided" });
+      status = 400;
+      res.send({ status, error: "No data provided" });
+      return;
     } else {
       const failedPromotions = [];
       Object.keys(usersToLevelChange).forEach(async user => {
@@ -97,27 +107,31 @@ app.post("/roleschange", async function(req, res) {
         }
       });
       if (!!failedPromotions.length) {
-        statusCode = 409; // Indicates that the request could not be processed because of conflict in the current state of the resource
+        status = 409; // Indicates that the request could not be processed because of conflict in the current state of the resource
         res.send({
-          statusCode,
+          status,
           error:
             "the following users were failed to be granted privileges for the following reason(s): input of incorrect userID / input of incorrect userLevel",
           failedPromotions
         });
+        return;
       } else {
         Object.keys(usersToLevelChange),
           forEach(async user => {
             levelChange(user, usersToLevelChange[user]);
           });
-        statusCode = 200;
-        res.send(statusCode, { message: "all user level changes granted" });
+        status = 200;
+        res.send(status, { message: "all user level changes granted" });
+        return;
       }
     }
   } else {
     if (!!authenticated.error) {
-      res.send(statusCode, { error: authenticated.error });
+      res.send(status, { error: authenticated.error });
+      return;
     } else {
-      res.send(statusCode, { error: "Unable to Authenticate" });
+      res.send(status, { error: "Unable to Authenticate" });
+      return;
     }
   }
 });
@@ -139,16 +153,32 @@ app.get("/put/:level", function(req, res) {
   }
 */
 const verifyJWT = async id => {
-  User.findById(id, function(err, doc) {
+  // uses ID for now because there is no token generated
+  console.log(id);
+  return await User.findById(id, function(err, doc) {
+    console.log(doc, "doc");
+    console.log(err, "err");
     if (err) {
       return {
         success: false,
         userLevel: "generalUser"
       };
     }
+    console.log("how am i here");
+    if (doc === null) {
+      return {
+        success: false
+      };
+    }
+    console.log("how am i here");
     return {
       success: true,
       userLevel: doc.userLevel
+    };
+  }).catch(error => {
+    return {
+      success: false,
+      error
     };
   });
 };
