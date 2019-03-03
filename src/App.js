@@ -1,8 +1,3 @@
-/*
-
-import {jwt} from 'jsonwebtoken';
-import {jwt_decode} from 'jwt-decode'; 
-*/
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -35,20 +30,15 @@ app.get("/put/:name", function(req, res) {
 app.post("/post/google", async function(req, res) {
   if (!req.body) return res.sendStatus(400)
 
-  const tokenInfoRes = await fetch(`https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${req.body.tokenId}`);
-  const payload = await tokenInfoRes.json();
+  const tokenInfoRes = await fetch(`https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${req.body.tokenId}`)
+  const payload = await tokenInfoRes.json()
 
-  addUser = true
-  const allUsers = await User.find()
-  allUsers.forEach(function(user) {
-    if (user.email === payload.email && user.googleAuth){
-      console.log("Welcome back " + user.username)
-      res.send("Welcome back " + user.username)
-      addUser = false
-    }
-  })
-
-  if(addUser){
+  const user = await User.find({email: payload.email, googleAuth: true})
+  if (user.length != 0){
+      console.log("Welcome back " + user[0].username)
+      res.send("Welcome back " + user[0].username)
+  }
+  else{
     const user = new User({
       email: payload.email,
       username: payload.name,
@@ -56,44 +46,12 @@ app.post("/post/google", async function(req, res) {
       googleAuth: true
     });
     await user.save().then(user => {
-      console.log("Google user added successfully");
-    });
-    res.send("email: " + payload.email);
+      console.log("Google user added successfully")
+    })
+    res.send("email: " + payload.email)
   }
 });
 
 app.listen(8000, function() {
   console.log("Listening on http://localhost:8000");
 });
-
-/*
-const getaccountFromGoogleToken = async (tokenId) => {
-    const tokenInfoRes = await fetch(`https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${tokenId}`);
-    const payload = await tokenInfoRes.json();
-
-    const [student, teacher] = await Promise.all([Student, Teacher].map(x => x.findOne({ email: payload.email })));
-    return { existing: student || teacher, payload };
-};
-
-app.post('/auth/google', async (req, res) => {
-    try {
-        const { tokenId, role, accessToken } = req.body;
-        const { existing, payload } = await getaccountFromGoogleToken(tokenId);
-
-        if (role === 'student') {
-            const student = await addStudent(payload.name, payload.email, tokenId);
-            const id = toGlobalId('Student', student._id);
-            const ret = {
-                id, name: student.name, email: student.email, gapi_access_token: accessToken, userType: 'student', tokenId,
-            };
-
-            // TODO: store secret key in .env file!!!
-            const token = jwt.sign(ret, 'secret', { expiresIn: '3 hours' });
-            res.json({ role: 'student', data: ret, token });
-        }
-    } catch (e) {
-        console.trace(e);
-    }
-});
-
-*/
