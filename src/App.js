@@ -83,7 +83,7 @@ app.post("/register", async function(req, res, next) {
   res.status(200);
   return res.send({
     status: 200,
-    message: "email: " + req.body.email + "\npassword: " + jwt_token
+    message: "User added successfully! Token: " + jwt_token
   });
 });
 
@@ -103,27 +103,23 @@ app.post("/login", async function(req, res) {
     var decoded = jwt.verify(user.password, SECRET_TOKEN, {
       password: req.body.password
     });
-    console.log("decoded email: " + decoded.email);
-    console.log("decoded pass: " + decoded.password);
     if (req.body.password === decoded.password) {
-      console.log("password match");
+      console.log("Successful login");
       res.status(200);
       return res.send({
         status: 200,
-        message: "email exists and password matches"
+        message: "Successful login! Token: " + user.password
       });
     } else {
+      console.log("Password doesn't match email");
       res.status(200);
       return res.send({
         status: 200,
-        message: "email exists, password don't tho"
+        message: "Passwword incorrect. Please try again."
       });
     }
   } else {
-    // no user associated with given email
-    console.log(
-      "The information you provided does not match our database. Please check your inputs again."
-    );
+    console.log("no user associated with this email");
     res.status(400);
     return res.send({
       status: 400,
