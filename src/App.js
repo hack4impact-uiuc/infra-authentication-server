@@ -38,11 +38,10 @@ app.get("/put/:name", function(req, res) {
   res.send("Added User " + req.params.name);
 });
 
-// TODO: send token into user db
 app.post("/register", async function(req, res, next) {
-  // no email provided --> invalid
+  // no email or password provided --> invalid
   if (!req.body.email | !req.body.password) {
-    console.log("Please enter valid arguemtns for the fields provided");
+    console.log("Please enter valid arguments for the fields provided");
     res.status(400);
     return res.send({
       status: 400,
@@ -70,27 +69,68 @@ app.post("/register", async function(req, res, next) {
    */
   // token generated with email and password with our "secret_token"
   const jwt_token = jwt.sign(
-    { id: req.body.email, password: req.body.password },
+    { email: req.body.email, password: req.body.password },
     SECRET_TOKEN
   );
   const user_data = {
     email: req.body.email,
-    token: jwt_token
+    password: jwt_token
   };
-  const user = new User(req.body);
+  const user = new User(user_data);
   await user.save().then(user => {
     console.log("User added successfully");
   });
   res.status(200);
   return res.send({
     status: 200,
-    message: "email: " + req.body.email + "\npassword: " + token
+    message: "email: " + req.body.email + "\npassword: " + jwt_token
   });
 });
 
-// TODO: take password from frontend, compare tokens??? or hashed password
 app.post("/login", async function(req, res) {
+  // no email or password provided --> invalid
+  if (!req.body.email | !req.body.password) {
+    console.log("Please enter valid argunents for the fields provided");
+    res.status(400);
+    return res.send({
+      status: 400,
+      message: "Please enter valid arguments for the fields provided."
+    });
+  }
   // un-jwt-ify the given password, see if it's a match with the token associated with the email.
+  var user = await User.findOne({ email: req.body.email });
+  if (user) {
+    var decoded = jwt.verify(user.password, SECRET_TOKEN, {
+      password: req.body.password
+    });
+    console.log("decoded email: " + decoded.email);
+    console.log("decoded pass: " + decoded.password);
+    if (req.body.password === decoded.password) {
+      console.log("password match");
+      res.status(200);
+      return res.send({
+        status: 200,
+        message: "email exists and password matches"
+      });
+    } else {
+      res.status(200);
+      return res.send({
+        status: 200,
+        message: "email exists, password don't tho"
+      });
+    }
+  } else {
+    // no user associated with given email
+    console.log(
+      "The information you provided does not match our database. Please check your inputs again."
+    );
+    res.status(400);
+    return res.send({
+      status: 400,
+      message:
+        "The information you provided does not match our database. Please check your inputs again."
+    });
+  }
 });
 
 app.post("/forgotPassword", async function(req, res) {
