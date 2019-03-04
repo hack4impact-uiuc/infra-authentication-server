@@ -83,7 +83,8 @@ app.post("/register", async function(req, res, next) {
   res.status(200);
   return res.send({
     status: 200,
-    message: "User added successfully! Token: " + jwt_token
+    message: "User added successfully!",
+    token: jwt_token
   });
 });
 
@@ -108,13 +109,14 @@ app.post("/login", async function(req, res) {
       res.status(200);
       return res.send({
         status: 200,
-        message: "Successful login! Token: " + user.password
+        message: "Successful login!",
+        token: user.password
       });
     } else {
       console.log("Password doesn't match email");
-      res.status(200);
+      res.status(400);
       return res.send({
-        status: 200,
+        status: 400,
         message: "Passwword incorrect. Please try again."
       });
     }
