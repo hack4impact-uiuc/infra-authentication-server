@@ -2,8 +2,9 @@ const express = require("express");
 const nodemailer = require("nodemailer");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const User = require("./models/User");
 const bodyParser = require("body-parser");
+const User = require("./models/User");
+const fetch = require("node-fetch");
 const app = express();
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
@@ -14,7 +15,8 @@ var SECRET_TOKEN = "helga_has_n000000_idea_what_she_doin";
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
-// app.use(bodyParser.json());
+
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const router = require("./api/password-reset.js");
@@ -37,10 +39,42 @@ app.get("/users", async function(req, res) {
 });
 
 app.get("/put/:name", function(req, res) {
-  var user = new User({ username: req.params.name, passord: "demo" });
+  var user = new User({ username: req.params.name, password: "demo" });
   user.save();
   console.log("Added User " + req.params.name);
   res.send("Added User " + req.params.name);
+});
+
+app.post("/post/google", async function(req, res) {
+  if (!req.body) return res.sendStatus(400);
+
+  const tokenInfoRes = await fetch(
+    `https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${
+      req.body.tokenId
+    }`
+  );
+  const payload = await tokenInfoRes.json();
+
+  const user = await User.find({ email: payload.email, googleAuth: true });
+  if (user.length != 0) {
+    console.log("Welcome back " + user[0].username);
+    res.send("Welcome back " + user[0].username);
+  } else {
+    const user = new User({
+      email: payload.email,
+      username: payload.name,
+      password: null,
+      googleAuth: true
+    });
+    await user.save().then(user => {
+      console.log("Google user added successfully");
+    });
+    res.send("email: " + payload.email);
+  }
+});
+
+app.listen(8000, function() {
+  console.log("Listening on http://localhost:8000");
 });
 
 app.post("/register", async function(req, res, next) {

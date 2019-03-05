@@ -7,7 +7,8 @@ const schema = mongoose.Schema({
   question: "string",
   answer: "string",
   pin: "number",
-  expiration: "date"
+  expiration: "date",
+  googleAuth: "boolean"
 });
 const User = mongoose.model("User", schema);
 
