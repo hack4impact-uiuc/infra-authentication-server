@@ -7,29 +7,37 @@ route: /loginandlogout
 
 
 ## Endpoints 
-
-| Endpoint | /login [POST] |
+| Endpoint | /login [POST] (redirected from API to Server) |
 | ------ | ----------- |
 | body   | email, hashed password |
-| response | success or error message, jwt token if the account is authenticated |
+| response | message: success/error, jwt token if the account is authenticated |
 
 
 
 ## Login Workflow
 
 ### Step 1: Filling out the form on the client side
+This includes fields for 
+* email or username
+* password (twice for good measure)
+* an option to sign up using their google accounts<br />
 
-This will include fields for 
-* email
-* password
-* an option to sign up using their google accounts
-
-We will provide an example of the login pages, but let the team customize it towards their needs and integrate it in. 
+The provided form provided for the login is also a default form you can use. Similar to the signup section, integration with the authentication server can be done through these methods:
+* customizing the default component
+* creating a new component altogether to plug into the server
 
 ### Step 2: Sends the login request to the API, redirected by the API to the authentication server. 
+A request will be made to your API, which will then be redirected to the authentication server. <br />
+The authentication server by checking these fields:
+* username
+* password (hashed)
+
+If the information is **validated** (more in next section), the server will send a success message and the jwt token containing the user id and permission level to the API. 
+If it is invalid, we will send an error message that the dev team can display for user notice.
+The API will check for all other required login fields. All of these customizations canb e specified in the config file.
 
 ### Step 3: Authentication Server Validation
-
+For logging in, we will validate a few things:
 * password matches
 * email is verified
 
@@ -41,5 +49,4 @@ If valid, the API will respond to the client with a success message and the jwt 
 
 
 ## Logout Workflow
-
 Step 1: Delete the jwt token from cookies
