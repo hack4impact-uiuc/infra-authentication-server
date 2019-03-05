@@ -43,33 +43,31 @@ app.get("/users", async function(req, res) {
 app.get("/roles", async function(req, res) {
   let status = 400;
   if (!req.headers.token) {
-    res.send({ status, error: "token not provided" });
+    res.status(status).send({ status, error: "token not provided" });
     return;
   }
   status = 401;
   const authenticated = await verifyJWT(req.headers.token);
   // only allow super admin or second level admin?
-  console.log(authenticated, "authenticated");
 
   if (!authenticated.success) {
     if (!!authenticated.error) {
-      res.send({ status, error: authenticated.error });
+      res.status(status).send({ error: authenticated.error });
       return;
     } else {
-      res.send({ status, error: "Unable to Authenticate" });
+      res.status(status).send({ status, error: "Unable to Authenticate" });
       return;
     }
   } else {
     const { list: rolesList, dict: rolesDict } = global.roles;
-    if (
-      authenticated.success &&
-      rolesDict[rolesList[1]] >= rolesDict[authenticated.userLevel]
-    ) {
+    if (rolesDict["admin"] >= rolesDict[authenticated.userLevel]) {
       status = 200;
-      res.send({ status, data: { roles: rolesList } });
+      res.status(status).send({ status, data: { roles: rolesList } });
       return;
     } else {
-      res.send({ status, error: "You do not have the role to view this" });
+      res
+        .status(status)
+        .send({ error: "You do not have the role to view this" });
       return;
     }
   }
@@ -78,40 +76,38 @@ app.get("/roles", async function(req, res) {
 app.post("/roleschange", async function(req, res) {
   let status = 400;
   if (!req.headers.token) {
-    res.send({ status, error: "token not provided" });
+    res.status(status).send({ error: "token not provided" });
     return;
   }
   status = 401;
-  const authenticated = verifyJWT(req.headers.token);
+  const authenticated = await verifyJWT(req.headers.token);
   const { dict: rolesDict } = global.roles;
-  console.log(authenticated);
   if (authenticated.success) {
     const { userLevel } = authenticated;
     const { usersToLevelChange } = req.body;
     if (!usersToLevelChange) {
       status = 400;
-      res.send({ status, error: "No data provided" });
+      res.status(status).send({ error: "No data provided" });
       return;
     } else {
       const failedPromotions = [];
-      Object.keys(usersToLevelChange).forEach(async user => {
-        const levelToChange = usersToLevelChange[user];
+      Object.keys(usersToLevelChange).forEach(async userID => {
+        const levelToChange = usersToLevelChange[userID];
+        const userToChange = ableToFindUser(userID);
         if (
-          !(
-            !!rolesDict[levelToChange] &&
-            rolesDict[levelToChange] >= rolesDict[userLevel] &&
-            ableToFindUser(user)
-          )
+          !rolesDict[levelToChange] ||
+          rolesDict[levelToChange] >= rolesDict[userLevel] ||
+          !userToChange.success ||
+          rolesDict[userLevel] > rolesDict[userToChange.userLevel]
         ) {
-          failedPromotions.push(user);
+          failedPromotions.push(userID);
         }
       });
       if (!!failedPromotions.length) {
         status = 409; // Indicates that the request could not be processed because of conflict in the current state of the resource
-        res.send({
-          status,
+        res.status(status).send({
           error:
-            "the following users were failed to be granted privileges for the following reason(s): input of incorrect userID / input of incorrect userLevel",
+            "the following users were failed to be granted privileges for the following reason(s): input of incorrect userID / input of incorrect userLevel, attempt to level change a user with higher permissions",
           failedPromotions
         });
         return;
@@ -121,16 +117,16 @@ app.post("/roleschange", async function(req, res) {
             levelChange(user, usersToLevelChange[user]);
           });
         status = 200;
-        res.send(status, { message: "all user level changes granted" });
+        res.status(status).send({ message: "all user level changes granted" });
         return;
       }
     }
   } else {
     if (!!authenticated.error) {
-      res.send(status, { error: authenticated.error });
+      res.status(status).send({ error: authenticated.error });
       return;
     } else {
-      res.send(status, { error: "Unable to Authenticate" });
+      res.status(status).send({ error: "Unable to Authenticate" });
       return;
     }
   }
@@ -154,42 +150,47 @@ app.get("/put/:level", function(req, res) {
 */
 const verifyJWT = async id => {
   // uses ID for now because there is no token generated
-  console.log(id);
-  return await User.findById(id, function(err, doc) {
-    console.log(doc, "doc");
-    console.log(err, "err");
+  let verifyRet = {};
+  await User.findById(id, function(err, doc) {
     if (err) {
-      return {
+      verifyRet = {
         success: false,
         userLevel: "generalUser"
       };
+      return;
     }
-    console.log("how am i here");
     if (doc === null) {
-      return {
+      verifyRet = {
         success: false
       };
+      return;
     }
-    console.log("how am i here");
-    return {
+    verifyRet = {
       success: true,
       userLevel: doc.userLevel
     };
+    return;
   }).catch(error => {
-    return {
+    verifyRet = {
       success: false,
       error
     };
+    return;
   });
+  return verifyRet;
 };
 const ableToFindUser = async (userID, level) => {
+  let findRet = { success: false };
   User.findById(userID, function(err, user) {
     if (err) {
-      return false;
+      findRet.error = err;
+      return;
     } else {
-      return true;
+      findRet = { success: true, userLevel: user.userLevel };
+      return;
     }
   });
+  return findRet;
 };
 const levelChange = async (userID, level) => {
   User.findById(userID, function(err, user) {
