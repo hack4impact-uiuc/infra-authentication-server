@@ -10,28 +10,34 @@ Confused? Don't worry, me too.
 ## Some nice links:
 More will be added over time :)
 
+Learn about OAuth:
+* [Frontend Button](https://www.npmjs.com/package/react-google-login)
 * [OAuth 2.0](https://developers.google.com/identity/protocols/OAuth2)
 * [OAuth Web](https://developers.google.com/identity/protocols/OAuth2WebServer)
 * [Playground](https://developers.google.com/oauthplayground/)
+
+Tutorial articles:
 * [Medium article about google api](https://medium.com/@pablo127/google-api-authentication-with-oauth-2-on-the-example-of-gmail-a103c897fd98)
 * [Medium article about express and oauth](https://medium.com/@bogna.ka/integrating-google-oauth-with-express-application-f8a4a2cf3fee)
 * [Extract stuff](https://stackoverflow.com/questions/16501895/how-do-i-get-user-profile-using-google-access-token)
-* [Frontend Button](https://www.npmjs.com/package/react-google-login)
+
+Reference code (credit to Timothy Ko):
 * [LWB Frontend](https://github.com/hack4impact-uiuc/love-without-boundaries/blob/3c8ceb3d76c44ce15b8257cc147ae6cf3b092476/react_frontend/src/components/signin.js)
 * [LWB Backend](https://github.com/hack4impact-uiuc/love-without-boundaries/blob/3c8ceb3d76c44ce15b8257cc147ae6cf3b092476/web_backend/src/index.js)
 
-
 ## Development:
-* Google OAuth stuff. Flask to handle endpoints.
-* Endpoint to talk to Google server. Special endpoints to accomodate for lack of password in server.
+* Google OAuth and Google API server
+* Google button in Frontend
+* Node-fetch and body-parser to handle endpoints and requests to Google servers
+* Includes special endpoints to accomodate for lack of password in server.
 
 ## Diagrams:
 ### Backend
 * Client sends a login request to Google.
 * Google authenticates everything, sends a token back. Client stores this token as cookies.
-* Auth server stores some flag. Don't need to keep password; Google takes care of this.
-* The token is then passed around to the API/auth server to check permissions.
-* Token is passed back to Google auth to make sure nothing fishy is going on. They can also be cycled.
+* Auth server stores a null password and a flag to signal a Google user.
+* Token is passed around to the API/auth server to check permissions.
+* Token is also passed back to Google auth to make sure nothing fishy is going on. They can also be cycled.
 <img src={require('./Workflow.png')} width="500"/>
 * Response is a bunch of json with access token, ID token, refresh time, scope etc.
 * You should be able to specify the scope of the request and access emails, usernames, etc. Not completely sure how to do this yet though.
@@ -48,7 +54,7 @@ More will be added over time :)
 ```
 
 ### Frontend
-"Sign In With Google" button. Google can handle the rest. 
+"Sign In With Google" button that links to Google/Auth server
 
 <img src={require('./GButton.png')} width="150"/>
 
@@ -65,12 +71,3 @@ Hopefully won't have to do much else with their API.
 | See Google button and don't want to use | Continue on like you never saw it. |
 | Don't see Google button and want to use | You're fucked. |
 | Don't see Google button and don't want to use | Nothing happens. |
-
-
-## Feedback 
-
-Michael this is beautiful
-
-Questions to answer
-* Do we need to store the email when sending the request to the auth server? 
-* what do the responses look like? 
