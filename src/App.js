@@ -40,10 +40,8 @@ app.get("/put/:name", function(req, res) {
 
 app.post("/register", async function(req, res, next) {
   // no email or password provided --> invalid
-  if (!req.body.email | !req.body.password) {
-    console.log("Please enter valid arguments for the fields provided");
-    res.status(400);
-    return res.send({
+  if (!req.body.email || !req.body.password) {
+    return res.status(400).send({
       status: 400,
       message: "Please enter valid arguments for the fields provided."
     });
@@ -51,9 +49,7 @@ app.post("/register", async function(req, res, next) {
 
   // email already in database --> invalid
   if (await User.findOne({ email: req.body.email })) {
-    console.log("User already exists. Please try again.");
-    res.status(400);
-    return res.send({
+    return res.status(400).send({
       status: 400,
       message: "User already exists. Please try again."
     });
@@ -80,8 +76,7 @@ app.post("/register", async function(req, res, next) {
   await user.save().then(user => {
     console.log("User added successfully");
   });
-  res.status(200);
-  return res.send({
+  return res.status(200).send({
     status: 200,
     message: "User added successfully!",
     token: jwt_token
@@ -90,10 +85,8 @@ app.post("/register", async function(req, res, next) {
 
 app.post("/login", async function(req, res) {
   // no email or password provided --> invalid
-  if (!req.body.email | !req.body.password) {
-    console.log("Please enter valid argunents for the fields provided");
-    res.status(400);
-    return res.send({
+  if (!req.body.email || !req.body.password) {
+    return res.status(400).send({
       status: 400,
       message: "Please enter valid arguments for the fields provided."
     });
@@ -105,25 +98,19 @@ app.post("/login", async function(req, res) {
       password: req.body.password
     });
     if (req.body.password === decoded.password) {
-      console.log("Successful login");
-      res.status(200);
-      return res.send({
+      return res.status(200).send({
         status: 200,
         message: "Successful login!",
         token: user.password
       });
     } else {
-      console.log("Password doesn't match email");
-      res.status(400);
-      return res.send({
+      return res.status(400).send({
         status: 400,
         message: "Passwword incorrect. Please try again."
       });
     }
   } else {
-    console.log("no user associated with this email");
-    res.status(400);
-    return res.send({
+    return res.status(400).send({
       status: 400,
       message:
         "The information you provided does not match our database. Please check your inputs again."
