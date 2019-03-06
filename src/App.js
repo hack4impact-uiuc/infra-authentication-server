@@ -1,15 +1,16 @@
 const express = require("express");
-
+const jwt = require("jsonwebtoken");
+const exjwt = require("express-jwt");
 const cors = require("cors");
 var bodyParser = require("body-parser");
-const User = require("./models/User");
 const fetch = require("node-fetch");
+
+const User = require("./models/User");
 const { parseConfig } = require("./utils/config-helpers");
 
 /*
   Before init the app: 
     go through the configuration file and initialize the global vars.
-
 */
 global.roles = {};
 const configRet = parseConfig();
@@ -19,8 +20,6 @@ if (!configRet.success) {
 
 const app = express();
 require("dotenv").config();
-const jwt = require("jsonwebtoken");
-const exjwt = require("express-jwt");
 
 // var SECRET_TOKEN = process.env.SECRET_TOKEN;
 var SECRET_TOKEN = "helga_has_n000000_idea_what_she_doin";
@@ -31,18 +30,10 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const router = require("./api/password-reset.js");
+// const router = require("./api/password-reset.js");
+const router = require("./api/index");
 
 app.use("/", router);
-
-app.get("/", function(req, res) {
-  res.send("Hello World");
-});
-
-app.post("/auth", async function(req, res) {
-  console.log("auth");
-  res.send({ result: "success", token: "magic" });
-});
 
 app.get("/users", async function(req, res) {
   const allUsers = await User.find();
@@ -190,6 +181,7 @@ const verifyJWT = async id => {
   });
   return verifyRet;
 };
+
 const ableToFindUser = async (userID, level) => {
   let findRet = { success: false };
   await User.findById(userID, function(err, user) {
@@ -203,6 +195,7 @@ const ableToFindUser = async (userID, level) => {
   });
   return findRet;
 };
+
 const levelChange = async (userID, level) => {
   User.findById(userID, function(err, user) {
     if (err) {
@@ -243,93 +236,14 @@ app.post("/post/google", async function(req, res) {
   }
 });
 
-app.post("/register", async function(req, res, next) {
-  // no email or password provided --> invalid
-  if (!req.body.email || !req.body.password) {
-    return res.status(400).send({
-      status: 400,
-      message: "Please enter valid arguments for the fields provided."
-    });
-  }
+// app.post("/forgotPassword", async function(req, res) {
+//   const user = await User.findOne({ email: req.body.email }).catch(e =>
+//     console.log(e)
+//   );
+// });
 
-  // email already in database --> invalid
-  if (await User.findOne({ email: req.body.email })) {
-    return res.status(400).send({
-      status: 400,
-      message: "User already exists. Please try again."
-    });
-  }
-
-  // create user with given form input data
-  /**
-   * {
-   *    //uuid: automatically done in when sent to db? i think
-   *    email: string,
-   *    token: string, generated in a more secure way than what i have rn lol
-   * }
-   */
-  // token generated with email and password with our "secret_token"
-  const jwt_token = jwt.sign(
-    { email: req.body.email, password: req.body.password },
-    SECRET_TOKEN
-  );
-  const user_data = {
-    email: req.body.email,
-    password: jwt_token
-  };
-  const user = new User(user_data);
-  await user.save().then(user => {
-    console.log("User added successfully");
-  });
-  return res.status(200).send({
-    status: 200,
-    message: "User added successfully!",
-    token: jwt_token
-  });
-});
 const server = app.listen(8000, function() {
   console.log("Listening on http://localhost:8000");
-});
-
-app.post("/login", async function(req, res) {
-  // no email or password provided --> invalid
-  if (!req.body.email || !req.body.password) {
-    return res.status(400).send({
-      status: 400,
-      message: "Please enter valid arguments for the fields provided."
-    });
-  }
-  // un-jwt-ify the given password, see if it's a match with the token associated with the email.
-  var user = await User.findOne({ email: req.body.email });
-  if (user) {
-    var decoded = jwt.verify(user.password, SECRET_TOKEN, {
-      password: req.body.password
-    });
-    if (req.body.password === decoded.password) {
-      return res.status(200).send({
-        status: 200,
-        message: "Successful login!",
-        token: user.password
-      });
-    } else {
-      return res.status(400).send({
-        status: 400,
-        message: "Passwword incorrect. Please try again."
-      });
-    }
-  } else {
-    return res.status(400).send({
-      status: 400,
-      message:
-        "The information you provided does not match our database. Please check your inputs again."
-    });
-  }
-});
-
-app.post("/forgotPassword", async function(req, res) {
-  const user = await User.findOne({ email: req.body.email }).catch(e =>
-    console.log(e)
-  );
 });
 
 module.exports = {
