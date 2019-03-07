@@ -209,10 +209,6 @@ const levelChange = async (userID, level) => {
   });
 };
 
-const server = app.listen(8000, function() {
-  console.log("Listening on http://localhost:8000");
-});
-
 module.exports = {
   app
 };
