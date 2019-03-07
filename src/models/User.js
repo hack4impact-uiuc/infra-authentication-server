@@ -8,10 +8,8 @@ const schema = mongoose.Schema({
   answer: "string",
   pin: "number",
   expiration: "date",
-  userLevel: "string",
   googleAuth: "boolean"
 });
-
 const User = mongoose.model("User", schema);
 
 module.exports = User;

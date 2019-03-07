@@ -1,5 +1,0 @@
-roles:
-    heirarchy:
-        - superAdmin
-        - admin
-        - generalUser
