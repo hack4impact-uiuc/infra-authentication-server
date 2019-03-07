@@ -5,14 +5,9 @@ const User = require("../models/User");
 const bodyParser = require("body-parser");
 const sendResponse = require("./../utils/sendResponse");
 
-// sendMalformedRequest = res => {
-//     sendResponse(res,400,"Malformed request")
-// };
-
 router.post("/forgotPassword", async function(req, res) {
   if (!req.body || !req.body.email) {
     sendResponse(res, 400, "Malformed request");
-    // sendMalformedRequest(res);
     return;
   }
   const user = await User.findOne({ email: req.body.email }).catch(e =>
@@ -50,38 +45,13 @@ router.post("/forgotPassword", async function(req, res) {
         text: "Enter the following pin on the reset page: " + user.pin
       })
       .catch(e => {
-        console.log(e);
-        res.send({
-          status: 500,
-          message:
-            "An internal server error occured and the email could not be sent."
-        });
+        sendResponse(
+          res,
+          500,
+          "An internal server error occured and the email could not be sent."
+        );
       });
-
-    sendResponse(
-      res,
-      200,
-      "Sent password reset PIN to user if they exist in the database."
-    );
-    // res.status(200).send({
-    //   status: 200,
-    //   message: "Sent password reset PIN to user if they exist in the database."
-    // });
-  } else if (!req.body.answer) {
-    res.status(400).send({
-      status: 400,
-      message: "No answer sent in the request."
-    });
-  } else if (!user.answer) {
-    res.status(400).send({
-      status: 400,
-      message: "No answer specified in the DB"
-    });
-  } else {
-    res.status(400).send({
-      status: 400,
-      message: "Answer didn't match what was specified in the DB"
-    });
+    sendResponse(res, 200, "Sent password reset PIN to user if they exist");
   }
 });
 
