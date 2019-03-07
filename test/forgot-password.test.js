@@ -1,11 +1,9 @@
-const { app } = require("../src/App");
+const { app, server } = require("../src/App");
 const request = require("supertest");
 const User = require("../src/models/User.js");
 const { mongoose, db } = require("./../src/utils/index");
-var server;
 
 before(done => {
-  server = app.listen(8000);
   // Make a DB connection before starting the tests so the first test
   // doesn't throw off timing if doing performance testing
   User.startSession(() => {
