@@ -30,7 +30,7 @@ router.post("/register", async function(req, res) {
   );
   const user = new User({
     email: req.body.email,
-    password: jwt_token
+    password: req.body.password
   });
   await user.save().then(user => {
     console.log("User added successfully");

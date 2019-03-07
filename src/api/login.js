@@ -21,10 +21,14 @@ router.post("/login", async function(req, res) {
       password: req.body.password
     });
     if (req.body.password === decoded.password) {
+      const jwt_token = jwt.sign(
+        { email: req.body.email, password: req.body.password },
+        SECRET_TOKEN
+      );
       return res.status(200).send({
         status: 200,
         message: "Successful login!",
-        token: user.password
+        token: jwt_token
       });
     } else {
       return res.status(400).send({
