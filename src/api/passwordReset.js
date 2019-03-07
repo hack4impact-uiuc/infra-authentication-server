@@ -3,41 +3,30 @@ const nodemailer = require("nodemailer");
 const cors = require("cors");
 const User = require("../models/User");
 const bodyParser = require("body-parser");
-
-sendMalformedRequest = res => {
-  res.status(400).send({
-    status: 400,
-    message: "Malformed request"
-  });
-};
+const sendResponse = require("./../utils/sendResponse");
 
 router.post("/passwordReset", async function(req, res) {
   if (!req.body || !req.body.email) {
-    sendMalformedRequest(res);
+    sendResponse(res, 400, "Malformed request");
     return;
   }
   const user = await User.findOne({ email: req.body.email }).catch(e =>
     console.log(e)
   );
   if (!user) {
-    res.status(400).send({
-      status: 400,
-      message: "User does not exist in the database"
-    });
+    sendResponse(res, 400, "User does not exist in the database");
     return;
   }
   if (user.pin && user.pin != req.body.pin) {
-    res.status(400).send({
-      status: 400,
-      message: "PIN does not match"
-    });
+    sendResponse(res, 400, "PIN does not match");
     return;
   }
   if (!user.expiration || user.expiration.getTime() < new Date().getTime()) {
-    res.status(400).send({
-      status: 400,
-      message: "PIN is expired or expiration field doesn't exist in the DB"
-    });
+    sendResponse(
+      res,
+      400,
+      "PIN is expired or expiration field doesn't exist in the DB"
+    );
     return;
   }
   // user matches, change expiration
@@ -51,10 +40,7 @@ router.post("/passwordReset", async function(req, res) {
   user.password = req.body.password;
   await user.save();
 
-  res.status(200).send({
-    status: 200,
-    message: "Password successfully reset"
-  });
+  sendResponse(res, 200, "Password successfully reset");
 });
 
 module.exports = router;

@@ -3,17 +3,11 @@ const nodemailer = require("nodemailer");
 const cors = require("cors");
 const User = require("../models/User");
 const bodyParser = require("body-parser");
-
-sendMalformedRequest = res => {
-  res.status(400).send({
-    status: 400,
-    message: "Malformed request"
-  });
-};
+const sendResponse = require("./../utils/sendResponse");
 
 router.post("/forgotPassword", async function(req, res) {
   if (!req.body || !req.body.email) {
-    sendMalformedRequest(res);
+    sendResponse(res, 400, "Malformed request");
     return;
   }
   const user = await User.findOne({ email: req.body.email }).catch(e =>
@@ -21,10 +15,7 @@ router.post("/forgotPassword", async function(req, res) {
   );
   // TODO: handle the config file change in security question
   if (!user) {
-    res.status(400).send({
-      status: 400,
-      message: "User does not exist in the DB."
-    });
+    sendResponse(res, 400, "User does not exist in the DB.");
     return;
   }
   if (req.body.answer && user.answer === req.body.answer.toLowerCase()) {
@@ -54,32 +45,13 @@ router.post("/forgotPassword", async function(req, res) {
         text: "Enter the following pin on the reset page: " + user.pin
       })
       .catch(e => {
-        console.log(e);
-        res.send({
-          status: 500,
-          message:
-            "An internal server error occured and the email could not be sent."
-        });
+        sendResponse(
+          res,
+          500,
+          "An internal server error occured and the email could not be sent."
+        );
       });
-    res.status(200).send({
-      status: 200,
-      message: "Sent password reset PIN to user if they exist in the database."
-    });
-  } else if (!req.body.answer) {
-    res.status(400).send({
-      status: 400,
-      message: "No answer sent in the request."
-    });
-  } else if (!user.answer) {
-    res.status(400).send({
-      status: 400,
-      message: "No answer specified in the DB"
-    });
-  } else {
-    res.status(400).send({
-      status: 400,
-      message: "Answer didn't match what was specified in the DB"
-    });
+    sendResponse(res, 200, "Sent password reset PIN to user if they exist");
   }
 });
 

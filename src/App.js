@@ -214,6 +214,5 @@ const server = app.listen(8000, function() {
 });
 
 module.exports = {
-  app,
-  server
+  app
 };
