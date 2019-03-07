@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 var SECRET_TOKEN = "helga_has_n000000_idea_what_she_doin";
 const User = require("../models/User");
 const bodyParser = require("body-parser");
+const { sendResponse } = require("./../utils/sendResponse");
 
 router.post("/login", async function(req, res) {
   // no email or password provided --> invalid
@@ -21,23 +22,16 @@ router.post("/login", async function(req, res) {
       password: req.body.password
     });
     if (req.body.password === decoded.password) {
-      return res.status(200).send({
-        status: 200,
-        message: "Successful login!",
-        token: user.password
-      });
+      return sendResponse(res, 200, "Successful login!");
     } else {
-      return res.status(400).send({
-        status: 400,
-        message: "Passwword incorrect. Please try again."
-      });
+      return sendResponse(res, 400, "Passwword incorrect. Please try again.");
     }
   } else {
-    return res.status(400).send({
-      status: 400,
-      message:
-        "The information you provided does not match our database. Please check your inputs again."
-    });
+    return sendResponse(
+      res,
+      400,
+      "The information you provided does not match our database. Please check your inputs again."
+    );
   }
 });
 
