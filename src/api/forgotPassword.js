@@ -3,17 +3,16 @@ const nodemailer = require("nodemailer");
 const cors = require("cors");
 const User = require("../models/User");
 const bodyParser = require("body-parser");
+const sendResponse = require("./../utils/sendResponse");
 
-sendMalformedRequest = res => {
-  res.status(400).send({
-    status: 400,
-    message: "Malformed request"
-  });
-};
+// sendMalformedRequest = res => {
+//     sendResponse(res,400,"Malformed request")
+// };
 
 router.post("/forgotPassword", async function(req, res) {
   if (!req.body || !req.body.email) {
-    sendMalformedRequest(res);
+    sendResponse(res, 400, "Malformed request");
+    // sendMalformedRequest(res);
     return;
   }
   const user = await User.findOne({ email: req.body.email }).catch(e =>
@@ -21,10 +20,7 @@ router.post("/forgotPassword", async function(req, res) {
   );
   // TODO: handle the config file change in security question
   if (!user) {
-    res.status(400).send({
-      status: 400,
-      message: "User does not exist in the DB."
-    });
+    sendResponse(res, 400, "User does not exist in the DB.");
     return;
   }
   if (req.body.answer && user.answer === req.body.answer.toLowerCase()) {
@@ -61,10 +57,16 @@ router.post("/forgotPassword", async function(req, res) {
             "An internal server error occured and the email could not be sent."
         });
       });
-    res.status(200).send({
-      status: 200,
-      message: "Sent password reset PIN to user if they exist in the database."
-    });
+
+    sendResponse(
+      res,
+      200,
+      "Sent password reset PIN to user if they exist in the database."
+    );
+    // res.status(200).send({
+    //   status: 200,
+    //   message: "Sent password reset PIN to user if they exist in the database."
+    // });
   } else if (!req.body.answer) {
     res.status(400).send({
       status: 400,
