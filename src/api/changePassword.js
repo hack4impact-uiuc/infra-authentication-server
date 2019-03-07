@@ -5,11 +5,16 @@ const User = require("../models/User");
 const bodyParser = require("body-parser");
 const jwt = require("jsonwebtoken");
 const exjwt = require("express-jwt");
+const sendResponse = require("../utils/sendResponse");
 const { SECRET_TOKEN } = require("../utils/secret-token");
 
 router.post("/changePassword", async function(req, res) {
   if (!req.body || !req.body.email || !req.body.token || !req.body.password) {
-    sendMalformedRequest(res);
+    sendResponse(
+      res,
+      400,
+      "Request doesn't contain all of: email, token, or password"
+    );
     return;
   }
 
@@ -24,23 +29,20 @@ router.post("/changePassword", async function(req, res) {
     if (user.email === req.body.email && req.body.token === user.password) {
       user.password = new_token;
       user.save();
-      return res.status(200).send({
-        status: 200,
-        message: "Successful change of password!",
-        token: new_token
-      });
+      sendResponse(res, 200, "Successful change of password!");
     } else {
-      return res.status(400).send({
-        status: 400,
-        message: "Username or password incorrect. Please try again."
-      });
+      sendResponse(
+        res,
+        400,
+        "Username or password incorrect. Please try again."
+      );
     }
   } else {
-    return res.status(400).send({
-      status: 400,
-      message:
-        "The information you provided does not match our database. Please check your inputs again."
-    });
+    sendResponse(
+      res,
+      400,
+      "The information you provided does not match our database. Please check your inputs again."
+    );
   }
 });
 module.exports = router;
