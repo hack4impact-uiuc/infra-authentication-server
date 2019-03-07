@@ -3,7 +3,7 @@ const User = require("../models/User");
 const fetch = require("node-fetch");
 require("dotenv").config();
 
-router.post("/post/google", async function(req, res) {
+router.post("/google", async function(req, res) {
   if (!req.body) return res.sendStatus(400);
 
   const tokenInfoRes = await fetch(
@@ -16,8 +16,8 @@ router.post("/post/google", async function(req, res) {
   const user = await User.findOne({ email: payload.email, googleAuth: true });
   if (user) {
     console.log("Welcome back " + user.username);
-    res.status(400).send({
-      status: 400,
+    res.status(200).send({
+      status: 200,
       message: "Successful login!"
     });
   } else {
