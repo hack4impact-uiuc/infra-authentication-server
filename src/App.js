@@ -1,4 +1,5 @@
 const express = require("express");
+
 const jwt = require("jsonwebtoken");
 const exjwt = require("express-jwt");
 const cors = require("cors");
@@ -134,6 +135,7 @@ app.post("/roleschange", async function(req, res) {
   }
 });
 
+
 app.get("/put/:level", function(req, res) {
   // var user = new User({ username: 'nithins2', password: "demo", userLevel: req.params.level });
   var user = new User({ username: req.params.name, passord: "demo" });
@@ -236,11 +238,6 @@ app.post("/post/google", async function(req, res) {
   }
 });
 
-// app.post("/forgotPassword", async function(req, res) {
-//   const user = await User.findOne({ email: req.body.email }).catch(e =>
-//     console.log(e)
-//   );
-// });
 
 const server = app.listen(8000, function() {
   console.log("Listening on http://localhost:8000");
