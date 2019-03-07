@@ -1,9 +1,10 @@
 {
   "name": "infra-authentication-server",
   "scripts": {
+    "docs:dev": "docz dev",
     "start": "nodemon src/startServer.js",
     "docs:dev": "docz dev",
-    "test": "mocha \"./{,!(node_modules)/**/}*.test.js\""
+    "test": "mocha"
   },
   "dependencies": {
     "@sendgrid/mail": "^6.3.1",
@@ -20,6 +21,7 @@
     "node-fetch": "^2.3.0",
     "express-jwt": "^5.3.1",
     "googleapis": "27",
+    "js-yaml": "^3.12.1",
     "mocha": "^6.0.2",
     "jsonwebtoken": "^8.5.0",
     "mongoose": "^5.4.11",
