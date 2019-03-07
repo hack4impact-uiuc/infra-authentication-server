@@ -55,10 +55,13 @@ app.post("/post/google", async function(req, res) {
   );
   const payload = await tokenInfoRes.json();
 
-  const user = await User.find({ email: payload.email, googleAuth: true });
-  if (user.length != 0) {
-    console.log("Welcome back " + user[0].username);
-    res.send("Welcome back " + user[0].username);
+  const user = await User.findOne({ email: payload.email, googleAuth: true });
+  if (user) {
+    console.log("Welcome back " + user.username);
+    res.status(400).send({
+      status: 400,
+      message: "Successful login! Welcome back " + user.username + "."
+    });
   } else {
     const user = new User({
       email: payload.email,
@@ -69,7 +72,10 @@ app.post("/post/google", async function(req, res) {
     await user.save().then(user => {
       console.log("Google user added successfully");
     });
-    res.send("email: " + payload.email);
+    res.status(200).send({
+      status: 200,
+      message: "New Google user: " + payload.email
+    });
   }
 });
 
@@ -133,13 +139,19 @@ app.post("/login", async function(req, res) {
   // un-jwt-ify the given password, see if it's a match with the token associated with the email.
   var user = await User.findOne({ email: req.body.email });
   if (user) {
+    if (user.googleAuth) {
+      return res.status(400).send({
+        status: 400,
+        message: "Please login using Google."
+      });
+    }
     var decoded = jwt.verify(user.password, SECRET_TOKEN, {
       password: req.body.password
     });
     if (req.body.password === decoded.password) {
       return res.status(200).send({
         status: 200,
-        message: "Successful login!",
+        message: "Successful login! Welcome back " + user.username + ".",
         token: user.password
       });
     } else {
