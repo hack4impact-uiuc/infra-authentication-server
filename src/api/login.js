@@ -18,6 +18,12 @@ router.post("/login", async function(req, res) {
   // un-jwt-ify the given password, see if it's a match with the token associated with the email.
   var user = await User.findOne({ email: req.body.email });
   if (user) {
+    if (user.googleAuth) {
+      return res.status(400).send({
+        status: 400,
+        message: "Please login using Google."
+      });
+    }
     var decoded = jwt.verify(user.password, SECRET_TOKEN, {
       password: req.body.password
     });
