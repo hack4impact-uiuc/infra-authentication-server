@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 var SECRET_TOKEN = "helga_has_n000000_idea_what_she_doin";
 const User = require("../models/User");
 const bodyParser = require("body-parser");
+const { sendResponse } = require("./../utils/sendResponse");
 
 router.post("/login", async function(req, res) {
   // no email or password provided --> invalid
@@ -17,6 +18,12 @@ router.post("/login", async function(req, res) {
   // un-jwt-ify the given password, see if it's a match with the token associated with the email.
   var user = await User.findOne({ email: req.body.email });
   if (user) {
+    if (user.googleAuth) {
+      return res.status(400).send({
+        status: 400,
+        message: "Please login using Google."
+      });
+    }
     var decoded = jwt.verify(user.password, SECRET_TOKEN, {
       password: req.body.password
     });
@@ -31,17 +38,14 @@ router.post("/login", async function(req, res) {
         token: jwt_token
       });
     } else {
-      return res.status(400).send({
-        status: 400,
-        message: "Passwword incorrect. Please try again."
-      });
+      return sendResponse(res, 400, "Passwword incorrect. Please try again.");
     }
   } else {
-    return res.status(400).send({
-      status: 400,
-      message:
-        "The information you provided does not match our database. Please check your inputs again."
-    });
+    return sendResponse(
+      res,
+      400,
+      "The information you provided does not match our database. Please check your inputs again."
+    );
   }
 });
 

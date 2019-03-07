@@ -209,32 +209,8 @@ const levelChange = async (userID, level) => {
   });
 };
 
-app.post("/post/google", async function(req, res) {
-  if (!req.body) return res.sendStatus(400);
-
-  const tokenInfoRes = await fetch(
-    `https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${
-      req.body.tokenId
-    }`
-  );
-  const payload = await tokenInfoRes.json();
-
-  const user = await User.find({ email: payload.email, googleAuth: true });
-  if (user.length != 0) {
-    console.log("Welcome back " + user[0].username);
-    res.send("Welcome back " + user[0].username);
-  } else {
-    const user = new User({
-      email: payload.email,
-      username: payload.name,
-      password: null,
-      googleAuth: true
-    });
-    await user.save().then(user => {
-      console.log("Google user added successfully");
-    });
-    res.send("email: " + payload.email);
-  }
+const server = app.listen(8000, function() {
+  console.log("Listening on http://localhost:8000");
 });
 
 module.exports = {
