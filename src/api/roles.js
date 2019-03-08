@@ -19,7 +19,7 @@ router.get("/roles", async function(req, res) {
   } catch (e) {
     return sendResponse(res, 400, "Invalid Token");
   }
-  var user = await User.findById(authenticationStatus.userId);
+  const user = await User.findById(authenticationStatus.userId);
   const roles = await getRolesForUser(user.role);
   let users = [];
   await Promise.all(

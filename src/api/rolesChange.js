@@ -6,7 +6,7 @@ const bodyParser = require("body-parser");
 const { sendResponse } = require("./../utils/sendResponse");
 const { getRolesForUser } = require("./../utils/getConfigFile");
 const jwt = require("jsonwebtoken");
-var SECRET_TOKEN = "helga_has_n000000_idea_what_she_doin";
+const SECRET_TOKEN = "helga_has_n000000_idea_what_she_doin";
 
 router.post("/roleschange", async function(req, res) {
   let status = 400;
