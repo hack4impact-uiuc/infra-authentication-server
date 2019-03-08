@@ -6,11 +6,10 @@ var SECRET_TOKEN = "helga_has_n000000_idea_what_she_doin";
 const User = require("../models/User");
 const bodyParser = require("body-parser");
 const { sendResponse } = require("./../utils/sendResponse");
+const { getRolesForUser } = require("./../utils/getConfigFile");
 
 router.post("/register", async function(req, res) {
-  // app.post("/register", async function(req, res, next) {
-  // no email or password provided --> invalid
-  if (!req.body.email || !req.body.password) {
+  if (!req.body.email || !req.body.password || !req.body.role) {
     return sendResponse(
       res,
       400,
@@ -18,19 +17,31 @@ router.post("/register", async function(req, res) {
     );
   }
 
-  // email already in database --> invalid
   if (await User.findOne({ email: req.body.email })) {
     return sendResponse(res, 400, "User already exists. Please try again.");
   }
 
-  const jwt_token = jwt.sign(
-    { email: req.body.email, password: req.body.password },
+  const encodedPassword = jwt.sign(
+    { password: req.body.password },
     SECRET_TOKEN
   );
-  const user = new User({
+  const userData = {
     email: req.body.email,
-    password: req.body.password
-  });
+    password: encodedPassword,
+    role: req.body.role
+  };
+  const user = new User(userData);
+  const requiredAuthFrom = await getRolesForUser(req.body.role);
+
+  if (requiredAuthFrom != null) {
+    return sendResponse(
+      res,
+      400,
+      "User needs a higher permission level for that role"
+    );
+  }
+
+  const jwt_token = jwt.sign({ userId: user._id }, SECRET_TOKEN);
   await user.save().then(user => {
     console.log("User added successfully");
   });

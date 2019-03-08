@@ -16,6 +16,7 @@ router.post("/login", async function(req, res) {
     });
   }
   // un-jwt-ify the given password, see if it's a match with the token associated with the email.
+
   var user = await User.findOne({ email: req.body.email });
   if (user) {
     if (user.googleAuth) {
@@ -28,10 +29,7 @@ router.post("/login", async function(req, res) {
       password: req.body.password
     });
     if (req.body.password === decoded.password) {
-      const jwt_token = jwt.sign(
-        { email: req.body.email, password: req.body.password },
-        SECRET_TOKEN
-      );
+      const jwt_token = jwt.sign({ userId: user._id }, SECRET_TOKEN);
       return res.status(200).send({
         status: 200,
         message: "Successful login!",

@@ -1,5 +1,11 @@
 roles:
-    heirarchy:
-        - superAdmin
+    root: 
         - admin
-        - generalUser
+        - supervisor
+        - guest
+    admin: 
+        - supervisor
+        - guest
+    supervisor: 
+        - guest
+    guest: 
