@@ -9,16 +9,13 @@ const { sendResponse } = require("../utils/sendResponse");
 const { SECRET_TOKEN } = require("../utils/secret-token");
 
 router.post("/changePassword", async function(req, res) {
-  if (!req.body || !req.body.email || !req.body.token || !req.body.password) {
-    sendResponse(
-      res,
-      400,
-      "Request doesn't contain all of: email, token, or password"
-    );
+  if (!req.body || !req.body.token || !req.body.password) {
+    sendResponse(res, 400, "Request doesn't contain token or password");
     return;
   }
 
-  const user = await User.findOne({ email: req.body.email }).catch(e =>
+  // Do a lookup by token rather than email
+  const user = await User.findOne({ password: req.body.token }).catch(e =>
     console.log(e)
   );
   if (user) {
@@ -26,7 +23,7 @@ router.post("/changePassword", async function(req, res) {
       { email: req.body.email, password: req.body.password },
       SECRET_TOKEN
     );
-    if (user.email === req.body.email && req.body.token === user.password) {
+    if (req.body.token === user.password) {
       user.password = new_token;
       user.save();
       sendResponse(res, 200, "Successful change of password!", {
