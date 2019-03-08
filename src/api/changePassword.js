@@ -5,7 +5,7 @@ const User = require("../models/User");
 const bodyParser = require("body-parser");
 const jwt = require("jsonwebtoken");
 const exjwt = require("express-jwt");
-const sendResponse = require("../utils/sendResponse");
+const { sendResponse } = require("../utils/sendResponse");
 const { SECRET_TOKEN } = require("../utils/secret-token");
 
 router.post("/changePassword", async function(req, res) {
@@ -29,7 +29,9 @@ router.post("/changePassword", async function(req, res) {
     if (user.email === req.body.email && req.body.token === user.password) {
       user.password = new_token;
       user.save();
-      sendResponse(res, 200, "Successful change of password!");
+      sendResponse(res, 200, "Successful change of password!", {
+        token: new_token
+      });
     } else {
       sendResponse(
         res,
@@ -41,7 +43,7 @@ router.post("/changePassword", async function(req, res) {
     sendResponse(
       res,
       400,
-      "The information you provided does not match our database. Please check your inputs again."
+      "The user does not exist. Please check your inputs again."
     );
   }
 });
