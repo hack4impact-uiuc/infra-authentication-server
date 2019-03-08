@@ -2,7 +2,7 @@ const router = require("express").Router();
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 
-var SECRET_TOKEN = "helga_has_n000000_idea_what_she_doin";
+const { SECRET_TOKEN } = require("../utils/secret-token");
 const User = require("../models/User");
 const bodyParser = require("body-parser");
 const { sendResponse } = require("./../utils/sendResponse");

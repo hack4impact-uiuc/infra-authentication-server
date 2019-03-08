@@ -1,7 +1,8 @@
-const sendResponse = function(res, status, message) {
+const sendResponse = (res, status, message, obj) => {
   res.status(status).send({
     status,
-    message
+    message,
+    ...obj
   });
 };
 
