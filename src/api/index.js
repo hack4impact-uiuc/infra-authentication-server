@@ -7,5 +7,7 @@ router.use("/", require("./passwordReset"));
 router.use("/", require("./forgotPassword"));
 router.use("/", require("./google"));
 router.use("/", require("./addSecurityQuestion"));
+router.use("/", require("./roles"));
+router.use("/", require("./rolesChange"));
 
 module.exports = router;

@@ -9,7 +9,8 @@ const schema = mongoose.Schema({
   pin: "number",
   expiration: "date",
   userLevel: "string",
-  googleAuth: "boolean"
+  googleAuth: "boolean",
+  role: "string"
 });
 
 const User = mongoose.model("User", schema);
