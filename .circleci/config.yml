@@ -2,7 +2,7 @@ version: 2
 jobs:
   backend_test:
       docker:
-        - image: circleci/python:3.7
+        - image: node:8.4.0
       dependencies:
         override:
           - echo $PATH
