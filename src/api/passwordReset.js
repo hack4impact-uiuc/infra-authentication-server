@@ -2,6 +2,7 @@ const router = require("express").Router();
 const bcrypt = require("bcrypt");
 const User = require("../models/User");
 const { sendResponse } = require("./../utils/sendResponse");
+const { signAuthJWT } = require("../utils/jwtHelpers");
 
 router.post("/passwordReset", async function(req, res) {
   if (!req.body || !req.body.email || !req.body.pin) {
@@ -38,7 +39,9 @@ router.post("/passwordReset", async function(req, res) {
   user.password = await bcrypt.hash(req.body.password, 10);
   await user.save();
 
-  sendResponse(res, 200, "Password successfully reset");
+  sendResponse(res, 200, "Password successfully reset", {
+    token: signAuthJWT(user._id, user.password)
+  });
 });
 
 module.exports = router;
