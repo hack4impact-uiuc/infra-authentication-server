@@ -27,10 +27,8 @@ router.post("/register", async function(req, res) {
     return sendResponse(res, 400, "User already exists. Please try again.");
   }
 
-  const encodedPassword = jwt.sign(
-    { password: req.body.password },
-    SECRET_TOKEN
-  );
+  const encodedPassword = hashPassword(req.body.password);
+
   const userData = {
     email: req.body.email,
     password: encodedPassword,
@@ -47,7 +45,7 @@ router.post("/register", async function(req, res) {
     );
   }
 
-  const jwt_token = signAuthJWT(user._id);
+  const jwt_token = signAuthJWT(user._id, user.password);
   await user.save();
   return res.status(200).send({
     status: 200,

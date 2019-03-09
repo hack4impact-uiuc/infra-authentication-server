@@ -20,15 +20,18 @@ router.post("/changePassword", async function(req, res) {
     return;
   }
   var userId = decryptAuthJWT(req.body.token);
+  // Do a lookup by the decrypted user id
+  const user = await User.findOne({ _id: userId }).catch(e => console.log(e));
 
-  if (userId === null) {
+  if (
+    userId === null ||
+    !verifyAuthJWT(req.body.token, userId, user.password)
+  ) {
     // error in decrypting JWT, so we can send back an invalid JWT message
     // could be expired or something else
     sendResponse(res, 400, "Invalid JWT token");
   }
 
-  // Do a lookup by the decrypted user id
-  const user = await User.findOne({ _id: userId }).catch(e => console.log(e));
   if (user) {
     var new_token = signAuthJWT(userId);
     user.password = hashPassword(req.body.password);

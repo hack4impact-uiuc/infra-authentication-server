@@ -23,7 +23,7 @@ router.post("/login", async function(req, res) {
     }
     if (verifyPasswordHash(user.password, req.body.password)) {
       // hash matches! sign a JWT with an expiration 1 day in the future and send back to the user
-      const jwt_token = signAuthJWT(user._id);
+      const jwt_token = signAuthJWT(user._id, user.password);
       return res.status(200).send({
         status: 200,
         message: "Successful login!",
