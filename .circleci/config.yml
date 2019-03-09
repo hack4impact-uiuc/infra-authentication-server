@@ -10,8 +10,8 @@ jobs:
         - checkout
         - run:
             command: |
-              cd test
               yarn install
+              cd test
               yarn test
 workflows:
   version: 2
