@@ -12,9 +12,8 @@ jobs:
             name: install
             command: |
               cd test
-              echo $PATH
-              yarn install
-              yarn test
+              npm install
+              npm run test
 workflows:
   version: 2
   build-test:
