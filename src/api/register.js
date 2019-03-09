@@ -1,18 +1,9 @@
 const router = require("express").Router();
-const cors = require("cors");
 
-var SECRET_TOKEN = "helga_has_n000000_idea_what_she_doin";
 const User = require("../models/User");
-const bodyParser = require("body-parser");
 const { sendResponse } = require("./../utils/sendResponse");
 const { getRolesForUser } = require("./../utils/getConfigFile");
-const {
-  signAuthJWT,
-  hashPassword,
-  verifyPasswordHash,
-  verifyAuthJWT,
-  decryptAuthJWT
-} = require("../utils/jwtHelpers");
+const { signAuthJWT, hashPassword } = require("../utils/jwtHelpers");
 
 router.post("/register", async function(req, res) {
   if (!req.body.email || !req.body.password || !req.body.role) {
