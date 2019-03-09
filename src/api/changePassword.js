@@ -6,36 +6,36 @@ const bodyParser = require("body-parser");
 const jwt = require("jsonwebtoken");
 const exjwt = require("express-jwt");
 const { sendResponse } = require("../utils/sendResponse");
-const { SECRET_TOKEN } = require("../utils/secret-token");
+const {
+  signAuthJWT,
+  hashPassword,
+  verifyPasswordHash,
+  verifyAuthJWT,
+  decryptAuthJWT
+} = require("../utils/jwtHelpers");
 
 router.post("/changePassword", async function(req, res) {
   if (!req.body || !req.body.token || !req.body.password) {
     sendResponse(res, 400, "Request doesn't contain token or password");
     return;
   }
+  var userId = decryptAuthJWT(req.body.token);
 
-  // Do a lookup by token rather than email
-  const user = await User.findOne({ password: req.body.token }).catch(e =>
-    console.log(e)
-  );
+  if (userId === null) {
+    // error in decrypting JWT, so we can send back an invalid JWT message
+    // could be expired or something else
+    sendResponse(res, 400, "Invalid JWT token");
+  }
+
+  // Do a lookup by the decrypted user id
+  const user = await User.findOne({ _id: userId }).catch(e => console.log(e));
   if (user) {
-    var new_token = jwt.sign(
-      { email: req.body.email, password: req.body.password },
-      SECRET_TOKEN
-    );
-    if (req.body.token === user.password) {
-      user.password = new_token;
-      user.save();
-      sendResponse(res, 200, "Successful change of password!", {
-        token: new_token
-      });
-    } else {
-      sendResponse(
-        res,
-        400,
-        "Username or password incorrect. Please try again."
-      );
-    }
+    var new_token = signAuthJWT(userId);
+    user.password = hashPassword(req.body.password);
+    await user.save();
+    sendResponse(res, 200, "Successful change of password!", {
+      token: new_token
+    });
   } else {
     sendResponse(
       res,
@@ -44,4 +44,5 @@ router.post("/changePassword", async function(req, res) {
     );
   }
 });
+
 module.exports = router;

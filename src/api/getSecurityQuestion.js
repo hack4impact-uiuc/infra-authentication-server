@@ -5,7 +5,7 @@ const User = require("../models/User");
 const bodyParser = require("body-parser");
 const { sendResponse } = require("./../utils/sendResponse");
 
-router.get("/getSecurityQuestion", async function(req, res) {
+router.post("/getSecurityQuestion", async function(req, res) {
   if (!req.body || !req.body.email) {
     sendResponse(res, 400, "Malformed request");
     return;

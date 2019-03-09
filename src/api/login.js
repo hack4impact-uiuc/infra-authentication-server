@@ -1,11 +1,7 @@
 const router = require("express").Router();
-const cors = require("cors");
-const jwt = require("jsonwebtoken");
-
-const { SECRET_TOKEN } = require("../utils/secret-token");
 const User = require("../models/User");
-const bodyParser = require("body-parser");
 const { sendResponse } = require("./../utils/sendResponse");
+const { signAuthJWT, verifyPasswordHash } = require("../utils/jwtHelpers");
 
 router.post("/login", async function(req, res) {
   // no email or password provided --> invalid
@@ -25,18 +21,17 @@ router.post("/login", async function(req, res) {
         message: "Please login using Google."
       });
     }
-    var decoded = jwt.verify(user.password, SECRET_TOKEN, {
-      password: req.body.password
-    });
-    if (req.body.password === decoded.password) {
-      const jwt_token = jwt.sign({ userId: user._id }, SECRET_TOKEN);
+    if (verifyPasswordHash(user.password, req.body.password)) {
+      // hash matches! sign a JWT with an expiration 1 day in the future and send back to the user
+      const jwt_token = signAuthJWT(user._id);
       return res.status(200).send({
         status: 200,
         message: "Successful login!",
         token: jwt_token
       });
     } else {
-      return sendResponse(res, 400, "Passwword incorrect. Please try again.");
+      // password doesn't match the hashed
+      return sendResponse(res, 400, "Password incorrect. Please try again.");
     }
   } else {
     return sendResponse(

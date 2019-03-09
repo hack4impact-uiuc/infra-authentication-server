@@ -6,18 +6,15 @@ var SECRET_TOKEN = "helga_has_n000000_idea_what_she_doin";
 const User = require("../models/User");
 const bodyParser = require("body-parser");
 const { sendResponse } = require("./../utils/sendResponse");
+const { decryptAuthJWT } = require("../utils/jwtHelpers");
 
 router.post("/addSecurityQuestion", async function(req, res) {
-  if (!req.body.question || !req.body.answer) {
+  if (!req.body.token || !req.body.question || !req.body.answer) {
     sendResponse(res, 400, "Please enter valid responses");
   }
-  let decoded = {};
-  try {
-    decoded = jwt.verify(req.body.token, SECRET_TOKEN);
-  } catch (e) {
-    await sendResponse(res, 400, "Invalid token");
-  }
-  var user = await User.findOne({ email: decoded.email });
+  const userId = decryptAuthJWT(req.body.token);
+  if (userId === null) await sendResponse(res, 400, "Invalid token");
+  var user = await User.findOne({ _id: userId });
   if (user) {
     await User.updateOne(
       { _id: user._id },

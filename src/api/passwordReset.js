@@ -4,6 +4,7 @@ const cors = require("cors");
 const User = require("../models/User");
 const bodyParser = require("body-parser");
 const sendResponse = require("./../utils/sendResponse");
+const { hashPassword } = require("../utils/jwtHelpers");
 
 router.post("/passwordReset", async function(req, res) {
   if (!req.body || !req.body.email) {
@@ -37,7 +38,7 @@ router.post("/passwordReset", async function(req, res) {
   // (i.e. if the user presses change password button twice)
   date.setDate(date.getDate() - 1);
   user.expiration = date;
-  user.password = req.body.password;
+  user.password = hashPassword(req.body.password);
   await user.save();
 
   sendResponse(res, 200, "Password successfully reset");
