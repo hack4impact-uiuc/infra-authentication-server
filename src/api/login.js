@@ -33,7 +33,9 @@ router.post("/login", async function(req, res) {
       return res.status(200).send({
         status: 200,
         message: "Successful login!",
-        token: jwt_token
+        token: jwt_token,
+        uid: user._id,
+        permission: user.role
       });
     } else {
       return sendResponse(res, 400, "Passwword incorrect. Please try again.");
