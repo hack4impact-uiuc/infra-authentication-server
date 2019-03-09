@@ -12,12 +12,9 @@ jobs:
             name: install
             command: |
               cd test
+              echo $PATH
               yarn install
               yarn test
-        # - run:
-        #     command: |
-        #       yarn install
-        #       yarn test
 workflows:
   version: 2
   build-test:
