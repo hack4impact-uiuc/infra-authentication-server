@@ -1,13 +1,10 @@
 const router = require("express").Router();
-const nodemailer = require("nodemailer");
-const cors = require("cors");
+const bcrypt = require("bcrypt");
 const User = require("../models/User");
-const bodyParser = require("body-parser");
-const sendResponse = require("./../utils/sendResponse");
-const { hashPassword } = require("../utils/jwtHelpers");
+const { sendResponse } = require("./../utils/sendResponse");
 
 router.post("/passwordReset", async function(req, res) {
-  if (!req.body || !req.body.email) {
+  if (!req.body || !req.body.email || !req.body.pin) {
     sendResponse(res, 400, "Malformed request");
     return;
   }
@@ -38,7 +35,7 @@ router.post("/passwordReset", async function(req, res) {
   // (i.e. if the user presses change password button twice)
   date.setDate(date.getDate() - 1);
   user.expiration = date;
-  user.password = hashPassword(req.body.password);
+  user.password = await bcrypt.hash(req.body.password, 10);
   await user.save();
 
   sendResponse(res, 200, "Password successfully reset");

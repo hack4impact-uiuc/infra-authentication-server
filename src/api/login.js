@@ -1,7 +1,8 @@
 const router = require("express").Router();
+const bcrypt = require("bcrypt");
 const User = require("../models/User");
 const { sendResponse } = require("./../utils/sendResponse");
-const { signAuthJWT, verifyPasswordHash } = require("../utils/jwtHelpers");
+const { signAuthJWT } = require("../utils/jwtHelpers");
 
 router.post("/login", async function(req, res) {
   // no email or password provided --> invalid
@@ -21,7 +22,7 @@ router.post("/login", async function(req, res) {
         message: "Please login using Google."
       });
     }
-    if (verifyPasswordHash(user.password, req.body.password)) {
+    if (await bcrypt.compare(req.body.password, user.password)) {
       // hash matches! sign a JWT with an expiration 1 day in the future and send back to the user
       const jwt_token = signAuthJWT(user._id, user.password);
       return res.status(200).send({

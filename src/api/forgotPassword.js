@@ -1,12 +1,10 @@
 const router = require("express").Router();
 const nodemailer = require("nodemailer");
-const cors = require("cors");
 const User = require("../models/User");
-const bodyParser = require("body-parser");
-const sendResponse = require("./../utils/sendResponse");
+const { sendResponse } = require("./../utils/sendResponse");
 
 router.post("/forgotPassword", async function(req, res) {
-  if (!req.body || !req.body.email) {
+  if (!req.body || !req.body.email || !req.body.answer) {
     sendResponse(res, 400, "Malformed request");
     return;
   }

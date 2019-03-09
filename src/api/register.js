@@ -1,9 +1,9 @@
 const router = require("express").Router();
-
+const bcrypt = require("bcrypt");
 const User = require("../models/User");
 const { sendResponse } = require("./../utils/sendResponse");
 const { getRolesForUser } = require("./../utils/getConfigFile");
-const { signAuthJWT, hashPassword } = require("../utils/jwtHelpers");
+const { signAuthJWT } = require("../utils/jwtHelpers");
 
 router.post("/register", async function(req, res) {
   if (!req.body.email || !req.body.password || !req.body.role) {
@@ -18,7 +18,7 @@ router.post("/register", async function(req, res) {
     return sendResponse(res, 400, "User already exists. Please try again.");
   }
 
-  const encodedPassword = hashPassword(req.body.password);
+  const encodedPassword = await bcrypt.hash(req.body.password, 10);
 
   const userData = {
     email: req.body.email,

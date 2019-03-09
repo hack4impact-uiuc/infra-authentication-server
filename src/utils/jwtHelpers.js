@@ -1,25 +1,13 @@
 const jwt = require("jsonwebtoken");
-const exjwt = require("express-jwt");
 const { SECRET_TOKEN } = require("./secret-token");
 
 function signAuthJWT(id, password) {
+  if (!password || !id) {
+    throw "Cannot create hash without both id && password";
+  }
   return jwt.sign({ userId: id, hashedPassword: password }, SECRET_TOKEN, {
     expiresIn: "1d"
   });
-}
-
-function hashPassword(password) {
-  return jwt.sign({ password: password }, SECRET_TOKEN);
-}
-
-// verify the hashed password, returning true if it matches
-function verifyPasswordHash(hashed, real) {
-  try {
-    const { password } = jwt.verify(hashed, SECRET_TOKEN);
-    return password == real;
-  } catch (err) {
-    return false;
-  }
 }
 
 // Return true if the JWT is valid and matches the parameters
@@ -44,8 +32,6 @@ function decryptAuthJWT(token) {
 
 module.exports = {
   signAuthJWT,
-  hashPassword,
-  verifyPasswordHash,
   verifyAuthJWT,
   decryptAuthJWT
 };

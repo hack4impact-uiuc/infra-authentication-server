@@ -1,15 +1,9 @@
 const router = require("express").Router();
-const nodemailer = require("nodemailer");
-const cors = require("cors");
+const bcrypt = require("bcrypt");
 const User = require("../models/User");
-const bodyParser = require("body-parser");
-const jwt = require("jsonwebtoken");
-const exjwt = require("express-jwt");
 const { sendResponse } = require("../utils/sendResponse");
 const {
   signAuthJWT,
-  hashPassword,
-  verifyPasswordHash,
   verifyAuthJWT,
   decryptAuthJWT
 } = require("../utils/jwtHelpers");
@@ -30,12 +24,10 @@ router.post("/changePassword", async function(req, res) {
     // error in decrypting JWT, so we can send back an invalid JWT message
     // could be expired or something else
     sendResponse(res, 400, "Invalid JWT token");
-  }
-
-  if (user) {
-    var new_token = signAuthJWT(userId);
-    user.password = hashPassword(req.body.password);
+  } else if (user) {
+    user.password = await bcrypt.hash(req.body.password, 10);
     await user.save();
+    var new_token = signAuthJWT(userId, user.password);
     sendResponse(res, 200, "Successful change of password!", {
       token: new_token
     });
