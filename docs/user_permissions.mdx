@@ -91,3 +91,24 @@ The heirarchy of the roles is defined as follows:
 Roles with precedence "x" can only promote users up to roles with precedence "x" or higher.
 
 Roles with precedence "x" can only demote users with roles of precedence "x" or higher.
+
+## Setting User Permission Workflow
+
+### Step 1: Create the Config File  
+Here's an example:
+
+```roles:
+    root: 
+        - admin
+        - supervisor
+        - guest
+    admin: 
+        - supervisor
+        - guest
+    supervisor: 
+        - guest
+    guest: 
+```
+
+### Step 2: Run the scripts
+
