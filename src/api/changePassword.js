@@ -1,41 +1,36 @@
 const router = require("express").Router();
-const nodemailer = require("nodemailer");
-const cors = require("cors");
+const bcrypt = require("bcrypt");
 const User = require("../models/User");
-const bodyParser = require("body-parser");
-const jwt = require("jsonwebtoken");
-const exjwt = require("express-jwt");
 const { sendResponse } = require("../utils/sendResponse");
-const { SECRET_TOKEN } = require("../utils/secret-token");
+const {
+  signAuthJWT,
+  verifyAuthJWT,
+  decryptAuthJWT
+} = require("../utils/jwtHelpers");
 
 router.post("/changePassword", async function(req, res) {
   if (!req.body || !req.body.token || !req.body.password) {
     sendResponse(res, 400, "Request doesn't contain token or password");
     return;
   }
+  var userId = decryptAuthJWT(req.body.token);
+  // Do a lookup by the decrypted user id
+  const user = await User.findOne({ _id: userId }).catch(e => console.log(e));
 
-  // Do a lookup by token rather than email
-  const user = await User.findOne({ password: req.body.token }).catch(e =>
-    console.log(e)
-  );
-  if (user) {
-    var new_token = jwt.sign(
-      { email: req.body.email, password: req.body.password },
-      SECRET_TOKEN
-    );
-    if (req.body.token === user.password) {
-      user.password = new_token;
-      user.save();
-      sendResponse(res, 200, "Successful change of password!", {
-        token: new_token
-      });
-    } else {
-      sendResponse(
-        res,
-        400,
-        "Username or password incorrect. Please try again."
-      );
-    }
+  if (
+    userId === null ||
+    !verifyAuthJWT(req.body.token, userId, user.password)
+  ) {
+    // error in decrypting JWT, so we can send back an invalid JWT message
+    // could be expired or something else
+    sendResponse(res, 400, "Invalid JWT token");
+  } else if (user) {
+    user.password = await bcrypt.hash(req.body.password, 10);
+    await user.save();
+    var new_token = signAuthJWT(userId, user.password);
+    sendResponse(res, 200, "Successful change of password!", {
+      token: new_token
+    });
   } else {
     sendResponse(
       res,
@@ -44,4 +39,5 @@ router.post("/changePassword", async function(req, res) {
     );
   }
 });
+
 module.exports = router;

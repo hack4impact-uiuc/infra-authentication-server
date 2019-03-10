@@ -1,12 +1,9 @@
 const router = require("express").Router();
-const cors = require("cors");
-const jwt = require("jsonwebtoken");
-
-var SECRET_TOKEN = "helga_has_n000000_idea_what_she_doin";
+const bcrypt = require("bcrypt");
 const User = require("../models/User");
-const bodyParser = require("body-parser");
 const { sendResponse } = require("./../utils/sendResponse");
 const { getRolesForUser } = require("./../utils/getConfigFile");
+const { signAuthJWT } = require("../utils/jwtHelpers");
 
 router.post("/register", async function(req, res) {
   if (!req.body.email || !req.body.password || !req.body.role) {
@@ -21,10 +18,8 @@ router.post("/register", async function(req, res) {
     return sendResponse(res, 400, "User already exists. Please try again.");
   }
 
-  const encodedPassword = jwt.sign(
-    { password: req.body.password },
-    SECRET_TOKEN
-  );
+  const encodedPassword = await bcrypt.hash(req.body.password, 10);
+
   const userData = {
     email: req.body.email,
     password: encodedPassword,
@@ -41,10 +36,8 @@ router.post("/register", async function(req, res) {
     );
   }
 
-  const jwt_token = jwt.sign({ userId: user._id }, SECRET_TOKEN);
-  await user.save().then(user => {
-    console.log("User added successfully");
-  });
+  const jwt_token = signAuthJWT(user._id, user.password);
+  await user.save();
   return res.status(200).send({
     status: 200,
     message: "User added successfully!",
