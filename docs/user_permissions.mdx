@@ -15,12 +15,12 @@ import Arrow from './arrow'
     <Container orientation="column">
         <Arrow scale=".5">
             <div>
-                jwt_token
+                jwt
             </div>
         </Arrow>
         <Arrow inverseArrow={true} scale=".5">
             <div>
-                {'{...data}'}
+                {'{...data} and jwt'}
             </div>
         </Arrow>
     </Container>
@@ -28,12 +28,12 @@ import Arrow from './arrow'
     <Container orientation="column">
         <Arrow scale=".5">
             <div>
-                jwt_token
+                jwt
             </div>
         </Arrow>
         <Arrow inverseArrow={true} scale=".5">
             <div>
-                {'{userLevel, userID, ...}'}
+                {'{userLevel, ...} and jwt'}
             </div>
         </Arrow>
     </Container>
@@ -46,7 +46,7 @@ All users with the same title have the same permissions and vice-versa.
 
 The auth server maintains the userIDs and role/title associated with each user.
 
-The jwt_token carries information of the userID and role/title, and the front-end exchanges this token with the API in the back-end in exhcange for resources.
+The JSON Web Token(JWT) will encode the userID. and the front-end exchanges this token with the API in the back-end in exhcange for resources.
 
 The back-end devs dictate how the data is limited by roles (ex. general users are not given write access to certain resources, etc).
 
@@ -91,3 +91,28 @@ The heirarchy of the roles is defined as follows:
 Roles with precedence "x" can only promote users up to roles with precedence "x" or higher.
 
 Roles with precedence "x" can only demote users with roles of precedence "x" or higher.
+
+## Setting User Permission Workflow
+
+### Step 1: Create the Config File  
+Here's an example:
+
+```roles:
+    root: 
+        - admin
+        - supervisor
+        - guest
+    admin: 
+        - supervisor
+        - guest
+    supervisor: 
+        - guest
+    guest: 
+```
+
+### Step 2: Run the command
+
+npm run
+
+
+

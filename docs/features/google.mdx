@@ -1,3 +1,8 @@
+import Box from '../box'
+import Container from '../container'
+import Arrow from '../arrow'
+import ArrowUp from '../arrowUp'
+
 # Google OAuth
 
 Confused? Don't worry, me too.
@@ -36,7 +41,58 @@ Reference code (credit to our precious goldfish codirector Timothy Ko):
 * Auth server stores a null password and a flag to signal a Google user.
 * Token is passed around to the API/auth server to check permissions.
 * Token is also passed back to Google auth to make sure nothing fishy is going on. They can also be cycled.
+
+
 <img src={require('./Workflow.png')} width="500"/>
+
+<Container orientation="column">
+    <Container jC="space-between">
+        <Box borderColor="black" text="Google"/>
+        <Arrow inverseArrow={true} scale=".75">
+            <div style={{padding: '.5rem'}}>
+            </div>
+        </Arrow>
+        <Box borderColor="black" text="Auth"/>
+    </Container>
+    <Container jC={'space-between'}>
+        <Container orientation="column">
+            <Container>
+            <ArrowUp scale=".5">
+                <div style={{padding: '.5rem'}}>
+                </div>
+            </ArrowUp>
+            </Container>
+            <ArrowUp down={true} scale=".5">
+                <div style={{padding: '.5rem'}}>
+                </div>
+            </ArrowUp>
+            <Box borderColor="black" text="Client"/>
+        </Container>
+        <Container orientation="column">
+            <Arrow scale=".75">
+                <div style={{padding: '.5rem'}}>
+                </div>
+            </Arrow>
+        </Container>
+        <Container orientation="column">
+            <Container>
+            <ArrowUp scale=".5">
+                <div style={{padding: '.5rem'}}>
+                </div>
+            </ArrowUp>
+            </Container>
+            <ArrowUp down={true} scale=".5">
+                <div style={{padding: '.5rem'}}>
+                </div>
+            </ArrowUp>
+            <Box borderColor="black" text="API"/>
+        </Container>
+    </Container>
+    
+</Container>
+
+This is the token's path
+
 * Response is a bunch of json with access token, ID token, refresh time, scope etc.
 ```
 // Extract information of users from id_token. Other keys specify what's accessible and control security.
@@ -58,10 +114,10 @@ Reference code (credit to our precious goldfish codirector Timothy Ko):
 You know the great thing about buttons? They can be anywhere you want them to! :)
 
 ## Usage:
-### Devs
+### What the Devs need to do:
 * Enable whether or not to use this feature and have it appear on frontend. 
 Hopefully won't have to do much else with their API.
-### Users
+### What the Users need to do:
 | You | Appropriate Response |
 | :--- | :--- |
 | See Google button and want to use | Move mouse. Click Button. |

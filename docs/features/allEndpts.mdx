@@ -1,10 +1,10 @@
 
 ---
-name: Forgot Password
-route: /forgot/
+name: All Endpoints
+route: /allendpoints/
 ---
 
-# Forgot Password
+# Endpoints
 
 This is a POST request endpoint that allows for email reset of a password for a user in the database.
 
@@ -148,42 +148,20 @@ The API will return the following if the password was successfully reset:
 }
 ```
 
-
-# Workflow 
-
-1. User navigates to some "forgot password" link on the frontend.
-
-2. User enters email in the provided field.
-
-3. Client makes a GET request to `/getSecurityQuestion?email=test@example.com`, and, if user exists, gets a securtiy question back.
-
-4. User enters security question answer. 
-
-5. Makes a post request to the API which goes to the auth server 
-    * form encoded body with email and security question answer
-    * doesn't need a JWT, isn't authenticated
+# Login and Logout
 
 
-6. Seaches for the user in the database, if it exists and the security question matches, it generates a pin and current database
+## Endpoints 
+| Endpoint | /login [POST] (redirected from API to Server) |
+| ------ | ----------- |
+| body   | email, hashed password |
+| response | message: success/error, jwt token if the account is authenticated |
 
-7. In the user model sets the date field called "expiration" to that current date + 24 hours.
+# Register
 
-8. Sets the pin to the 7 digit code.
 
-9. Using Nodemailer, it sends an email to the user if the user exists.
-
-9. Will return a response based on whether the email was successfully sent to the user.
-
-10. User enters PIN in a field in the client to reset password.
-
-11. Client sends request to `/resetPassword` with the updated password, email, and PIN.
-
-12. If all is successful, expiration is invalidated and password is changed. If not (email doesn't match, PIN is expired, etc.) then an error message will be returned to the client.
-User gets logged in with the returned JWT.
-
-***Not sure whether you want to use Security Questions? Make it an optional feature before the pin***
-
-* Set a default security question in the database (if the user doesnt exist)
-* Field with every user for specific questions
-* The dev team can choose questions, auth server handles everything. 
-* Config file can turn off this functionality
+## Endpoints 
+| Endpoint | /register [POST] (redirected from API to Server) |
+| ------ | ----------- |
+| body   | email, username, hashed password, permission level, phone number (optional) |
+| response | message: success/error, jwt token if the account is authenticated |
