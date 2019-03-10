@@ -28,7 +28,9 @@ router.post("/login", async function(req, res) {
       return res.status(200).send({
         status: 200,
         message: "Successful login!",
-        token: jwt_token
+        token: jwt_token,
+        uid: user._id,
+        permission: user.role
       });
     } else {
       // password doesn't match the hashed

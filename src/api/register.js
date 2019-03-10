@@ -41,7 +41,9 @@ router.post("/register", async function(req, res) {
   return res.status(200).send({
     status: 200,
     message: "User added successfully!",
-    token: jwt_token
+    token: jwt_token,
+    uid: user._id,
+    permission: user.role
   });
 });
 
