@@ -37,6 +37,14 @@ router.post("/passwordReset", async function(req, res) {
       );
       return;
     }
+  } else {
+    if (
+      req.body.answer &&
+      user.answer !== req.body.answer.toLowerCase().replace(/\s/g, "")
+    ) {
+      sendResponse(res, 400, "Answer to security question does not match");
+      return;
+    }
   }
   // user matches, change expiration
   var date = new Date();
