@@ -3,7 +3,7 @@ const fs = require("fs");
 
 const getConfigFile = async () => {
   return await yaml.safeLoad(
-    fs.readFileSync("src/config/defaultroles.yml", "utf8")
+    fs.readFileSync("config/defaultroles.yml", "utf8")
   );
 };
 

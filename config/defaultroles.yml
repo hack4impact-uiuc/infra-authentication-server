@@ -9,3 +9,6 @@ roles:
     supervisor: 
         - guest
     guest: 
+
+test_db:
+    mongodb://product:infra28@ds111441.mlab.com:11441/auth-infra-server-test
