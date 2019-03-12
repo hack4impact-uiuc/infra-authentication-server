@@ -1,3 +1,7 @@
+---
+name: Google Authentication
+route: /googleauth
+---
 import Box from '../box'
 import Container from '../container'
 import Arrow from '../arrow'
@@ -41,9 +45,6 @@ Reference code (credit to our precious goldfish codirector Timothy Ko):
 * Auth server stores a null password and a flag to signal a Google user.
 * Token is passed around to the API/auth server to check permissions.
 * Token is also passed back to Google auth to make sure nothing fishy is going on. They can also be cycled.
-
-
-<img src={require('./Workflow.png')} width="500"/>
 
 <Container orientation="column">
     <Container jC="space-between">
