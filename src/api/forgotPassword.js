@@ -2,15 +2,21 @@ const router = require("express").Router();
 const nodemailer = require("nodemailer");
 const User = require("../models/User");
 const { sendResponse } = require("./../utils/sendResponse");
-
+const { isGmailEnabled } = require("../utils/getConfigFile");
 router.post("/forgotPassword", async function(req, res) {
-  if (!req.body || !req.body.email || !req.body.answer) {
+  const usingGmail = await isGmailEnabled();
+  if (!usingGmail) {
+    sendResponse(res, 400, "Gmail not enabled. Do not use this endpoint.");
+  }
+  if (!req.body || !req.body.email || (usingGmail && !req.body.answer)) {
     sendResponse(res, 400, "Malformed request");
     return;
   }
+
   const user = await User.findOne({ email: req.body.email }).catch(e =>
     console.log(e)
   );
+
   // TODO: handle the config file change in security question
   if (!user) {
     sendResponse(res, 400, "User does not exist in the DB.");
@@ -34,7 +40,6 @@ router.post("/forgotPassword", async function(req, res) {
         refreshToken: process.env.INFRA_REFRESH_TOKEN
       }
     });
-    console.log("Created transport with nodemailer");
     transporter
       .sendMail({
         from: "hack4impact.infra@gmail.com",
@@ -42,7 +47,7 @@ router.post("/forgotPassword", async function(req, res) {
         subject: "Forgot Password",
         text: "Enter the following pin on the reset page: " + user.pin
       })
-      .catch(e => {
+      .catch(_ => {
         sendResponse(
           res,
           500,

@@ -9,3 +9,10 @@ roles:
     supervisor: 
         - guest
     guest: 
+
+# Note that you MUST have either security question or 
+# gmail sent to true
+security_question:
+    true
+gmail:
+    false
