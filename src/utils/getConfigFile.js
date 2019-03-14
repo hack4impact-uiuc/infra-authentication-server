@@ -16,6 +16,14 @@ const getRolesForUser = async role => {
   return null;
 };
 
+const googleAuth = async () => {
+  const config = await getConfigFile();
+  if (config["useGoogleAuth"] === undefined) {
+    return true;
+  }
+  return config["useGoogleAuth"];
+};
+
 const isSecurityQuestionEnabled = async () => {
   const config = await getConfigFile();
   if (config["gmail"] != true && config["security_question"] != true) {
@@ -42,6 +50,7 @@ const isGmailEnabled = async () => {
 module.exports = {
   getConfigFile,
   getRolesForUser,
+  googleAuth,
   isSecurityQuestionEnabled,
   isGmailEnabled
 };

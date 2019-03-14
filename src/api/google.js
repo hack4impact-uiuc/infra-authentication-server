@@ -1,9 +1,14 @@
 const router = require("express").Router();
 const User = require("../models/User");
 const fetch = require("node-fetch");
+const { googleAuth } = require("./../utils/getConfigFile");
+const { sendResponse } = require("./../utils/sendResponse");
 require("dotenv").config();
 
 router.post("/google", async function(req, res) {
+  const useGoogle = await googleAuth();
+  if (!useGoogle)
+    return sendRespose(400, "Google authentication has not be enabled");
   if (!req.body) return res.sendStatus(400);
 
   const tokenInfoRes = await fetch(
@@ -16,10 +21,7 @@ router.post("/google", async function(req, res) {
   const user = await User.findOne({ email: payload.email, googleAuth: true });
   if (user) {
     console.log("Welcome back " + user.username);
-    res.status(200).send({
-      status: 200,
-      message: "Successful login!"
-    });
+    sendResponse(200, "Successful login!");
   } else {
     const user = new User({
       email: payload.email,
@@ -31,10 +33,7 @@ router.post("/google", async function(req, res) {
     await user.save().then(user => {
       console.log("Google user added successfully");
     });
-    res.status(200).send({
-      status: 200,
-      message: "New Google user: " + payload.email
-    });
+    sendResponse(200, "New Google user: " + payload.email);
   }
 });
 

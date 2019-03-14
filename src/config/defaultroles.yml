@@ -10,6 +10,8 @@ roles:
         - guest
     guest: 
 
+useGoogleAuth: true
+
 # Note that you MUST have either security question or 
 # gmail sent to true
 security_question:
