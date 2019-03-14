@@ -15,7 +15,10 @@ router.post("/addSecurityQuestion", async function(req, res) {
   if (user) {
     await User.updateOne(
       { _id: user._id },
-      { question: req.body.question, answer: req.body.answer }
+      {
+        question: req.body.question,
+        answer: req.body.answer.toLowerCase().replace(/\s/g, "")
+      }
     );
     sendResponse(res, 200, "Succesfully added the security question");
   } else {
