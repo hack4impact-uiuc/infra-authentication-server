@@ -16,7 +16,13 @@ const getRolesForUser = async role => {
   return null;
 };
 
+const googleAuth = async () => {
+  const config = await getConfigFile();
+  return config["useGoogleAuth"];
+};
+
 module.exports = {
   getConfigFile,
-  getRolesForUser
+  getRolesForUser,
+  googleAuth
 };
