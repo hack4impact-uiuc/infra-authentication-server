@@ -16,6 +16,14 @@ const getRolesForUser = async role => {
   return null;
 };
 
+const getTestDB = async () => {
+  const config = await getConfigFile();
+  if (config["test_db"] != undefined) {
+    return config["test_db"];
+  }
+  return null;
+};
+
 module.exports = {
   getConfigFile,
   getRolesForUser
