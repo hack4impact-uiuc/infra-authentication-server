@@ -18,11 +18,39 @@ const getRolesForUser = async role => {
 
 const googleAuth = async () => {
   const config = await getConfigFile();
+  if (config["useGoogleAuth"] === undefined) {
+    return true;
+  }
   return config["useGoogleAuth"];
+};
+
+const isSecurityQuestionEnabled = async () => {
+  const config = await getConfigFile();
+  if (config["gmail"] != true && config["security_question"] != true) {
+    throw "Must have at least one of Gmail and security question enabled";
+  }
+  if (config["security_question"] === undefined) {
+    return true;
+  }
+  return config["security_question"];
+};
+
+const isGmailEnabled = async () => {
+  const config = await getConfigFile();
+  if (config["gmail"] != true && config["security_question"] != true) {
+    throw "Must have at least one of Gmail and security question enabled";
+  }
+  if (config["gmail"] === undefined) {
+    return false;
+  }
+
+  return config["gmail"];
 };
 
 module.exports = {
   getConfigFile,
   getRolesForUser,
-  googleAuth
+  googleAuth,
+  isSecurityQuestionEnabled,
+  isGmailEnabled
 };
