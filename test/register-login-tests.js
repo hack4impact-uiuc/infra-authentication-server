@@ -5,6 +5,10 @@ const request = require("supertest");
 const User = require("../src/models/User.js");
 const mongoose = require("mongoose");
 const assert = require("assert");
+const test_uri =
+  "mongodb://product:infra28@ds111441.mlab.com:11441/auth-infra-server-test";
+// connect mongoose to test_uri
+// const test_db = mongoose.connect(test_uri, { useNewUrlParser: true });
 
 before(done => {
   // Make a DB connection before starting the tests so the first test
@@ -14,12 +18,11 @@ before(done => {
     done();
   });
 
-  const test_uri =
-    "mongodb://product:infra28@ds111441.mlab.com:11441/auth-infra-server-test";
-  const test_db = mongoose.connect(test_uri, { useNewUrlParser: true }); //connect mongoose to test_uri
+  // connect mongoose to test_uri
+  const test_db = mongoose.connect(test_uri, { useNewUrlParser: true });
 
+  // drop db
   mongoose.connect(test_uri, function() {
-    /* Drop the DB */
     mongoose.connection.db.dropDatabase();
   });
 });
