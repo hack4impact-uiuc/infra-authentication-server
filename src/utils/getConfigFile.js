@@ -26,5 +26,6 @@ const getTestDB = async () => {
 
 module.exports = {
   getConfigFile,
-  getRolesForUser
+  getRolesForUser,
+  getTestDB
 };
