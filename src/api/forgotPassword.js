@@ -1,9 +1,10 @@
 const router = require("express").Router();
-const nodemailer = require("nodemailer");
 const User = require("../models/User");
 const { sendResponse } = require("./../utils/sendResponse");
 const { isGmailEnabled } = require("../utils/getConfigFile");
 const { sendMail } = require("../utils/sendMail");
+const { generateAndCommitPIN } = require("../utils/pinHelpers");
+
 router.post("/forgotPassword", async function(req, res) {
   const usingGmail = await isGmailEnabled();
   if (!usingGmail) {
@@ -29,14 +30,7 @@ router.post("/forgotPassword", async function(req, res) {
     req.body.answer &&
     user.answer === req.body.answer.toLowerCase().replace(/\s/g, "")
   ) {
-    //user found, update pin
-    user.pin = Math.floor(Math.random() * (100000000 - 100000 + 1)) + 100000;
-    var date = new Date();
-    // add a day to the current date
-    date.setDate(date.getDate() + 1);
-    user.expiration = date;
-    await user.save();
-
+    generateAndCommitPIN(user);
     const body = {
       from: "hack4impact.infra@gmail.com",
       to: user.email,

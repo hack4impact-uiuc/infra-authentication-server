@@ -1,4 +1,5 @@
 const nodemailer = require("nodemailer");
+const { sendResponse } = require("../utils/sendResponse");
 async function sendMail(mail_body) {
   let transporter = nodemailer.createTransport({
     service: "gmail",
@@ -10,13 +11,8 @@ async function sendMail(mail_body) {
       refreshToken: process.env.INFRA_REFRESH_TOKEN
     }
   });
-  await transporter.sendMail(mail_body).catch(_ => {
-    sendResponse(
-      res,
-      500,
-      "An internal server error occured and the email could not be sent."
-    );
-  });
+  var success = true;
+  await transporter.sendMail(mail_body);
 }
 
 module.exports = { sendMail };
