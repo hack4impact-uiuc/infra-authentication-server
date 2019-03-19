@@ -13,6 +13,7 @@ router.post("/register", async function(req, res) {
       "Please enter valid arguments for the fields provided."
     );
   }
+  const u = await User.findOne({ email: req.body.email });
 
   if (await User.findOne({ email: req.body.email })) {
     return sendResponse(res, 400, "User already exists. Please try again.");
