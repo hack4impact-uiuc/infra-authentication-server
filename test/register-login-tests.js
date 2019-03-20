@@ -7,8 +7,7 @@ const mongoose = require("mongoose");
 const assert = require("assert");
 const test_uri =
   "mongodb://product:infra28@ds111441.mlab.com:11441/auth-infra-server-test";
-// connect mongoose to test_uri
-// const test_db = mongoose.connect(test_uri, { useNewUrlParser: true });
+var server;
 
 before(done => {
   // Make a DB connection before starting the tests so the first test
@@ -19,7 +18,8 @@ before(done => {
   });
 
   var options = {
-    reconnectTries: Number.MAX_VALUE,
+    server: { socketOptions: { keepAlive: 1, connectTimeoutMS: 30000 } }, // to get rid of error that comes up bc of server
+    reconnectTries: Number.MAX_VALUE, // to get rid of weird topology was destroyed error from mongo
     reconnectInterval: 1000,
     useNewUrlParser: true
   };
@@ -28,15 +28,37 @@ before(done => {
   mongoose.connect(test_uri, options, function() {
     mongoose.connection.db.dropDatabase();
   });
+
+  server = app.listen(8000);
 });
 
-describe("get /popo", function() {
+describe("connection test", function() {
   it("connection established and test_db cleared", async () => {
     assert(1 === 1);
   });
 });
 
+/**
+ * Test Login/Register Credentials
+ * email: helga_test@ifra.org
+ * password: Lmao_Bi$$Can7Stop4Ho3s
+ */
+
+describe("POST /register", function() {
+  it("returns 400 for empty body", async () => {
+    const response = await request(server)
+      .post("/register")
+      .type("form")
+      .send("")
+      .expect(
+        400,
+        '{"status":400,"message":"Please enter valid arguments for the fields provided."}'
+      );
+  });
+});
+
 after(done => {
+  server.close();
   mongoose.connection.close();
   done();
 });
