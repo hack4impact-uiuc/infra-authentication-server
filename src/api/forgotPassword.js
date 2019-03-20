@@ -1,8 +1,10 @@
 const router = require("express").Router();
-const nodemailer = require("nodemailer");
 const User = require("../models/User");
 const { sendResponse } = require("./../utils/sendResponse");
 const { isGmailEnabled } = require("../utils/getConfigFile");
+const { sendMail } = require("../utils/sendMail");
+const { generateAndCommitPIN } = require("../utils/pinHelpers");
+
 router.post("/forgotPassword", async function(req, res) {
   const usingGmail = await isGmailEnabled();
   if (!usingGmail) {
@@ -28,37 +30,14 @@ router.post("/forgotPassword", async function(req, res) {
     req.body.answer &&
     user.answer === req.body.answer.toLowerCase().replace(/\s/g, "")
   ) {
-    //user found, update pin
-    user.pin = Math.floor(Math.random() * (100000000 - 100000 + 1)) + 100000;
-    var date = new Date();
-    // add a day to the current date
-    date.setDate(date.getDate() + 1);
-    user.expiration = date;
-    await user.save();
-    let transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        type: "OAuth2",
-        user: process.env.INFRA_EMAIL,
-        clientId: process.env.INFRA_CLIENT_ID,
-        clientSecret: process.env.INFRA_CLIENT_SECRET,
-        refreshToken: process.env.INFRA_REFRESH_TOKEN
-      }
-    });
-    transporter
-      .sendMail({
-        from: "hack4impact.infra@gmail.com",
-        to: user.email,
-        subject: "Forgot Password",
-        text: "Enter the following pin on the reset page: " + user.pin
-      })
-      .catch(_ => {
-        sendResponse(
-          res,
-          500,
-          "An internal server error occured and the email could not be sent."
-        );
-      });
+    generateAndCommitPIN(user);
+    const body = {
+      from: "hack4impact.infra@gmail.com",
+      to: user.email,
+      subject: "Forgot Password",
+      text: "Enter the following pin on the reset page: " + user.pin
+    };
+    await sendMail(body);
     sendResponse(res, 200, "Sent password reset PIN to user if they exist");
   } else {
     sendResponse(res, 200, "Answer to security question doesn't match");

@@ -8,6 +8,7 @@ router.use("/", require("./forgotPassword"));
 router.use("/", require("./changePassword"));
 router.use("/", require("./google"));
 router.use("/", require("./addSecurityQuestion"));
+router.use("/", require("./verifyEmail"));
 router.use("/", require("./roles"));
 router.use("/", require("./rolesChange"));
 router.use("/", require("./verify"));
