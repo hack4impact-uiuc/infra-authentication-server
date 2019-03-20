@@ -5,14 +5,16 @@ const { sendResponse } = require("./../utils/sendResponse");
 var SECRET_TOKEN = "helga_has_n000000_idea_what_she_doin";
 
 router.post("/verify", async function(req, res) {
-  let authenticationStatus = {};
-  try {
-    authenticationStatus = jwt.verify(req.body.token, SECRET_TOKEN);
-  } catch (e) {
-    return sendResponse(res, 400, "Invalid Token");
-  }
-  if (authenticationStatus) {
-    return sendResponse(res, 200, "Successfully verified");
+  var userId = decryptAuthJWT(req.body.token);
+  // Do a lookup by the decrypted user id
+  const user = await User.findOne({ _id: userId }).catch(e => console.log(e));
+  if (
+    userId === null ||
+    !verifyAuthJWT(req.body.token, userId, user.password)
+  ) {
+    sendResponse(res, 400, "Invalid JWT token");
+  } else if (user) {
+    sendResponse(res, 200, "Valid JWT token");
   }
 });
 
