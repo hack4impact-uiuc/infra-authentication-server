@@ -18,7 +18,7 @@ before(done => {
   });
 
   var options = {
-    server: { socketOptions: { keepAlive: 1, connectTimeoutMS: 30000 } }, // to get rid of error that comes up bc of server
+    server: { socketOptions: { keepAlive: 1, connectTimeoutMS: 30000 } }, // ahh server makes the error come up again but this doesnt help apparently
     reconnectTries: Number.MAX_VALUE, // to get rid of weird topology was destroyed error from mongo
     reconnectInterval: 1000,
     useNewUrlParser: true
@@ -41,8 +41,13 @@ describe("connection test", function() {
 /**
  * Test Login/Register Credentials
  * email: helga_test@ifra.org
- * password: Lmao_Bi$$Can7Stop4Ho3s
+ * password: 69biss_cant_stop_dis_hoe420
  */
+const valid_test_user = {
+  email: "helga_test@infra.org",
+  password: "69biss_cant_stop_dis_hoe420",
+  role: "guest"
+};
 
 describe("POST /register", function() {
   it("returns 400 for empty body", async () => {
@@ -54,6 +59,36 @@ describe("POST /register", function() {
         400,
         '{"status":400,"message":"Please enter valid arguments for the fields provided."}'
       );
+  });
+
+  it("returns 400 for invalid email", async () => {
+    const response = await request(server)
+      .post("/register")
+      .type("form")
+      .send("email=093j")
+      .expect(
+        400,
+        '{"status":400,"message":"Please enter valid arguments for the fields provided."}'
+      );
+  });
+
+  it("returns 400 for no password", async () => {
+    const response = await request(server)
+      .post("/register")
+      .type("form")
+      .send("email=helga_test@infra.org")
+      .expect(
+        400,
+        '{"status":400,"message":"Please enter valid arguments for the fields provided."}'
+      );
+  });
+
+  it("returns 200 for valid user", async () => {
+    const response = await request(app)
+      .post("/register")
+      .type("form")
+      .send(valid_test_user)
+      .expect(200, '{"status":400,"message":"User added successfully!"}');
   });
 });
 
