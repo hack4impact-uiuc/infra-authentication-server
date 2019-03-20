@@ -87,8 +87,11 @@ describe("POST /register", function() {
     const response = await request(app)
       .post("/register")
       .type("form")
-      .send(valid_register_test)
-      .expect(200, '{"status":200,"message":"User added successfully!"}');
+      .send(valid_register_test);
+
+    // doing this instead of *expect* bc *expect* expects the complete response and doesn't check for only parts of it
+    assert(200 === response.body.status);
+    assert("User added successfully!" === response.body.message);
   });
 });
 
@@ -145,8 +148,10 @@ describe("POST /login", function() {
     const response = await request(app)
       .post("/login")
       .type("form")
-      .send(valid_login_test)
-      .expect(200, '{"status":200,"message":"Successful login!"}');
+      .send(valid_login_test);
+    // .expect(200, '{"status":200,"message":"Successful login!"}');
+    assert(200 === response.body.status);
+    assert("Successful login!" === response.body.message);
   });
 });
 
