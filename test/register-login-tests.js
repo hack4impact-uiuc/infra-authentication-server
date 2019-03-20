@@ -18,17 +18,20 @@ before(done => {
     done();
   });
 
-  // connect mongoose to test_uri
-  const test_db = mongoose.connect(test_uri, { useNewUrlParser: true });
+  var options = {
+    reconnectTries: Number.MAX_VALUE,
+    reconnectInterval: 1000,
+    useNewUrlParser: true
+  };
 
-  // drop db
-  mongoose.connect(test_uri, function() {
+  // connect test_db and clear it before starting
+  mongoose.connect(test_uri, options, function() {
     mongoose.connection.db.dropDatabase();
   });
 });
 
 describe("get /popo", function() {
-  it("passes my boi", async () => {
+  it("connection established and test_db cleared", async () => {
     assert(1 === 1);
   });
 });
