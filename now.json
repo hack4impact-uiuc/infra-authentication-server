@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "name": "h4i-infra-server",
+  "builds": [
+    { "src": "src/App.js", "use": "@now/node" },
+    { "src": "src/config/defaultroles.yml", "use": "@now/static" }
+  ],
+  "routes": [{ "src": "/(.*)", "dest": "src/App.js" }]
+}
