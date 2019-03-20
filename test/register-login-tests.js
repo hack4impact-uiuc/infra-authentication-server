@@ -43,7 +43,7 @@ describe("connection test", function() {
  * email: helga_test@ifra.org
  * password: 69biss_cant_stop_dis_hoe420
  */
-const valid_test_user = {
+const valid_register_test = {
   email: "helga_test@infra.org",
   password: "69biss_cant_stop_dis_hoe420",
   role: "guest"
@@ -87,8 +87,66 @@ describe("POST /register", function() {
     const response = await request(app)
       .post("/register")
       .type("form")
-      .send(valid_test_user)
-      .expect(200, '{"status":400,"message":"User added successfully!"}');
+      .send(valid_register_test)
+      .expect(200, '{"status":200,"message":"User added successfully!"}');
+  });
+});
+
+const valid_login_test = {
+  email: "helga_test@infra.org",
+  password: "69biss_cant_stop_dis_hoe420"
+};
+
+const user_doesnt_exist = {
+  email: "helga@infra.org",
+  password: "69biss_cant_stop_dis_hoe420"
+};
+
+const wrong_pass = {
+  email: "helga_test@infra.org",
+  password: "bissssss6969"
+};
+
+describe("POST /login", function() {
+  it("returns 400 for no input", async () => {
+    const response = await request(app)
+      .post("/login")
+      .type("form")
+      .send("")
+      .expect(
+        400,
+        '{"status":400,"message":"Please enter valid arguments for the fields provided."}'
+      );
+  });
+
+  it("returns 400 for no such user in database", async () => {
+    const response = await request(app)
+      .post("/login")
+      .type("form")
+      .send(user_doesnt_exist)
+      .expect(
+        400,
+        '{"status":400,"message":"The information you provided does not match our database. Please check your inputs again."}'
+      );
+  });
+
+  it("returns 400 for wrong password", async () => {
+    const response = await request(app)
+      .post("/login")
+      .type("form")
+      .send(wrong_pass)
+      .expect(
+        400,
+        '{"status":400,"message":"Password incorrect. Please try again."}'
+      );
+  });
+
+  it("returns 200 for successful login", async () => {
+    const response = await request(app)
+      .post("/login")
+      .type("form")
+      .send(valid_login_test)
+      .expect(200, '{"status":200,"message":"Successful login!"}');
   });
 });
 
