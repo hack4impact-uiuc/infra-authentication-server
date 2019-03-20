@@ -51,7 +51,7 @@ const valid_register_test = {
 
 describe("POST /register", function() {
   it("returns 400 for empty body", async () => {
-    const response = await request(server)
+    const response = await request(app)
       .post("/register")
       .type("form")
       .send("")
@@ -62,7 +62,7 @@ describe("POST /register", function() {
   });
 
   it("returns 400 for invalid email", async () => {
-    const response = await request(server)
+    const response = await request(app)
       .post("/register")
       .type("form")
       .send("email=093j")
@@ -73,7 +73,7 @@ describe("POST /register", function() {
   });
 
   it("returns 400 for no password", async () => {
-    const response = await request(server)
+    const response = await request(app)
       .post("/register")
       .type("form")
       .send("email=helga_test@infra.org")
