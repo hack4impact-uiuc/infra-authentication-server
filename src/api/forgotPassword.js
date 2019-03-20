@@ -8,7 +8,7 @@ router.post("/forgotPassword", async function(req, res) {
   if (!usingGmail) {
     return sendResponse(
       res,
-      400,
+      500,
       "Gmail not enabled. Do not use this endpoint."
     );
   }
