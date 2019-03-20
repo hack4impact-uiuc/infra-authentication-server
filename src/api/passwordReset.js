@@ -4,6 +4,7 @@ const User = require("../models/User");
 const { sendResponse } = require("./../utils/sendResponse");
 const { signAuthJWT } = require("../utils/jwtHelpers");
 const { isGmailEnabled } = require("../utils/getConfigFile");
+const { expirePIN } = require("../utils/pinHelpers");
 
 router.post("/passwordReset", async function(req, res) {
   const gmailEnabled = await isGmailEnabled();
@@ -46,14 +47,7 @@ router.post("/passwordReset", async function(req, res) {
       return;
     }
   }
-  // user matches, change expiration
-  var date = new Date();
-  // remove a day to the current date to expire it
-  // set date to 24 hours before because we don't want
-  // concurrent requests happening in the same second to both go through
-  // (i.e. if the user presses change password button twice)
-  date.setDate(date.getDate() - 1);
-  user.expiration = date;
+  expirePIN(user);
   user.password = await bcrypt.hash(req.body.password, 10);
   await user.save();
 

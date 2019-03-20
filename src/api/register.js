@@ -4,8 +4,10 @@ const User = require("../models/User");
 const { sendResponse } = require("./../utils/sendResponse");
 const { getRolesForUser } = require("./../utils/getConfigFile");
 const { signAuthJWT } = require("../utils/jwtHelpers");
-
+const { generateAndCommitPIN } = require("../utils/pinHelpers");
+const { isGmailEnabled } = require("../utils/getConfigFile");
 router.post("/register", async function(req, res) {
+  const usingGmail = await isGmailEnabled();
   if (!req.body.email || !req.body.password || !req.body.role) {
     return sendResponse(
       res,
@@ -13,6 +15,7 @@ router.post("/register", async function(req, res) {
       "Please enter valid arguments for the fields provided."
     );
   }
+  const u = await User.findOne({ email: req.body.email });
 
   if (await User.findOne({ email: req.body.email })) {
     return sendResponse(res, 400, "User already exists. Please try again.");
@@ -23,7 +26,8 @@ router.post("/register", async function(req, res) {
   const userData = {
     email: req.body.email,
     password: encodedPassword,
-    role: req.body.role
+    role: req.body.role,
+    verified: false
   };
   const user = new User(userData);
   const requiredAuthFrom = await getRolesForUser(req.body.role);
@@ -37,6 +41,29 @@ router.post("/register", async function(req, res) {
   }
 
   const jwt_token = signAuthJWT(user._id, user.password);
+
+  if (usingGmail) {
+    // using gmail so should send verification email
+    generateAndCommitPIN();
+    const body = {
+      from: "hack4impact.infra@gmail.com",
+      to: user.email,
+      subject: "Forgot Password",
+      text: "Enter the following pin on the reset page: " + user.pin
+    };
+    try {
+      await sendMail(body);
+    } catch (e) {
+      // TODO: discuss whether or not we want to register the user even if the email doesn't send
+      return sendResponse(
+        res,
+        500,
+        "Verification email could not be sent despite Gmail being enabled. User not added to DB"
+      );
+    }
+  }
+
+  // success, so save the user to the DB and send back the JWT
   await user.save();
   return res.status(200).send({
     status: 200,

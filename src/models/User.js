@@ -7,6 +7,7 @@ const schema = mongoose.Schema({
   question: "string",
   answer: "string",
   pin: "number",
+  verified: "boolean",
   expiration: "date",
   userLevel: "string",
   googleAuth: "boolean",
