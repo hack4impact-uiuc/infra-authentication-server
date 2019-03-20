@@ -20,10 +20,12 @@ router.post("/verifyEmail", async function(req, res) {
       "Malformed request: email or pin not specified"
     );
   }
-
-  const user = await User.findOne({ email: req.body.email }).catch(e =>
-    console.log(e)
-  );
+  let user;
+  try {
+    user = await User.findOne({ email: req.body.email });
+  } catch (e) {
+    return sendResponse(res, 400, e);
+  }
 
   if (!user) {
     return sendResponse(res, 400, "User does not exist in the DB.");
@@ -33,7 +35,6 @@ router.post("/verifyEmail", async function(req, res) {
   }
 
   if (req.body.pin != user.pin) {
-    console.log(typeof user.pin);
     return sendResponse(res, 400, "PIN does not match");
   }
 
