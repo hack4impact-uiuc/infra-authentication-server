@@ -16,8 +16,11 @@ router.post("/verify", async function(req, res) {
   ) {
     sendResponse(res, 400, "Invalid JWT token");
   } else if (user) {
-    console.log("HERE");
-    sendResponse(res, 200, "Valid JWT token");
+    return res.status(200).send({
+      status: 200,
+      message: "Valid JWT token",
+      role: user.role
+    });
   }
 });
 
