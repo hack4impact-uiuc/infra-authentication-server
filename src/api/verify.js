@@ -14,6 +14,7 @@ router.post("/verify", async function(req, res) {
     userId === null ||
     !verifyAuthJWT(req.body.token, userId, user.password)
   ) {
+    console.log(req.body.token);
     sendResponse(res, 400, "Invalid JWT token");
   } else if (user) {
     return res.status(200).send({

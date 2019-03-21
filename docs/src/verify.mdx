@@ -7,8 +7,8 @@ route: /verify
 | Endpoint | /verify [POST] |
 | ------ | ----------- |
 | Header   | token |
-| Response 200 | success message |
-| Response 400 | role, error message |
+| Response 200 | success message, role |
+| Response 400 | error message |
 
 (1) If the request doesn't have a header with a token, it will return an error message "Malformed request, doesn't have a token"
 

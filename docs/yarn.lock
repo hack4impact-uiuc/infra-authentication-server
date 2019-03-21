@@ -4955,9 +4955,9 @@ normalize-path@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/normalize-path/-/normalize-path-3.0.0.tgz#0dcd69ff23a1c9b11fd0978316644a0388216a65"
 
-now@^14.2.0:
-  version "14.2.0"
-  resolved "https://registry.yarnpkg.com/now/-/now-14.2.0.tgz#326afe3b18d20b327c4fec330978b858dee019b7"
+now@^14.2.2:
+  version "14.2.2"
+  resolved "https://registry.yarnpkg.com/now/-/now-14.2.2.tgz#96dbb57c8c327e85cf877fca31f2547dc4b8d614"
 
 npm-bundled@^1.0.1:
   version "1.0.6"
