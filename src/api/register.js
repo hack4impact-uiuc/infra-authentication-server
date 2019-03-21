@@ -4,7 +4,7 @@ const User = require("../models/User");
 const { sendResponse } = require("./../utils/sendResponse");
 const { getRolesForUser } = require("./../utils/getConfigFile");
 const { signAuthJWT } = require("../utils/jwtHelpers");
-const { generateAndCommitPIN } = require("../utils/pinHelpers");
+const { generatePIN } = require("../utils/pinHelpers");
 const { isGmailEnabled } = require("../utils/getConfigFile");
 const { sendMail } = require("./../utils/sendMail");
 router.post("/register", async function(req, res) {
@@ -43,8 +43,8 @@ router.post("/register", async function(req, res) {
 
   const jwt_token = signAuthJWT(user._id, user.password);
   if (usingGmail) {
-    // using gmail so should send verification email
-    generateAndCommitPIN(user);
+    // using gmail so it should send generate a PIN and send a verification email.
+    generatePIN(user);
     const body = {
       from: "hack4impact.infra@gmail.com",
       to: user.email,
