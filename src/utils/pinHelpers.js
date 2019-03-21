@@ -21,6 +21,5 @@ async function expirePIN(user) {
   // (i.e. if the user presses change password button twice)
   date.setDate(date.getDate() - 1);
   user.expiration = date;
-  await user.save();
 }
 module.exports = { generatePIN, expirePIN };
