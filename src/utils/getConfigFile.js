@@ -2,6 +2,10 @@ const yaml = require("js-yaml");
 const fs = require("fs");
 
 const getConfigFile = async () => {
+  /* we use __dirname because ncc (Zeit's now compiler) only supports
+   * requiring files in this fashion. If https://github.com/zeit/ncc/issues/216 resolves,
+   * we may be able to do this another way.
+   */
   return await yaml.safeLoad(
     fs.readFileSync(__dirname + "/../config/defaultroles.yml", "utf8")
   );
