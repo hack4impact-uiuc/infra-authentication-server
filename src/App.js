@@ -21,6 +21,4 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 app.use("/", router);
 
-module.exports = {
-  app
-};
+module.exports = app;
