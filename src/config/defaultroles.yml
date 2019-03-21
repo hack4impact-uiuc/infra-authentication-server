@@ -17,4 +17,4 @@ useGoogleAuth: true
 security_question:
     true
 gmail:
-    false
+    true
