@@ -1,0 +1,21 @@
+---
+name: Login
+route: /login
+---
+
+# Login
+
+
+| Endpoint | /login [POST] |
+| ------ | ----------- |
+| Body   | email, hashed password |
+| Response 200 | userid, role, and token |
+| Response 400 | error message |
+
+1. The Authentictaion Server recieves an email and password.  It responds with a 400 error if any of the arguments aren't there. 
+2. Finds the user in the database using the email. If the user doesn't exits or te user is using google oauth, it returns a corresponding error message. 
+3. It encrypts the password and compares it to the password stored in the database. 
+4. It sends a valid jwt token, user id, and permission level to the API. 
+5. The API sends the token to the client. The client stores the token in cookies and sends it in the header of every request. 
+
+

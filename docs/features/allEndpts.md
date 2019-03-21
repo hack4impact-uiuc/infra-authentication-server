@@ -2,6 +2,7 @@
 name: All Endpoints
 route: /allendpoints/
 ---
+
 Endpoints Reference
 
 # Endpoints
@@ -17,15 +18,13 @@ To issue a password reset email, you will send a POST request to `/forgotPasswor
     email: test@example.com,
     security_answer: abc
 }
-``` 
+```
 
 Note that a JWT is not needed for this because the user does not need to have any form of authentication.
 
-
-
 ## Get Security Question
 
-Get the security question stored with user - this is required if the field `securityQuestion` is set to true in the `config.yaml` file. 
+Get the security question stored with user - this is required if the field `securityQuestion` is set to true in the `config.yaml` file.
 
 **URL** : `/getSecurityQuestion?email=test@example.com`
 
@@ -39,9 +38,9 @@ Get the security question stored with user - this is required if the field `secu
 
 **Code** : `200 OK` if the user could be successfully found.
 
-**Code** : `500` if there was an internal server error and the security question couldn't be retrieved, or the `securityQuestion` is not configured. 
+**Code** : `500` if there was an internal server error and the security question couldn't be retrieved, or the `securityQuestion` is not configured.
 
-**Code** : `400` if the email requested did not exist in the database. 
+**Code** : `400` if the email requested did not exist in the database.
 
 **Content examples**
 
@@ -49,11 +48,10 @@ The API will return the following if the password was successfully reset:
 
 ```json
 {
-    "status": 200,
-    "question": "What street did you grow up on?"
+  "status": 200,
+  "question": "What street did you grow up on?"
 }
 ```
-
 
 ## Reset Password
 
@@ -68,7 +66,7 @@ subscription information.
 
 **Permissions required** : None
 
-### Request 
+### Request
 
 The following is an example request to the endpoint:
 
@@ -77,7 +75,7 @@ The following is an example request to the endpoint:
     email: test@example.com,
     answer: main street
 }
-``` 
+```
 
 Where `answer` is the answer to the security question previously fetched with `getSecurityQuestion`.
 
@@ -95,11 +93,10 @@ If the email could successfully be sent, the API will return:
 
 ```json
 {
-    "status": 200,
-    "message": "Sent password reset PIN to user if they exist in the database."
+  "status": 200,
+  "message": "Sent password reset PIN to user if they exist in the database."
 }
 ```
-
 
 ## Verify Password Reset
 
@@ -114,7 +111,7 @@ subscription information.
 
 **Permissions required** : None
 
-### Request 
+### Request
 
 The following is an example request to the endpoint:
 
@@ -125,8 +122,7 @@ The following is an example request to the endpoint:
     password: verysecurepassword
 
 }
-``` 
-
+```
 
 ### Response
 
@@ -142,26 +138,26 @@ The API will return the following if the password was successfully reset:
 
 ```json
 {
-    "status": 200,
-    "message": "Password successfully reset.",
-    "jwt": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxM"
+  "status": 200,
+  "message": "Password successfully reset.",
+  "jwt": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxM"
 }
 ```
 
 # Login and Logout
 
+## Endpoints
 
-## Endpoints 
-| Endpoint | /login [POST] (redirected from API to Server) |
-| ------ | ----------- |
-| body   | email, hashed password |
+| Endpoint | /login [POST] (redirected from API to Server)                     |
+| -------- | ----------------------------------------------------------------- |
+| body     | email, hashed password                                            |
 | response | message: success/error, jwt token if the account is authenticated |
 
 # Register
 
+## Endpoints
 
-## Endpoints 
-| Endpoint | /register [POST] (redirected from API to Server) |
-| ------ | ----------- |
-| body   | email, username, hashed password, permission level, phone number (optional) |
-| response | message: success/error, jwt token if the account is authenticated |
+| Endpoint | /register [POST] (redirected from API to Server)                            |
+| -------- | --------------------------------------------------------------------------- |
+| body     | email, username, hashed password, permission level, phone number (optional) |
+| response | message: success/error, jwt token if the account is authenticated           |

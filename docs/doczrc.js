@@ -1,3 +1,6 @@
 export default {
-  dest: "/dist"
+  dest: "/dist",
+  themeConfig: {
+    mode: "dark"
+  }
 };

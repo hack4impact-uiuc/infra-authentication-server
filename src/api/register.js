@@ -6,7 +6,9 @@ const { getRolesForUser } = require("./../utils/getConfigFile");
 const { signAuthJWT } = require("../utils/jwtHelpers");
 const { generateAndCommitPIN } = require("../utils/pinHelpers");
 const { isGmailEnabled } = require("../utils/getConfigFile");
+const { sendMail } = require("./../utils/sendMail");
 router.post("/register", async function(req, res) {
+  console.log("HHERE");
   const usingGmail = await isGmailEnabled();
   if (!req.body.email || !req.body.password || !req.body.role) {
     return sendResponse(
@@ -41,10 +43,11 @@ router.post("/register", async function(req, res) {
   }
 
   const jwt_token = signAuthJWT(user._id, user.password);
-
+  await user.save();
+  console.log("YO");
   if (usingGmail) {
     // using gmail so should send verification email
-    generateAndCommitPIN();
+    generateAndCommitPIN(user);
     const body = {
       from: "hack4impact.infra@gmail.com",
       to: user.email,
@@ -54,7 +57,7 @@ router.post("/register", async function(req, res) {
     try {
       await sendMail(body);
     } catch (e) {
-      // TODO: discuss whether or not we want to register the user even if the email doesn't send
+      console.log(e);
       return sendResponse(
         res,
         500,

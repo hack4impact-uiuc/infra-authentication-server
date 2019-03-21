@@ -10,6 +10,7 @@ async function generateAndCommitPIN(user) {
   date.setDate(date.getDate() + 1);
   user.expiration = date;
   await user.save();
+  console.log(user.pin);
   return user.pin;
 }
 async function expirePIN(user) {

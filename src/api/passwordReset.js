@@ -50,7 +50,6 @@ router.post("/passwordReset", async function(req, res) {
   expirePIN(user);
   user.password = await bcrypt.hash(req.body.password, 10);
   await user.save();
-
   sendResponse(res, 200, "Password successfully reset", {
     token: signAuthJWT(user._id, user.password)
   });

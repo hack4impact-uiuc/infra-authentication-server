@@ -40,7 +40,7 @@ router.post("/forgotPassword", async function(req, res) {
     await sendMail(body);
     sendResponse(res, 200, "Sent password reset PIN to user if they exist");
   } else {
-    sendResponse(res, 200, "Answer to security question doesn't match");
+    sendResponse(res, 400, "Answer to security question doesn't match");
   }
 });
 
