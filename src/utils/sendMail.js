@@ -11,7 +11,6 @@ async function sendMail(mail_body) {
       refreshToken: process.env.INFRA_REFRESH_TOKEN
     }
   });
-  var success = true;
   await transporter.sendMail(mail_body);
 }
 

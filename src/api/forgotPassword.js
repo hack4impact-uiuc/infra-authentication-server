@@ -14,7 +14,7 @@ router.post("/forgotPassword", async function(req, res) {
       "Gmail not enabled. Do not use this endpoint."
     );
   }
-  if (!req.body || !req.body.email || (usingGmail && !req.body.answer)) {
+  if (!req.body || !req.body.email || !req.body.answer) {
     return sendResponse(res, 400, "Malformed request");
   }
 
