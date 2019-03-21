@@ -20,15 +20,24 @@ router.get("/roles", async function(req, res) {
     return sendResponse(res, 400, "Invalid Token");
   }
   const user = await User.findById(authenticationStatus.userId);
+  if (!user) {
+    sendResponse(res, 400, "User does not exist in the database");
+    return;
+  }
   const roles = await getRolesForUser(user.role);
   let users = [];
   await Promise.all(
     roles.map(async role => {
-      const usersWithRole = await User.find({ role });
-      users = users.concat(usersWithRole);
+      let usersWithRoles = await User.find({ role });
+      for (i in usersWithRoles) {
+        newUser = {
+          email: usersWithRoles[i].email,
+          role: usersWithRoles[i].role
+        };
+        users = users.concat(newUser);
+      }
     })
   );
-  users = users.map(user => user);
   return res.status(200).send({
     status: 200,
     message: "User's that you have the access rights to promote",

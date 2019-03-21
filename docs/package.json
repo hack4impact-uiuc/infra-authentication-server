@@ -11,6 +11,6 @@
     "docz-theme-default": "latest"
   },
   "dependencies": {
-    "now": "^14.2.0"
+    "now": "^14.2.2"
   }
 }
