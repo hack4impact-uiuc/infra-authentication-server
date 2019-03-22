@@ -40,7 +40,7 @@ router.get("/roles", async function(req, res) {
   );
   return res.status(200).send({
     status: 200,
-    message: "User's that you have the access rights to promote",
+    message: "Users succesfully returned",
     user_emails: users
   });
 });

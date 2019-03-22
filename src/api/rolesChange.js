@@ -25,7 +25,7 @@ router.post("/roleschange", async function(req, res) {
     sendResponse(res, 400, "User does not exist in the database");
     return;
   }
-  if (!req.body.userEmail && req.body.newRole) {
+  if (!req.body.userEmail || !req.body.newRole) {
     return sendResponse(res, 400, "Malformed Request");
   }
   const roles = await getRolesForUser(user.role);
@@ -36,6 +36,7 @@ router.post("/roleschange", async function(req, res) {
   userToBePromoted = userToBePromoted[0];
   if (roles.indexOf(req.body.newRole) >= 0) {
     userToBePromoted.role = req.body.newRole;
+    await userToBePromoted.save();
     return sendResponse(
       res,
       200,
