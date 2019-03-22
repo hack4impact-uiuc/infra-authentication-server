@@ -10,7 +10,8 @@ route: /profile-changes
 
 | Endpoint | /addSecurityQuestion [POST] |
 | ------ | ----------- |
-| Body   | question, answer, token |
+| Header | token |
+| Body   | question, answer |
 | Response 200 | success message |
 | Response 400 | error message |
 
@@ -28,7 +29,8 @@ route: /profile-changes
 
 | Endpoint | / [POST] |
 | ------ | ----------- |
-| Body   | password, token |
+| Header | token |
+| Body   | password |
 | Response 200 | success message |
 | Response 400 | error message |
 

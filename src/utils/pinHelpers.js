@@ -1,5 +1,5 @@
-// Generate and save the pin for the user, returning the generated PIN
-async function generateAndCommitPIN(user) {
+// Generate a PIN for the user and inserting it into the object (but not saving it), returning the generated PIN
+async function generatePIN(user) {
   if (!user) {
     throw "User is not defined";
   }
@@ -9,8 +9,6 @@ async function generateAndCommitPIN(user) {
   // add a day to the current date for the expiration
   date.setDate(date.getDate() + 1);
   user.expiration = date;
-  await user.save();
-  console.log(user.pin);
   return user.pin;
 }
 async function expirePIN(user) {
@@ -22,6 +20,5 @@ async function expirePIN(user) {
   // (i.e. if the user presses change password button twice)
   date.setDate(date.getDate() - 1);
   user.expiration = date;
-  await user.save();
 }
-module.exports = { generateAndCommitPIN, expirePIN };
+module.exports = { generatePIN, expirePIN };
