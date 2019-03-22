@@ -15,7 +15,7 @@ router.post("/changePassword", async function(req, res) {
   }
   var userId = decryptAuthJWT(req.body.token);
   // Do a lookup by the decrypted user id
-  const user = await User.findOne({ _id: userId }).catch(e => console.log(e));
+  const user = await User.findOne({ _id: userId });
 
   if (
     userId === null ||

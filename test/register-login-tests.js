@@ -1,13 +1,13 @@
 const { getTestURI } = require("./../src/utils/getConfigFile");
 
-const { app } = require("../src/App");
+const app = require("./../src/App");
 const request = require("supertest");
 const User = require("../src/models/User.js");
 const mongoose = require("mongoose");
 const assert = require("assert");
 const test_uri =
   "mongodb://product:infra28@ds111441.mlab.com:11441/auth-infra-server-test";
-var server;
+let server;
 
 before(done => {
   // Make a DB connection before starting the tests so the first test

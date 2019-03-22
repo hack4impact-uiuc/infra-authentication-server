@@ -8,7 +8,6 @@ const { generateAndCommitPIN } = require("../utils/pinHelpers");
 const { isGmailEnabled } = require("../utils/getConfigFile");
 const { sendMail } = require("./../utils/sendMail");
 router.post("/register", async function(req, res) {
-  console.log("HHERE");
   const usingGmail = await isGmailEnabled();
   if (!req.body.email || !req.body.password || !req.body.role) {
     return sendResponse(
