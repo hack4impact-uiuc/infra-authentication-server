@@ -5,7 +5,7 @@ const User = require("../models/User");
 const { sendResponse } = require("./../utils/sendResponse");
 const { getRolesForUser } = require("./../utils/getConfigFile");
 const { signAuthJWT } = require("../utils/jwtHelpers");
-const { generateAndCommitPIN } = require("../utils/pinHelpers");
+const { generatePIN } = require("../utils/pinHelpers");
 const { isGmailEnabled } = require("../utils/getConfigFile");
 const { sendMail } = require("./../utils/sendMail");
 router.post(

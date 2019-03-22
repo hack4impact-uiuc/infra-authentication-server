@@ -4,7 +4,7 @@ const { check, validationResult } = require("express-validator/check");
 const { sendResponse } = require("./../utils/sendResponse");
 const { isGmailEnabled } = require("../utils/getConfigFile");
 const { sendMail } = require("../utils/sendMail");
-const { generateAndCommitPIN } = require("../utils/pinHelpers");
+const { generatePIN } = require("../utils/pinHelpers");
 
 router.post(
   "/forgotPassword",
