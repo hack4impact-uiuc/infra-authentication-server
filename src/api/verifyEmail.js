@@ -2,7 +2,6 @@ const router = require("express").Router();
 const User = require("../models/User");
 const { sendResponse } = require("./../utils/sendResponse");
 const { isGmailEnabled } = require("../utils/getConfigFile");
-const { sendMail } = require("../utils/sendMail");
 
 router.post("/verifyEmail", async function(req, res) {
   const usingGmail = await isGmailEnabled();
