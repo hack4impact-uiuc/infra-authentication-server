@@ -7,7 +7,7 @@ const getConfigFile = async () => {
    * we may be able to do this another way.
    */
   return await yaml.safeLoad(
-    fs.readFileSync(__dirname + "/../config/defaultroles.yml", "utf8")
+    fs.readFileSync(__dirname + "/../../config/defaultroles.yml", "utf8")
   );
 };
 
