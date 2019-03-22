@@ -55,6 +55,7 @@ The back-end should always validate this token with the auth server, which in tu
 The API uses its own discretion on how to serve data based on the user role.
 
 # Endpoints
+
 <Container orientation="column">
     <Container jC="space-between">
         <Box borderColor="black" text="GET /roles"/>
@@ -94,25 +95,23 @@ Roles with precedence "x" can only demote users with roles of precedence "x" or 
 
 ## Setting User Permission Workflow
 
-### Step 1: Create the Config File  
+### Step 1: Create the Config File
+
 Here's an example:
 
 ```roles:
-    root: 
+    root:
         - admin
         - supervisor
         - guest
-    admin: 
+    admin:
         - supervisor
         - guest
-    supervisor: 
+    supervisor:
         - guest
-    guest: 
+    guest:
 ```
 
 ### Step 2: Run the command
 
 npm run
-
-
-

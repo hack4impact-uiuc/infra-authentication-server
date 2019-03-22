@@ -5,7 +5,7 @@ const { decryptAuthJWT } = require("../utils/jwtHelpers");
 
 router.post("/addSecurityQuestion", async function(req, res) {
   if (!req.body.token || !req.body.question || !req.body.answer) {
-    return sendResponse(res, 400, "Please enter valid responses");
+    return sendResponse(res, 400, "Malformed Request");
   }
   const userId = decryptAuthJWT(req.body.token);
   if (userId === null) {
@@ -15,7 +15,10 @@ router.post("/addSecurityQuestion", async function(req, res) {
   if (user) {
     await User.updateOne(
       { _id: user._id },
-      { question: req.body.question, answer: req.body.answer }
+      {
+        question: req.body.question,
+        answer: req.body.answer.toLowerCase().replace(/\s/g, "")
+      }
     );
     sendResponse(res, 200, "Succesfully added the security question");
   } else {

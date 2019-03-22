@@ -21,11 +21,19 @@ router.post("/roleschange", async function(req, res) {
     return sendResponse(res, 400, "Invalid Token");
   }
   const user = await User.findById(authenticationStatus.userId);
-  if (!req.body.userId && req.body.newRole) {
-    return sendResponse(res, 400, "No users promoted");
+  if (!user) {
+    sendResponse(res, 400, "User does not exist in the database");
+    return;
+  }
+  if (!req.body.userEmail || !req.body.newRole) {
+    return sendResponse(res, 400, "Malformed Request");
   }
   const roles = await getRolesForUser(user.role);
-  const userToBePromoted = await User.findById(req.body.userId);
+  let userToBePromoted = await User.find({ email: req.body.userEmail });
+  if (userToBePromoted.length === 0) {
+    return sendResponse(res, 400, "User with that email doesn't exist");
+  }
+  userToBePromoted = userToBePromoted[0];
   if (roles.indexOf(req.body.newRole) >= 0) {
     userToBePromoted.role = req.body.newRole;
     await userToBePromoted.save();
@@ -33,7 +41,9 @@ router.post("/roleschange", async function(req, res) {
       res,
       200,
       "Sucessfully set new permission level for " +
-        String(userToBePromoted.email)
+        String(userToBePromoted.email) +
+        " to " +
+        String(userToBePromoted.role)
     );
   } else {
     return sendResponse(res, 400, "Incorrect Permission Levels");

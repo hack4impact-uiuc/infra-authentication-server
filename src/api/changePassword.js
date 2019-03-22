@@ -10,7 +10,7 @@ const {
 
 router.post("/changePassword", async function(req, res) {
   if (!req.body || !req.body.token || !req.body.password) {
-    sendResponse(res, 400, "Request doesn't contain token or password");
+    sendResponse(res, 400, "Malformed Request");
     return;
   }
   var userId = decryptAuthJWT(req.body.token);
@@ -32,11 +32,7 @@ router.post("/changePassword", async function(req, res) {
       token: new_token
     });
   } else {
-    sendResponse(
-      res,
-      400,
-      "The user does not exist. Please check your inputs again."
-    );
+    sendResponse(res, 400, "User does not exist.");
   }
 });
 
