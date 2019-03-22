@@ -1,6 +1,6 @@
 const { getTestURI } = require("./../src/utils/getConfigFile");
 
-const { app } = require("../src/App");
+const app = require("../src/App");
 const request = require("supertest");
 const User = require("../src/models/User.js");
 const mongoose = require("mongoose");
@@ -18,7 +18,6 @@ before(done => {
   });
 
   var options = {
-    socketOptions: { keepAlive: 1, connectTimeoutMS: 30000 },
     reconnectTries: Number.MAX_VALUE, // to get rid of weird topology was destroyed error from mongo
     reconnectInterval: 1000,
     useNewUrlParser: true
@@ -33,6 +32,7 @@ before(done => {
 });
 
 describe("connection test", function() {
+  console.log("Hello");
   it("connection established and test_db cleared", async () => {
     assert(1 === 1);
   });
