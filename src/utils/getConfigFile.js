@@ -13,7 +13,6 @@ const getConfigFile = async () => {
 
 const getRolesForUser = async role => {
   const config = await getConfigFile();
-  console.log(config);
   if (config["roles"][role] != undefined) {
     return config["roles"][role];
   }
