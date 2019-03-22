@@ -9,17 +9,17 @@ const {
 } = require("../utils/jwtHelpers");
 
 router.post("/changePassword", async function(req, res) {
-  if (!req.body || !req.header.token || !req.body.password) {
+  if (!req.body || !req.headers.token || !req.body.password) {
     sendResponse(res, 400, "Malformed Request");
     return;
   }
-  var userId = decryptAuthJWT(req.header.token);
+  var userId = decryptAuthJWT(req.headers.token);
   // Do a lookup by the decrypted user id
   const user = await User.findOne({ _id: userId }).catch(e => console.log(e));
 
   if (
     userId === null ||
-    !verifyAuthJWT(req.header.token, userId, user.password)
+    !verifyAuthJWT(req.headers.token, userId, user.password)
   ) {
     // error in decrypting JWT, so we can send back an invalid JWT message
     // could be expired or something else

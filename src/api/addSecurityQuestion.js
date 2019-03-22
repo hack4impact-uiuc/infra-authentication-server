@@ -4,10 +4,10 @@ const { sendResponse } = require("./../utils/sendResponse");
 const { decryptAuthJWT } = require("../utils/jwtHelpers");
 
 router.post("/addSecurityQuestion", async function(req, res) {
-  if (!req.header.token || !req.body.question || !req.body.answer) {
+  if (!req.headers.token || !req.body.question || !req.body.answer) {
     return sendResponse(res, 400, "Malformed Request");
   }
-  const userId = decryptAuthJWT(req.header.token);
+  const userId = decryptAuthJWT(req.headers.token);
   if (userId === null) {
     return sendResponse(res, 400, "Invalid token");
   }
