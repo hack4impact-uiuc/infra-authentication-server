@@ -11,10 +11,8 @@ let server;
 
 before(async () => {
   // Make a DB connection before starting the tests so the first test
-  // doesn't throw off timing if doing performance testing
-  User.startSession(() => {
-    console.log("Successfully started session on port 8000");
-  });
+  // doesn't throw off timing if doing performance testing TTFB
+  User.startSession();
 
   var options = {
     useNewUrlParser: true
@@ -35,7 +33,6 @@ after(async () => {
 });
 
 describe("connection test", function() {
-  console.log("Hello");
   it("connection established and test_db cleared", async () => {
     assert(1 === 1);
   });
