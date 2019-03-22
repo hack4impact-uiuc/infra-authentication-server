@@ -25,6 +25,7 @@ router.post(
         errors: errors.array({ onlyFirstError: true })
       });
     }
+    const userId = decryptAuthJWT(req.headers.token);
     var user = await User.findOne({ _id: userId });
     if (user) {
       await User.updateOne(
