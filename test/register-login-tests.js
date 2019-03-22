@@ -9,26 +9,29 @@ const test_uri =
   "mongodb://product:infra28@ds111441.mlab.com:11441/auth-infra-server-test";
 var server;
 
-before(done => {
+before(async () => {
   // Make a DB connection before starting the tests so the first test
   // doesn't throw off timing if doing performance testing
   User.startSession(() => {
     console.log("Successfully started session on port 8000");
-    done();
   });
 
   var options = {
-    reconnectTries: Number.MAX_VALUE, // to get rid of weird topology was destroyed error from mongo
-    reconnectInterval: 1000,
     useNewUrlParser: true
   };
 
   // connect test_db and clear it before starting
-  mongoose.connect(test_uri, options, function() {
-    mongoose.connection.db.dropDatabase();
-  });
+  await mongoose.connect(test_uri, options);
 
+  mongoose.connection.db
+    .dropDatabase()
+    .catch(() => console.log("Trying to drop"));
   server = app.listen(8000);
+});
+
+after(async () => {
+  // wait for both the server close and the mongoose connection to finish
+  return Promise.all([server.close(), mongoose.connection.close()]);
 });
 
 describe("connection test", function() {
@@ -150,13 +153,7 @@ describe("POST /login", function() {
       .type("form")
       .send(valid_login_test);
     // .expect(200, '{"status":200,"message":"Successful login!"}');
-    assert(200 === response.body.status);
-    assert("Successful login!" === response.body.message);
+    assert.equal(200, response.body.status);
+    assert.equal("Successful login!", response.body.message);
   });
-});
-
-after(done => {
-  server.close();
-  mongoose.connection.close();
-  done();
 });
