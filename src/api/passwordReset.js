@@ -41,9 +41,12 @@ router.post(
       );
       return;
     }
-    const user = await User.findOne({ email: req.body.email }).catch(e =>
-      console.log(e)
-    );
+    let user;
+    try {
+      user = await User.findOne({ email: req.body.email });
+    } catch (e) {
+      return sendResponse(res, 500, e.message);
+    }
     if (!user) {
       sendResponse(res, 400, "User does not exist in the database");
       return;

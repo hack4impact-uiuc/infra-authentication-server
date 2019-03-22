@@ -30,9 +30,12 @@ router.post(
         "Gmail not enabled. Do not use this endpoint."
       );
     }
-    const user = await User.findOne({ email: req.body.email }).catch(e =>
-      console.log(e)
-    );
+    let user;
+    try {
+      user = await User.findOne({ email: req.body.email });
+    } catch (e) {
+      return sendResponse(res, 500, e.message);
+    }
 
     // TODO: handle the config file change in security question
     if (!user) {

@@ -19,7 +19,6 @@ router.get(
         errors: errors.array({ onlyFirstError: true })
       });
     }
-    status = 401;
     let authenticationStatus = {};
     try {
       authenticationStatus = jwt.verify(req.headers.token, SECRET_TOKEN);

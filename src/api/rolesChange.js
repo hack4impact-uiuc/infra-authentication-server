@@ -26,7 +26,6 @@ router.post(
     if (!req.headers.token) {
       return sendResponse(res, 400, "Token not provided");
     }
-    status = 401;
     let authenticationStatus = {};
     try {
       authenticationStatus = jwt.verify(req.headers.token, SECRET_TOKEN);

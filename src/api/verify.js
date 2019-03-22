@@ -20,7 +20,12 @@ router.post(
     }
     var userId = decryptAuthJWT(req.header.token);
     // Do a lookup by the decrypted user id
-    const user = await User.findOne({ _id: userId }).catch(e => console.log(e));
+    let user;
+    try {
+      user = await User.findOne({ _id: userId });
+    } catch (e) {
+      return sendResponse(res, 500, e.message);
+    }
     if (
       userId === null ||
       !verifyAuthJWT(req.header.token, userId, user.password)

@@ -67,7 +67,6 @@ router.post(
       try {
         await sendMail(body);
       } catch (e) {
-        console.log(e);
         return sendResponse(
           res,
           500,

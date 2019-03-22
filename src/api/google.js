@@ -22,7 +22,7 @@ router.post(
 
     const useGoogle = await googleAuth();
     if (!useGoogle)
-      return sendRespose(res, 400, "Google authentication has not be enabled");
+      return sendResponse(res, 400, "Google authentication has not be enabled");
 
     const tokenInfoRes = await fetch(
       `https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${
@@ -33,8 +33,7 @@ router.post(
 
     const user = await User.findOne({ email: payload.email, googleAuth: true });
     if (user) {
-      console.log("Welcome back " + user.username);
-      sendResponse(res, 200, "Successful login!");
+      return sendResponse(res, 200, "Successful login!");
     } else {
       const user = new User({
         email: payload.email,
@@ -43,9 +42,7 @@ router.post(
         googleAuth: true,
         userLevel: "generalUser"
       });
-      await user.save().then(user => {
-        console.log("Google user added successfully");
-      });
+      await user.save();
       sendResponse(res, 200, "New Google user: " + payload.email);
     }
   }
