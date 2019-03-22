@@ -1,8 +1,6 @@
 const router = require("express").Router();
 const User = require("../models/User");
-const fetch = require("node-fetch");
 const { sendResponse } = require("./../utils/sendResponse");
-var SECRET_TOKEN = "helga_has_n000000_idea_what_she_doin";
 const { decryptAuthJWT, verifyAuthJWT } = require("./../utils/jwtHelpers");
 
 router.post("/verify", async function(req, res) {
