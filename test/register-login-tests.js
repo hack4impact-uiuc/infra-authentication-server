@@ -18,7 +18,7 @@ before(done => {
   });
 
   var options = {
-    server: { socketOptions: { keepAlive: 1, connectTimeoutMS: 30000 } }, // ahh server makes the error come up again but this doesnt help apparently
+    socketOptions: { keepAlive: 1, connectTimeoutMS: 30000 },
     reconnectTries: Number.MAX_VALUE, // to get rid of weird topology was destroyed error from mongo
     reconnectInterval: 1000,
     useNewUrlParser: true
