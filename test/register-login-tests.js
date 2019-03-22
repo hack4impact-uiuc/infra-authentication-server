@@ -87,8 +87,6 @@ describe("POST /register", function() {
       .post("/register")
       .type("form")
       .send(valid_register_test);
-
-    // doing this instead of *expect* bc *expect* expects the complete response and doesn't check for only parts of it
     assert(200 === response.body.status);
     assert("User added successfully!" === response.body.message);
   });
