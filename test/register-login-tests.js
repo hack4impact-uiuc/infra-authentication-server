@@ -23,7 +23,7 @@ before(async () => {
   // connect test_db and clear it before starting
   await mongoose.connect(test_uri, options);
 
-  mongoose.connection.db
+  await mongoose.connection.db
     .dropDatabase()
     .catch(() => console.log("Trying to drop"));
   server = app.listen(8000);
@@ -31,11 +31,15 @@ before(async () => {
 
 after(async () => {
   // wait for both the server close and the mongoose connection to finish
-  return Promise.all([server.close(), mongoose.connection.close()]);
+  await mongoose.connection.db
+    .dropDatabase()
+    .catch(() => console.log("Trying to drop"));
+  await server.close();
+  await mongoose.connection.close();
+  // await Promise.all([server.close(), mongoose.connection.close()]);
 });
 
 describe("connection test", function() {
-  console.log("Hello");
   it("connection established and test_db cleared", async () => {
     assert(1 === 1);
   });
@@ -53,7 +57,7 @@ const valid_register_test = {
 };
 
 describe("POST /register", function() {
-  it("returns 400 for empty body", async () => {
+  it("returns 400 for empty body", async function() {
     const response = await request(app)
       .post("/register")
       .type("form")
@@ -64,7 +68,7 @@ describe("POST /register", function() {
       );
   });
 
-  it("returns 400 for invalid email", async () => {
+  it("returns 400 for invalid email", async function() {
     const response = await request(app)
       .post("/register")
       .type("form")
@@ -86,7 +90,7 @@ describe("POST /register", function() {
       );
   });
 
-  it("returns 200 for valid user", async () => {
+  it("returns 200 for valid user", async function() {
     const response = await request(app)
       .post("/register")
       .type("form")
