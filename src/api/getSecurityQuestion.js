@@ -1,15 +1,20 @@
 const router = require("express").Router();
-const nodemailer = require("nodemailer");
-const cors = require("cors");
+const { check, validationResult } = require("express-validator/check");
 const User = require("../models/User");
-const bodyParser = require("body-parser");
 const { sendResponse } = require("./../utils/sendResponse");
 
-router.post("/getSecurityQuestion", async function(req, res) {
-  if (!req.body || !req.body.email) {
-    sendResponse(res, 400, "Malformed request");
-    return;
+router.post("/getSecurityQuestion", check("email").isEmail(), async function(
+  req,
+  res
+) {
+  // Input validation
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return sendResponse(res, 400, "Invalid request", {
+      errors: errors.array({ onlyFirstError: true })
+    });
   }
+
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
     sendResponse(res, 400, "User does not exist in the database");
