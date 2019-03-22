@@ -24,6 +24,7 @@ function verifyAuthJWT(token, id, password) {
 function decryptAuthJWT(token) {
   try {
     const { userId } = jwt.verify(token, SECRET_TOKEN);
+    console.log(userId);
     return userId;
   } catch (err) {
     return null;
