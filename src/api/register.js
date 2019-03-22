@@ -4,11 +4,10 @@ const User = require("../models/User");
 const { sendResponse } = require("./../utils/sendResponse");
 const { getRolesForUser } = require("./../utils/getConfigFile");
 const { signAuthJWT } = require("../utils/jwtHelpers");
-const { generateAndCommitPIN } = require("../utils/pinHelpers");
+const { generatePIN } = require("../utils/pinHelpers");
 const { isGmailEnabled } = require("../utils/getConfigFile");
 const { sendMail } = require("./../utils/sendMail");
 router.post("/register", async function(req, res) {
-  console.log("HHERE");
   const usingGmail = await isGmailEnabled();
   if (!req.body.email || !req.body.password || !req.body.role) {
     return sendResponse(
@@ -44,13 +43,15 @@ router.post("/register", async function(req, res) {
 
   const jwt_token = signAuthJWT(user._id, user.password);
   if (usingGmail) {
-    // using gmail so should send verification email
-    generateAndCommitPIN(user);
+    // using gmail so it should send generate a PIN and send a verification email.
+    generatePIN(user);
     const body = {
       from: "hack4impact.infra@gmail.com",
       to: user.email,
-      subject: "Forgot Password",
-      text: "Enter the following pin on the reset page: " + user.pin
+      subject: "New User Verification",
+      text:
+        "Thanks for signing up! Please enter the following PIN on the new user confirmation page" +
+        user.pin
     };
     try {
       await sendMail(body);
