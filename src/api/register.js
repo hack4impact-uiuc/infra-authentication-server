@@ -27,6 +27,8 @@ router.post(
         errors: errors.array({ onlyFirstError: true })
       });
     }
+
+    const usingGmail = await isGmailEnabled();
     if (await User.findOne({ email: req.body.email })) {
       return sendResponse(res, 400, "User already exists. Please try again.");
     }
