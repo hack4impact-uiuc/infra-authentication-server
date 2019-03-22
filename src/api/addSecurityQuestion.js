@@ -25,11 +25,6 @@ router.post(
         errors: errors.array({ onlyFirstError: true })
       });
     }
-
-    const userId = decryptAuthJWT(req.body.token);
-    if (userId === null) {
-      return sendResponse(res, 400, "Invalid token");
-    }
     var user = await User.findOne({ _id: userId });
     if (user) {
       await User.updateOne(

@@ -28,14 +28,17 @@ router.post(
       });
     }
 
-    var userId = decryptAuthJWT(req.body.token);
+    var userId = decryptAuthJWT(req.header.token);
     // Do a lookup by the decrypted user id
     const user = await User.findOne({ _id: userId }).catch(e => console.log(e));
 
-    if (!verifyAuthJWT(req.body.token, userId, user.password)) {
+    if (
+      userId === null ||
+      !verifyAuthJWT(req.header.token, userId, user.password)
+    ) {
       // error in decrypting JWT, so we can send back an invalid JWT message
       // could be expired or something else
-      sendResponse(res, 400, "JWT doesn't match password");
+      sendResponse(res, 400, "Invalid JWT token");
     } else if (user) {
       user.password = await bcrypt.hash(req.body.password, 10);
       await user.save();

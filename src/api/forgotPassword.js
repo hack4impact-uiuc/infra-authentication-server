@@ -22,7 +22,6 @@ router.post(
         errors: errors.array({ onlyFirstError: true })
       });
     }
-
     const usingGmail = await isGmailEnabled();
     if (!usingGmail) {
       return sendResponse(
@@ -43,7 +42,8 @@ router.post(
       req.body.answer &&
       user.answer === req.body.answer.toLowerCase().replace(/\s/g, "")
     ) {
-      generateAndCommitPIN(user);
+      generatePIN(user);
+      await user.save();
       const body = {
         from: "hack4impact.infra@gmail.com",
         to: user.email,

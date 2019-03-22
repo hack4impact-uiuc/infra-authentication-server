@@ -27,9 +27,6 @@ router.post(
         errors: errors.array({ onlyFirstError: true })
       });
     }
-    console.log("HHERE");
-    const usingGmail = await isGmailEnabled();
-
     if (await User.findOne({ email: req.body.email })) {
       return sendResponse(res, 400, "User already exists. Please try again.");
     }
@@ -55,13 +52,15 @@ router.post(
 
     const jwt_token = signAuthJWT(user._id, user.password);
     if (usingGmail) {
-      // using gmail so should send verification email
-      generateAndCommitPIN(user);
+      // using gmail so it should send generate a PIN and send a verification email.
+      generatePIN(user);
       const body = {
         from: "hack4impact.infra@gmail.com",
         to: user.email,
-        subject: "Forgot Password",
-        text: "Enter the following pin on the reset page: " + user.pin
+        subject: "New User Verification",
+        text:
+          "Thanks for signing up! Please enter the following PIN on the new user confirmation page" +
+          user.pin
       };
       try {
         await sendMail(body);

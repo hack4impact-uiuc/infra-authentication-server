@@ -18,14 +18,13 @@ router.post(
         errors: errors.array({ onlyFirstError: true })
       });
     }
-    var userId = decryptAuthJWT(req.body.token);
+    var userId = decryptAuthJWT(req.header.token);
     // Do a lookup by the decrypted user id
     const user = await User.findOne({ _id: userId }).catch(e => console.log(e));
     if (
       userId === null ||
-      !verifyAuthJWT(req.body.token, userId, user.password)
+      !verifyAuthJWT(req.header.token, userId, user.password)
     ) {
-      console.log(req.body.token);
       sendResponse(res, 400, "Invalid JWT token");
     } else if (user) {
       return res.status(200).send({
