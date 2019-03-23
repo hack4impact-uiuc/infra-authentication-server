@@ -89,7 +89,7 @@ describe("POST /register", function() {
       .send(valid_register_test);
     assert(200 === response.body.status);
     assert("User added successfully!" === response.body.message);
-  });
+  }).timeout(5000); // add a longer timeout since there's a lot that has to get done when adding a user
 });
 
 const valid_login_test = {
