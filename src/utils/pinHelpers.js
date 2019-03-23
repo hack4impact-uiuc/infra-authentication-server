@@ -9,7 +9,6 @@ async function generatePIN(user) {
   // add a day to the current date for the expiration
   date.setDate(date.getDate() + 1);
   user.expiration = date;
-  console.log(user.pin);
   return user.pin;
 }
 async function expirePIN(user) {

@@ -35,7 +35,7 @@ router.get(
     await Promise.all(
       roles.map(async role => {
         let usersWithRoles = await User.find({ role });
-        for (var i in usersWithRoles) {
+        for (let i in usersWithRoles) {
           let newUser = {
             email: usersWithRoles[i].email,
             role: usersWithRoles[i].role

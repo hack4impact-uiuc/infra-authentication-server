@@ -18,7 +18,7 @@ router.post(
         errors: errors.array({ onlyFirstError: true })
       });
     }
-    var userId = decryptAuthJWT(req.header.token);
+    var userId = decryptAuthJWT(req.headers.token);
     // Do a lookup by the decrypted user id
     let user;
     try {
@@ -28,7 +28,7 @@ router.post(
     }
     if (
       userId === null ||
-      !verifyAuthJWT(req.header.token, userId, user.password)
+      !verifyAuthJWT(req.headers.token, userId, user.password)
     ) {
       sendResponse(res, 400, "Invalid JWT token");
     } else if (user) {
