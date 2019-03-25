@@ -7,7 +7,7 @@ const getConfigFile = async () => {
    * we may be able to do this another way.
    */
   return await yaml.safeLoad(
-    fs.readFileSync(__dirname + "/../config/defaultroles.yml", "utf8")
+    fs.readFileSync(__dirname + "/../../config/defaultroles.yml", "utf8")
   );
 };
 
@@ -15,6 +15,14 @@ const getRolesForUser = async role => {
   const config = await getConfigFile();
   if (config["roles"][role] != undefined) {
     return config["roles"][role];
+  }
+  return null;
+};
+
+const getTestURI = async () => {
+  const config = await getConfigFile();
+  if (config["test_db"] != undefined) {
+    return config["test_db"];
   }
   return null;
 };
@@ -53,6 +61,7 @@ const isGmailEnabled = async () => {
 module.exports = {
   getConfigFile,
   getRolesForUser,
+  getTestURI,
   googleAuth,
   isSecurityQuestionEnabled,
   isGmailEnabled

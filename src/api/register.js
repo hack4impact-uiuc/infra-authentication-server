@@ -23,7 +23,7 @@ router.post(
     // Input validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return sendResponse(res, 400, "Invalid request", {
+      return sendResponse(res, 400, "Invalid Request", {
         errors: errors.array({ onlyFirstError: true })
       });
     }
