@@ -12,5 +12,6 @@ router.use("/", require("./verifyEmail"));
 router.use("/", require("./roles"));
 router.use("/", require("./rolesChange"));
 router.use("/", require("./verify"));
+router.use("/", require("./resendVerificationEmail"));
 
 module.exports = router;

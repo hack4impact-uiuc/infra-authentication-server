@@ -45,7 +45,7 @@ router.post(
     if (!user) {
       return sendResponse(res, 400, "User does not exist in the DB.");
     }
-    if (user.verified === 1) {
+    if (user.verified) {
       return sendResponse(res, 400, "User has already verified their email");
     }
 
