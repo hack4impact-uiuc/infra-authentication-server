@@ -15,7 +15,10 @@ router.post(
     check("token")
       .custom(value => decryptAuthJWT(value) !== null)
       .withMessage("Invalid JWT"),
-    check("password")
+    check("currentPassword")
+      .isString()
+      .isLength({ min: 1 }),
+    check("newPassword")
       .isString()
       .isLength({ min: 1 })
   ],
@@ -23,6 +26,7 @@ router.post(
     // Input validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log(errors);
       return sendResponse(res, 400, "Invalid request", {
         errors: errors.array({ onlyFirstError: true })
       });
@@ -45,12 +49,20 @@ router.post(
       // could be expired or something else
       sendResponse(res, 400, "Invalid JWT token");
     } else if (user) {
-      user.password = await bcrypt.hash(req.body.password, 10);
-      await user.save();
-      var new_token = signAuthJWT(userId, user.password);
-      sendResponse(res, 200, "Successful change of password!", {
-        token: new_token
-      });
+      const oldPasswordMatches = await bcrypt.compare(
+        req.body.currentPassword,
+        user.password
+      );
+      if (oldPasswordMatches) {
+        user.password = await bcrypt.hash(req.body.newPassword, 10);
+        await user.save();
+        var new_token = signAuthJWT(userId, user.password);
+        sendResponse(res, 200, "Successful change of password!", {
+          token: new_token
+        });
+      } else {
+        sendResponse(res, 400, "Current password is incorrect");
+      }
     } else {
       sendResponse(res, 400, "User does not exist.");
     }
