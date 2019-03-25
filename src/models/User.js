@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const { mongoose } = require("./../utils/index");
 
 const schema = mongoose.Schema({
   username: "string",
