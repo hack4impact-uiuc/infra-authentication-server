@@ -7,9 +7,6 @@ const { decryptAuthJWT } = require("../utils/jwtHelpers");
 router.post(
   "/addSecurityQuestion",
   [
-    check("token")
-      .custom(value => decryptAuthJWT(value) !== null)
-      .withMessage("Invalid JWT"),
     check("question")
       .isString()
       .isLength({ min: 1 }),
@@ -19,6 +16,10 @@ router.post(
   ],
   async function(req, res) {
     // Input validation
+    if ((await decryptAuthJWT(req.headers.token)) === null) {
+      sendResponse(res, 400, "Invalid JWT");
+    }
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return sendResponse(res, 400, "Invalid request", {

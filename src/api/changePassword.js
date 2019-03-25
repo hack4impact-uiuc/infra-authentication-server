@@ -12,9 +12,6 @@ const {
 router.post(
   "/changePassword",
   [
-    check("token")
-      .custom(value => decryptAuthJWT(value) !== null)
-      .withMessage("Invalid JWT"),
     check("currentPassword")
       .isString()
       .isLength({ min: 1 }),
@@ -23,6 +20,9 @@ router.post(
       .isLength({ min: 1 })
   ],
   async function(req, res) {
+    if ((await decryptAuthJWT(req.headers.token)) === null) {
+      sendResponse(res, 400, "Invalid JWT");
+    }
     // Input validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -43,7 +43,7 @@ router.post(
 
     if (
       userId === null ||
-      !verifyAuthJWT(req.headers.token, userId, user.password)
+      !(await verifyAuthJWT(req.headers.token, userId, user.password))
     ) {
       // error in decrypting JWT, so we can send back an invalid JWT message
       // could be expired or something else
@@ -56,7 +56,7 @@ router.post(
       if (oldPasswordMatches) {
         user.password = await bcrypt.hash(req.body.newPassword, 10);
         await user.save();
-        var new_token = signAuthJWT(userId, user.password);
+        var new_token = await signAuthJWT(userId, user.password);
         sendResponse(res, 200, "Successful change of password!", {
           token: new_token
         });

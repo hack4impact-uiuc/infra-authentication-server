@@ -18,7 +18,13 @@ router.post(
         errors: errors.array({ onlyFirstError: true })
       });
     }
-    var userId = decryptAuthJWT(req.headers.token);
+
+    var userId = await decryptAuthJWT(req.headers.token);
+    if (userId === null) {
+      sendResponse(res, 400, "Invalid JWT");
+    }
+
+    // var userId = await decryptAuthJWT(req.headers.token);
     // Do a lookup by the decrypted user id
     let user;
     try {
@@ -28,8 +34,9 @@ router.post(
     }
     if (
       userId === null ||
-      !verifyAuthJWT(req.headers.token, userId, user.password)
+      !(await verifyAuthJWT(req.headers.token, userId, user.password))
     ) {
+      console.log("HJ");
       sendResponse(res, 400, "Invalid JWT token");
     } else if (user) {
       return res.status(200).send({

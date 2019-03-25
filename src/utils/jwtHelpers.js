@@ -1,19 +1,30 @@
 const jwt = require("jsonwebtoken");
-const { SECRET_TOKEN } = require("./secret-token");
+const { getSecretToken } = require("./secret-token");
 
-function signAuthJWT(id, password) {
+async function signAuthJWT(id, password) {
   if (!password || !id) {
     throw "Cannot create hash without both id && password";
   }
-  return jwt.sign({ userId: id, hashedPassword: password }, SECRET_TOKEN, {
-    expiresIn: "1d"
-  });
+  const SECRET_TOKEN = await getSecretToken();
+  console.log("SIGNING ");
+  console.log(SECRET_TOKEN[0]);
+  return jwt.sign(
+    { userId: id, hashedPassword: password },
+    String(SECRET_TOKEN[0]),
+    {
+      expiresIn: "1d"
+    }
+  );
 }
 
 // Return true if the JWT is valid and matches the parameters
-function verifyAuthJWT(token, id, password) {
+async function verifyAuthJWT(token, id, password) {
   try {
-    const { userId, hashedPassword } = jwt.verify(token, SECRET_TOKEN);
+    const SECRET_TOKEN = await getSecretToken();
+    const { userId, hashedPassword } = jwt.verify(
+      token,
+      String(SECRET_TOKEN[0])
+    );
     return userId === id && hashedPassword == password;
   } catch (err) {
     return false;
@@ -21,10 +32,15 @@ function verifyAuthJWT(token, id, password) {
 }
 
 // Returns the auth JWT if it's valid, else return null if it's invalid
-function decryptAuthJWT(token) {
+async function decryptAuthJWT(token) {
   try {
-    const { userId } = jwt.verify(token, SECRET_TOKEN);
-    return userId;
+    const SECRET_TOKEN = await getSecretToken();
+    const { userId } = jwt.verify(token, String(SECRET_TOKEN[0]));
+    if (userId) {
+      return userId;
+    } else {
+      return null;
+    }
   } catch (err) {
     return null;
   }
