@@ -33,17 +33,23 @@ router.post(
 
     const user = await User.findOne({ email: payload.email, googleAuth: true });
     if (user) {
+      console.log(user);
       return sendResponse(res, 200, "Successful login!");
     } else {
-      const user = new User({
-        email: payload.email,
-        username: payload.name,
-        password: null,
-        googleAuth: true,
-        userLevel: "generalUser"
-      });
-      await user.save();
-      sendResponse(res, 200, "New Google user: " + payload.email);
+      const userCheck = await User.findOne({ email: payload.email });
+      if (userCheck) {
+        return sendResponse(res, 400, "User is not a Google user");
+      } else {
+        const user = new User({
+          email: payload.email,
+          //username: payload.name,
+          password: null,
+          googleAuth: true,
+          role: "guest"
+        });
+        await user.save();
+        sendResponse(res, 200, "New Google user: " + payload.email);
+      }
     }
   }
 );
