@@ -43,11 +43,6 @@ describe("connection test", function() {
   });
 });
 
-/**
- * Test Login/Register Credentials
- * email: hchi124@gmail.com
- * password: Bi$$420
- */
 const valid_register_test = {
   email: "lmao_biss69@gmail.com",
   password: "Bi$$420",
