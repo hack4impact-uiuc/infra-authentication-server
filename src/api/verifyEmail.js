@@ -6,12 +6,7 @@ const { isGmailEnabled } = require("../utils/getConfigFile");
 
 router.post(
   "/verifyEmail",
-  [
-    check("email").isEmail(),
-    check("pin")
-      .isNumeric()
-      .optional()
-  ],
+  [check("email").isEmail(), check("pin").isNumeric()],
   async function(req, res) {
     // Input validation
     const errors = validationResult(req);
