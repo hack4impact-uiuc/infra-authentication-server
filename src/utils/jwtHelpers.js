@@ -25,7 +25,13 @@ async function verifyAuthJWT(token, id, password) {
       token,
       String(SECRET_TOKEN[0])
     );
-    return userId === id && hashedPassword == password;
+    const valid = userId === id && hashedPassword == password;
+    const { otherUserId, otherHashedPassword } = jwt.verify(
+      token,
+      String(SECRET_TOKEN[1])
+    );
+    const valid2 = otherUserId === id && otherHashedPassword == password;
+    return valid || valid2;
   } catch (err) {
     return false;
   }
@@ -35,12 +41,15 @@ async function verifyAuthJWT(token, id, password) {
 async function decryptAuthJWT(token) {
   try {
     const SECRET_TOKEN = await getSecretToken();
-    const { userId } = jwt.verify(token, String(SECRET_TOKEN[0]));
+    let { userId } = jwt.verify(token, String(SECRET_TOKEN[0]));
     if (userId) {
       return userId;
-    } else {
-      return null;
     }
+    let { otherUserId } = jwt.verify(token, String(SECRET_TOKEN[1]));
+    if (otherUserId) {
+      return otherUserId;
+    }
+    return null;
   } catch (err) {
     return null;
   }
