@@ -27,6 +27,14 @@ const getTestURI = async () => {
   return null;
 };
 
+const getProdURI = async () => {
+  const config = await getConfigFile();
+  if (config["prod_db"] != undefined) {
+    return config["prod_db"];
+  }
+  return null;
+};
+
 const googleAuth = async () => {
   const config = await getConfigFile();
   if (config["useGoogleAuth"] === undefined) {
@@ -64,5 +72,6 @@ module.exports = {
   getTestURI,
   googleAuth,
   isSecurityQuestionEnabled,
-  isGmailEnabled
+  isGmailEnabled,
+  getProdURI
 };

@@ -2,7 +2,7 @@
 
 const app = require("../src/App");
 const request = require("supertest");
-const User = require("../src/models/User.js");
+const User = require("../test/models/User.js");
 const mongoose = require("mongoose");
 const assert = require("assert");
 const test_uri =
@@ -43,14 +43,9 @@ describe("connection test", function() {
   });
 });
 
-/**
- * Test Login/Register Credentials
- * email: helga_test@ifra.org
- * password: 69biss_cant_stop_dis_hoe420tZ
- */
 const valid_register_test = {
-  email: "helga_test@infra.org",
-  password: "69biss_cant_stop_dis_hoe420",
+  email: "lmao_biss69@gmail.com",
+  password: "Bi$$420",
   role: "guest"
 };
 
@@ -89,21 +84,22 @@ describe("POST /register", function() {
       .send(valid_register_test);
     assert.equal(200, response.body.status);
     assert.equal("User added successfully!", response.body.message);
+    console.log("response.body.message: " + response.body.message);
   }).timeout(5000); // add a longer timeout since there's a lot that has to get done when adding a user
 });
 
 const valid_login_test = {
-  email: "helga_test@infra.org",
-  password: "69biss_cant_stop_dis_hoe420"
+  email: "lmao_biss69@gmail.com",
+  password: "Bi$$420"
 };
 
 const user_doesnt_exist = {
-  email: "helga@infra.org",
+  email: "lmao_biss69@infra.org",
   password: "69biss_cant_stop_dis_hoe420"
 };
 
 const wrong_pass = {
-  email: "helga_test@infra.org",
+  email: "lmao_biss69@gmail.com",
   password: "bissssss6969"
 };
 
