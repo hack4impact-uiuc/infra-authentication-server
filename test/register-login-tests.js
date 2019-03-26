@@ -49,7 +49,7 @@ describe("connection test", function() {
  * password: Bi$$420
  */
 const valid_register_test = {
-  email: "hchi124@gmail.com",
+  email: "lmao_biss69@gmail.com",
   password: "Bi$$420",
   role: "guest"
 };
@@ -94,17 +94,17 @@ describe("POST /register", function() {
 });
 
 const valid_login_test = {
-  email: "hchi124@gmail.com",
+  email: "lmao_biss69@gmail.com",
   password: "Bi$$420"
 };
 
 const user_doesnt_exist = {
-  email: "helga@infra.org",
+  email: "lmao_biss69@infra.org",
   password: "69biss_cant_stop_dis_hoe420"
 };
 
 const wrong_pass = {
-  email: "hchi124@gmail.com",
+  email: "lmao_biss69@gmail.com",
   password: "bissssss6969"
 };
 
