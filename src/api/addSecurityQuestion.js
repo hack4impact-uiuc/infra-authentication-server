@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const bcrypt = require("bcrypt");
 const User = require("../models/User");
 const { check, validationResult } = require("express-validator/check");
 const { sendResponse } = require("./../utils/sendResponse");
@@ -10,6 +11,9 @@ router.post(
     check("token")
       .custom(value => decryptAuthJWT(value) !== null)
       .withMessage("Invalid JWT"),
+    check("reenter_password")
+      .isString()
+      .isLength({ min: 1 }),
     check("question")
       .isString()
       .isLength({ min: 1 }),
@@ -27,7 +31,11 @@ router.post(
     }
     const userId = decryptAuthJWT(req.headers.token);
     var user = await User.findOne({ _id: userId });
-    if (user) {
+    var correct_password = await bcrypt.compare(
+      req.body.reenter_password,
+      user.password
+    );
+    if (user && correct_password) {
       await User.updateOne(
         { _id: user._id },
         {
