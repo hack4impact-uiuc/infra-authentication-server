@@ -33,7 +33,6 @@ router.post(
 
     const user = await User.findOne({ email: payload.email, googleAuth: true });
     if (user) {
-      console.log(user);
       return sendResponse(res, 200, "Successful login!");
     } else {
       const userCheck = await User.findOne({ email: payload.email });
