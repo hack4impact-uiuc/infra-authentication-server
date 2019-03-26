@@ -12,6 +12,9 @@ roles:
 
 test_db:
     "mongodb://product:infra28@ds111441.mlab.com:11441/auth-infra-server-test"
+prod_db:
+    "mongodb://product:infra28@ds125385.mlab.com:25385/auth-infra"
+
 useGoogleAuth: true
 
 # Note that you MUST have either security question or 
