@@ -3,6 +3,8 @@ const { check, validationResult } = require("express-validator/check");
 const User = require("../models/User");
 const { sendResponse } = require("./../utils/sendResponse");
 const { decryptAuthJWT, verifyAuthJWT } = require("./../utils/jwtHelpers");
+const { googleAuth } = require("./../utils/getConfigFile");
+const fetch = require("node-fetch");
 
 router.post(
   "/verify",
@@ -18,6 +20,26 @@ router.post(
         errors: errors.array({ onlyFirstError: true })
       });
     }
+
+    const useGoogle = await googleAuth();
+    if (useGoogle) {
+      const tokenInfoRes = await fetch(
+        `https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${
+          req.headers.token
+        }`
+      );
+      const payload = await tokenInfoRes.json();
+      const user = await User.findOne({
+        email: payload.email,
+        googleAuth: true
+      });
+      if (user) {
+        return sendResponse(res, 200, "Google Authenticated");
+      } else {
+        null;
+      }
+    }
+
     var userId = decryptAuthJWT(req.headers.token);
     // Do a lookup by the decrypted user id
     let user;
