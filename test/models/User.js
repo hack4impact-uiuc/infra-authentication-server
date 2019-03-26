@@ -14,6 +14,6 @@ const schema = mongoose.Schema({
   role: "string"
 });
 
-const User = mongoose.model("User", schema);
+const User = mongoose.model("TestUser", schema);
 
 module.exports = User;
