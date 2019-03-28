@@ -56,6 +56,8 @@ router.post(
     if (usingGmail) {
       // using gmail so it should send generate a PIN and send a verification email.
       generatePIN(user);
+      // expire it since we don't want it able to be used to change password
+      user.expiration = 0;
       const body = {
         from: "hack4impact.infra@gmail.com",
         to: user.email,
