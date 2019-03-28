@@ -16,7 +16,6 @@ router.get(
     // Input validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log("1");
       return sendResponse(res, 400, "Invalid request", {
         errors: errors.array({ onlyFirstError: true })
       });
@@ -28,12 +27,10 @@ router.get(
       try {
         authenticationStatus = jwt.verify(req.headers.token, SECRET_TOKEN);
       } catch (e) {
-        console.log("2");
         return sendResponse(res, 400, "Invalid Token");
       }
       user = await User.findById(authenticationStatus.userId);
       if (!user) {
-        console.log("3");
         sendResponse(res, 400, "User does not exist in the database");
         return;
       }
@@ -46,7 +43,6 @@ router.get(
       const payload = await tokenInfoRes.json();
       user = await User.findOne({ email: payload.email, googleAuth: true });
       if (!user) {
-        //console.log("4")
         sendResponse(res, 400, "User does not exist in the database");
         return;
       }
