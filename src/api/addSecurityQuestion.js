@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const bcrypt = require("bcrypt");
+// const bcrypt = require("bcrypt");
 const User = require("../models/User");
 const { check, validationResult } = require("express-validator/check");
 const { sendResponse } = require("./../utils/sendResponse");
@@ -11,9 +11,9 @@ router.post(
     check("token")
       .custom(value => decryptAuthJWT(value) !== null)
       .withMessage("Invalid JWT"),
-    check("reenter_password")
-      .isString()
-      .isLength({ min: 1 }),
+    // check("question_password")
+    //   .isString()
+    //   .isLength({ min: 1 }),
     check("question")
       .isString()
       .isLength({ min: 1 }),
@@ -31,11 +31,11 @@ router.post(
     }
     const userId = decryptAuthJWT(req.headers.token);
     var user = await User.findOne({ _id: userId });
-    var correct_password = await bcrypt.compare(
-      req.body.reenter_password,
-      user.password
-    );
-    if (user && correct_password) {
+    // var password_match = await bcrypt.compare(
+    //   req.body.question_password,
+    //   user.password
+    // );
+    if (user) {
       await User.updateOne(
         { _id: user._id },
         {
@@ -43,8 +43,10 @@ router.post(
           answer: req.body.answer.toLowerCase().replace(/\s/g, "")
         }
       );
+      console.log("successfully added");
       sendResponse(res, 200, "Succesfully added the security question");
     } else {
+      console.log("user doesnt exist");
       sendResponse(res, 400, "User doesn't exist");
     }
   }
