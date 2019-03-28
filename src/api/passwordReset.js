@@ -4,7 +4,10 @@ const { check, validationResult } = require("express-validator/check");
 const User = require("../models/User");
 const { sendResponse } = require("./../utils/sendResponse");
 const { signAuthJWT } = require("../utils/jwtHelpers");
-const { isGmailEnabled } = require("../utils/getConfigFile");
+const {
+  isGmailEnabled,
+  isSecurityQuestionEnabled
+} = require("../utils/getConfigFile");
 const { expirePIN } = require("../utils/pinHelpers");
 
 router.post(
@@ -20,6 +23,7 @@ router.post(
     check("answer")
       .isString()
       .isLength({ min: 1 })
+      .optional()
   ],
   async function(req, res) {
     // Input validation
@@ -30,9 +34,10 @@ router.post(
       });
     }
     const gmailEnabled = await isGmailEnabled();
+    const securityQuestionEnabled = await isSecurityQuestionEnabled();
     if (
       (gmailEnabled && !req.body.pin) ||
-      (!gmailEnabled && !req.body.answer)
+      (securityQuestionEnabled && !req.body.answer)
     ) {
       sendResponse(
         res,
