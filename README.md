@@ -16,3 +16,16 @@ Client Example: https://github.com/hack4impact-uiuc/infra-authentication-client
 yarn
 yarn start
 ```
+
+Documentation: https://h4i-auth-infra-docs.now.sh/
+
+API: https://github.com/hack4impact-uiuc/infra-authentication-api/
+
+Client Example: https://github.com/hack4impact-uiuc/infra-authentication-client
+
+# To Run Locally
+
+```
+yarn
+yarn start
+```
