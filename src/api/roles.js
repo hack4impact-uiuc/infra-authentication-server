@@ -5,6 +5,7 @@ const { sendResponse } = require("./../utils/sendResponse");
 const { getRolesForUser } = require("./../utils/getConfigFile");
 const jwt = require("jsonwebtoken");
 var SECRET_TOKEN = "helga_has_n000000_idea_what_she_doin";
+const fetch = require("node-fetch");
 
 router.get(
   "/roles",
@@ -19,16 +20,32 @@ router.get(
         errors: errors.array({ onlyFirstError: true })
       });
     }
+    let user = null;
+
     let authenticationStatus = {};
-    try {
-      authenticationStatus = jwt.verify(req.headers.token, SECRET_TOKEN);
-    } catch (e) {
-      return sendResponse(res, 400, "Invalid Token");
-    }
-    const user = await User.findById(authenticationStatus.userId);
-    if (!user) {
-      sendResponse(res, 400, "User does not exist in the database");
-      return;
+    if (req.headers.google === "undefined") {
+      try {
+        authenticationStatus = jwt.verify(req.headers.token, SECRET_TOKEN);
+      } catch (e) {
+        return sendResponse(res, 400, "Invalid Token");
+      }
+      user = await User.findById(authenticationStatus.userId);
+      if (!user) {
+        sendResponse(res, 400, "User does not exist in the database");
+        return;
+      }
+    } else {
+      const tokenInfoRes = await fetch(
+        `https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${
+          req.headers.token
+        }`
+      );
+      const payload = await tokenInfoRes.json();
+      user = await User.findOne({ email: payload.email, googleAuth: true });
+      if (!user) {
+        sendResponse(res, 400, "User does not exist in the database");
+        return;
+      }
     }
     const roles = await getRolesForUser(user.role);
     let users = [];

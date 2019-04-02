@@ -4,6 +4,7 @@ const User = require("../models/User");
 const { sendResponse } = require("./../utils/sendResponse");
 const { getRolesForUser } = require("./../utils/getConfigFile");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 const SECRET_TOKEN = "helga_has_n000000_idea_what_she_doin";
 
 router.post(
@@ -32,10 +33,17 @@ router.post(
     } catch (e) {
       return sendResponse(res, 400, "Invalid Token");
     }
+
     const user = await User.findById(authenticationStatus.userId);
     if (!user) {
       sendResponse(res, 400, "User does not exist in the database");
       return;
+    }
+
+    let authenticated = false;
+    if (await bcrypt.compare(req.body.password, user.password)) {
+      // hash matches! sign a JWT with an expiration 1 day in the future and send back to the user
+      authenticated = true;
     }
 
     const roles = await getRolesForUser(user.role);
@@ -44,7 +52,7 @@ router.post(
       return sendResponse(res, 400, "User with that email doesn't exist");
     }
     userToBePromoted = userToBePromoted[0];
-    if (roles.indexOf(req.body.newRole) >= 0) {
+    if (roles.indexOf(req.body.newRole) >= 0 && authenticated) {
       userToBePromoted.role = req.body.newRole;
       await userToBePromoted.save();
       return sendResponse(
@@ -55,6 +63,8 @@ router.post(
           " to " +
           String(userToBePromoted.role)
       );
+    } else if (roles.indexOf(req.body.newRole) >= 0 && !authenticated) {
+      return sendResponse(res, 400, "Incorrect Password");
     } else {
       return sendResponse(res, 400, "Incorrect Permission Levels");
     }
