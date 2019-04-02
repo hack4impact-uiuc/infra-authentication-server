@@ -45,9 +45,8 @@ router.post(
     }
     userToBePromoted = userToBePromoted[0];
     // PR note: adding logic for promoting to higher level than yourself / demoting higher level user
-    console.log(userToBePromoted);
-    console.log(roles);
     if (
+      !!roles &&
       roles.indexOf(req.body.newRole) >= 0 &&
       roles.indexOf(userToBePromoted.role >= 0)
     ) {

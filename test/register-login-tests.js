@@ -5,8 +5,7 @@ const request = require("supertest");
 const User = require("../test/models/User.js");
 const mongoose = require("mongoose");
 const assert = require("assert");
-const test_uri =
-  "mongodb://product:infra28@ds111441.mlab.com:11441/auth-infra-server-test";
+const { getTestURI } = require("../src/utils/getConfigFile");
 let server;
 
 before(async () => {
@@ -18,22 +17,24 @@ before(async () => {
     useNewUrlParser: true
   };
 
+  console.log(await getTestURI());
   // connect test_db and clear it before starting
-  await mongoose.connect(test_uri, options);
+  await mongoose.connect(await getTestURI(), options);
 
-  await mongoose.connection.db
-    .dropDatabase()
-    .catch(() => console.log("Trying to drop"));
+  // await mongoose.connection.db
+  //   .dropDatabase()
+  //   .catch((error) => console.log("Trying to drop", error));
+
   server = app.listen(8000);
 });
 
 after(async () => {
   // wait for both the server close and the mongoose connection to finish
-  await mongoose.connection.db
-    .dropDatabase()
-    .catch(() => console.log("Trying to drop"));
-  await server.close();
-  await mongoose.connection.close();
+  // await mongoose.connection.db
+  //   .dropDatabase()
+  //   .catch(() => console.log("Trying to drop"));
+  // await server.close();
+  // await mongoose.connection.close();
   // await Promise.all([server.close(), mongoose.connection.close()]);
 });
 

@@ -3,7 +3,7 @@
   "scripts": {
     "start": "nodemon src/startServer.js",
     "docs": "docz dev",
-    "test": "mocha"
+    "test": "mocha --timeout 10000"
   },
   "dependencies": {
     "@sendgrid/mail": "^6.3.1",
