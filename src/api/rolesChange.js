@@ -5,7 +5,7 @@ const { sendResponse } = require("./../utils/sendResponse");
 const { getRolesForUser } = require("./../utils/getConfigFile");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const SECRET_TOKEN = "helga_has_n000000_idea_what_she_doin";
+const { SECRET_TOKEN } = require("../utils/secret-token");
 
 router.post(
   "/roleschange",

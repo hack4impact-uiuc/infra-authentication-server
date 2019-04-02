@@ -5,7 +5,7 @@ const { sendResponse } = require("./../utils/sendResponse");
 const { decryptAuthJWT } = require("../utils/jwtHelpers");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const SECRET_TOKEN = "helga_has_n000000_idea_what_she_doin";
+const { SECRET_TOKEN } = require("../utils/secret-token");
 
 router.post(
   "/addSecurityQuestion",
