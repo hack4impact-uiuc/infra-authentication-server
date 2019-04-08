@@ -30,12 +30,11 @@ before(async () => {
 
 after(async () => {
   // wait for both the server close and the mongoose connection to finish
-  // await mongoose.connection.db
-  //   .dropDatabase()
-  //   .catch(() => console.log("Trying to drop"));
-  // await server.close();
-  // await mongoose.connection.close();
-  // await Promise.all([server.close(), mongoose.connection.close()]);
+  await mongoose.connection.db
+    .dropDatabase()
+    .catch(() => console.log("Trying to drop"));
+  await server.close();
+  await mongoose.connection.close();
 });
 
 describe("connection test", function() {
