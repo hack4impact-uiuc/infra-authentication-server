@@ -1,12 +1,17 @@
 const router = require("express").Router();
-const { check, validationResult } = require("express-validator/check");
+const { header, validationResult } = require("express-validator/check");
 const User = require("../models/User");
 const { sendResponse } = require("./../utils/sendResponse");
 const { isGmailEnabled } = require("../utils/getConfigFile");
+const { decryptAuthJWT } = require("../utils/jwtHelpers");
 
 router.post(
   "/verifyEmail",
-  [check("email").isEmail(), check("pin").isNumeric()],
+  [
+    header("token")
+      .custom(value => decryptAuthJWT(value) !== null)
+      .withMessage("Invalid JWT")
+  ],
   async function(req, res) {
     // Input validation
     const errors = validationResult(req);
@@ -23,20 +28,16 @@ router.post(
         "Gmail not enabled. Do not use this endpoint."
       );
     }
-    if (!req.body || !req.body.email || !req.body.pin) {
-      return sendResponse(
-        res,
-        400,
-        "Malformed request: email or pin not specified"
-      );
+    if (!req.body || !req.body.pin) {
+      return sendResponse(res, 400, "Malformed request: pin not specified");
     }
+    const userId = decryptAuthJWT(req.headers.token);
     let user;
     try {
-      user = await User.findOne({ email: req.body.email });
+      user = await User.findOne({ _id: userId });
     } catch (e) {
-      return sendResponse(res, 400, e);
+      return sendResponse(res, 500, e.message);
     }
-
     if (!user) {
       return sendResponse(res, 400, "User does not exist in the DB.");
     }
