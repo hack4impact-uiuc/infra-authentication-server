@@ -4,7 +4,7 @@ const User = require("../models/User");
 const { sendResponse } = require("./../utils/sendResponse");
 const { getRolesForUser } = require("./../utils/getConfigFile");
 const jwt = require("jsonwebtoken");
-var SECRET_TOKEN = "helga_has_n000000_idea_what_she_doin";
+const { SECRET_TOKEN } = require("../utils/secret-token");
 const fetch = require("node-fetch");
 
 router.get(
