@@ -9,6 +9,7 @@ const {
   isSecurityQuestionEnabled
 } = require("../utils/getConfigFile");
 const { expirePIN } = require("../utils/pinHelpers");
+const handleAsyncErrors = require("../utils/errorHandler");
 
 router.post(
   "/passwordReset",
@@ -25,7 +26,7 @@ router.post(
       .isLength({ min: 1 })
       .optional()
   ],
-  async function(req, res) {
+  handleAsyncErrors(async function(req, res) {
     // Input validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -87,7 +88,7 @@ router.post(
     sendResponse(res, 200, "Password successfully reset", {
       token: signAuthJWT(user._id, user.password)
     });
-  }
+  })
 );
 
 module.exports = router;

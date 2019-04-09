@@ -8,7 +8,7 @@ const {
   verifyAuthJWT,
   decryptAuthJWT
 } = require("../utils/jwtHelpers");
-
+const handleAsyncErrors = require("../utils/errorHandler");
 router.post(
   "/changePassword",
   [
@@ -22,7 +22,7 @@ router.post(
       .isString()
       .isLength({ min: 1 })
   ],
-  async function(req, res) {
+  handleAsyncErrors(async function(req, res) {
     // Input validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -66,7 +66,7 @@ router.post(
     } else {
       sendResponse(res, 400, "User does not exist.");
     }
-  }
+  })
 );
 
 module.exports = router;

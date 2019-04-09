@@ -6,6 +6,7 @@ const { decryptAuthJWT } = require("../utils/jwtHelpers");
 const { isGmailEnabled } = require("../utils/getConfigFile");
 const { generatePIN } = require("../utils/pinHelpers");
 const { sendMail } = require("../utils/sendMail");
+const handleAsyncErrors = require("../utils/errorHandler");
 router.post(
   "/resendVerificationEmail",
   [
@@ -13,7 +14,7 @@ router.post(
       .custom(value => decryptAuthJWT(value) !== null)
       .withMessage("Invalid JWT")
   ],
-  async function(req, res) {
+  handleAsyncErrors(async function(req, res) {
     // Input validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -64,7 +65,7 @@ router.post(
         "Verification email could not be sent despite Gmail being enabled. User not added to DB"
       );
     }
-  }
+  })
 );
 
 module.exports = router;

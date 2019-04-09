@@ -4,6 +4,7 @@ const { check, validationResult } = require("express-validator/check");
 const User = require("../models/User");
 const { sendResponse } = require("./../utils/sendResponse");
 const { signAuthJWT } = require("../utils/jwtHelpers");
+const handleAsyncErrors = require("../utils/errorHandler");
 
 router.post(
   "/login",
@@ -13,7 +14,7 @@ router.post(
       .isString()
       .isLength({ min: 1 })
   ],
-  async function(req, res) {
+  handleAsyncErrors(async function(req, res) {
     // Input validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -52,7 +53,7 @@ router.post(
         "The information you provided does not match our database. Please check your inputs again."
       );
     }
-  }
+  })
 );
 
 module.exports = router;

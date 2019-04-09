@@ -8,6 +8,8 @@ const { signAuthJWT } = require("../utils/jwtHelpers");
 const { generatePIN } = require("../utils/pinHelpers");
 const { isGmailEnabled } = require("../utils/getConfigFile");
 const { sendMail } = require("./../utils/sendMail");
+const handleAsyncErrors = require("../utils/errorHandler");
+
 router.post(
   "/register",
   [
@@ -19,8 +21,9 @@ router.post(
       .isString()
       .isLength({ min: 1 })
   ],
-  async function(req, res) {
+  handleAsyncErrors(async function(req, res) {
     // Input validation
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return sendResponse(res, 400, "Invalid Request", {
@@ -86,7 +89,7 @@ router.post(
       uid: user._id,
       permission: user.role
     });
-  }
+  })
 );
 
 module.exports = router;

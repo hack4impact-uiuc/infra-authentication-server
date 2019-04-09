@@ -4,6 +4,7 @@ const User = require("../models/User");
 const { sendResponse } = require("./../utils/sendResponse");
 const { isGmailEnabled } = require("../utils/getConfigFile");
 const { decryptAuthJWT } = require("../utils/jwtHelpers");
+const handleAsyncErrors = require("../utils/errorHandler");
 
 router.post(
   "/verifyEmail",
@@ -12,7 +13,7 @@ router.post(
       .custom(value => decryptAuthJWT(value) !== null)
       .withMessage("Invalid JWT")
   ],
-  async function(req, res) {
+  handleAsyncErrors(async function(req, res) {
     // Input validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -52,7 +53,7 @@ router.post(
     user.verified = true;
     await user.save();
     return sendResponse(res, 200, "User successfully verified");
-  }
+  })
 );
 
 module.exports = router;

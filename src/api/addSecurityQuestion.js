@@ -6,7 +6,7 @@ const { decryptAuthJWT } = require("../utils/jwtHelpers");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { SECRET_TOKEN } = require("../utils/secret-token");
-
+const handleAsyncErrors = require("../utils/errorHandler");
 router.post(
   "/addSecurityQuestion",
   [
@@ -20,7 +20,7 @@ router.post(
       .isString()
       .isLength({ min: 1 })
   ],
-  async function(req, res) {
+  handleAsyncErrors(async function(req, res) {
     // Input validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -59,7 +59,7 @@ router.post(
       );
       sendResponse(res, 200, "Succesfully added the security question");
     }
-  }
+  })
 );
 
 module.exports = router;

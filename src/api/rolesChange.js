@@ -6,6 +6,7 @@ const { getRolesForUser } = require("./../utils/getConfigFile");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { SECRET_TOKEN } = require("../utils/secret-token");
+const handleAsyncErrors = require("../utils/errorHandler");
 
 router.post(
   "/roleschange",
@@ -15,7 +16,7 @@ router.post(
       .isString()
       .isLength({ min: 1 })
   ],
-  async function(req, res) {
+  handleAsyncErrors(async function(req, res) {
     // Input validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -68,7 +69,7 @@ router.post(
     } else {
       return sendResponse(res, 400, "Incorrect Permission Levels");
     }
-  }
+  })
 );
 
 module.exports = router;
