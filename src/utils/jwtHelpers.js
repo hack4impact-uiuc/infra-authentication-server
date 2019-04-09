@@ -20,12 +20,20 @@ async function signAuthJWT(id, password) {
 async function verifyAuthJWT(token, id, password) {
   try {
     const SECRET_TOKEN = await getSecretToken();
-    console.log(SECRET_TOKEN);
+    // console.log(SECRET_TOKEN);
     const { userId, hashedPassword } = jwt.verify(
       token,
       String(SECRET_TOKEN[0])
     );
-    return userId === id && hashedPassword == password;
+    // console.log("USER ID")
+    // console.log(userId)
+    // console.log(id)
+    // console.log("HASHED PSSWD")
+    // console.log((hashedPassword))
+    // console.log(password)
+    // console.log(hashedPassword == password)
+    // console.log(String(userId) === String(id))
+    return String(userId) === String(id) && hashedPassword == password;
   } catch (err) {
     return false;
   }

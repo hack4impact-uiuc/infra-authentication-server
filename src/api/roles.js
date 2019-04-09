@@ -3,9 +3,8 @@ const { check, validationResult } = require("express-validator/check");
 const User = require("../models/User");
 const { sendResponse } = require("./../utils/sendResponse");
 const { getRolesForUser } = require("./../utils/getConfigFile");
-const jwt = require("jsonwebtoken");
-const { SECRET_TOKEN } = require("../utils/secret-token");
 const fetch = require("node-fetch");
+const { verifyUser } = require("./../utils/userVerification");
 
 router.get(
   "/roles",
@@ -22,17 +21,10 @@ router.get(
     }
     let user = null;
 
-    let authenticationStatus = {};
     if (req.headers.google === "undefined") {
-      try {
-        authenticationStatus = jwt.verify(req.headers.token, SECRET_TOKEN);
-      } catch (e) {
-        return sendResponse(res, 400, "Invalid Token");
-      }
-      user = await User.findById(authenticationStatus.userId);
-      if (!user) {
-        sendResponse(res, 400, "User does not exist in the database");
-        return;
+      const user = await verifyUser(req.headers.token);
+      if (user.errorMessage != null) {
+        return sendResponse(res, 400, user.errorMessage);
       }
     } else {
       const tokenInfoRes = await fetch(

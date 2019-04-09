@@ -1,13 +1,8 @@
 const router = require("express").Router();
 const bcrypt = require("bcrypt");
 const { check, validationResult } = require("express-validator/check");
-const User = require("../models/User");
 const { sendResponse } = require("../utils/sendResponse");
-const {
-  signAuthJWT,
-  verifyAuthJWT,
-  decryptAuthJWT
-} = require("../utils/jwtHelpers");
+const { signAuthJWT, verifyAuthJWT } = require("../utils/jwtHelpers");
 const { verifyUser } = require("./../utils/userVerification");
 
 router.post(
@@ -30,15 +25,6 @@ router.post(
       });
     }
 
-    // var userId = decryptAuthJWT(req.headers.token);
-    // // Do a lookup by the decrypted user id
-    // let user;
-    // try {
-    //   user = await User.findOne({ _id: userId });
-    // } catch (e) {
-    //   return sendResponse(res, 500, e.message);
-    // }
-
     const user = await verifyUser(req.headers.token);
     if (user.errorMessage != null) {
       return sendResponse(res, 400, user.errorMessage);
@@ -47,18 +33,14 @@ router.post(
     const userId = user._id;
     if (
       userId === null ||
-      !(await verifyAuthJWT(
-        req.headers.token,
-        userId,
-        req.body.currentPassword
-      ))
+      !(await verifyAuthJWT(req.headers.token, userId, user.password))
     ) {
       // error in decrypting JWT, so we can send back an invalid JWT message
       // could be expired or something else
       console.log(userId);
       console.log(user.password);
       console.log(
-        await verifyAuthJWT(req.headers.token, userId, req.body.currentPassword)
+        await verifyAuthJWT(req.headers.token, userId, user.password)
       );
       sendResponse(res, 400, "Invalid JWT token");
     } else if (user) {
