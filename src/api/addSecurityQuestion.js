@@ -24,7 +24,7 @@ router.post(
       });
     }
 
-    const user = await verifyUser();
+    const user = await verifyUser(req.headers.token);
     if (user.errorMessage != null) {
       return sendResponse(res, 400, user.errorMessage);
     }

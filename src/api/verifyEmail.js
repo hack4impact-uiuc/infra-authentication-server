@@ -14,7 +14,8 @@ router.post("/verifyEmail", [], async function(req, res) {
   //     errors: errors.array({ onlyFirstError: true })
   //   });
   // }
-  const user = await verifyUser();
+  const user = await verifyUser(req.headers.token);
+  console.log(user);
   if (user.errorMessage != null) {
     return sendResponse(res, 400, user.errorMessage);
   }

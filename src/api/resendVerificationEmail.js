@@ -21,7 +21,7 @@ router.post("/resendVerificationEmail", [], async function(req, res) {
   if (!usingGmail) {
     return sendResponse(res, 500, "Endpoint invalid. Gmail is not enabled.");
   }
-  const user = await verifyUser();
+  const user = await verifyUser(req.headers.token);
   if (user.errorMessage != null) {
     return sendResponse(res, 400, user.errorMessage);
   }

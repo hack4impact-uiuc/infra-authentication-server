@@ -39,17 +39,27 @@ router.post(
     //   return sendResponse(res, 500, e.message);
     // }
 
-    const user = await verifyUser();
+    const user = await verifyUser(req.headers.token);
     if (user.errorMessage != null) {
       return sendResponse(res, 400, user.errorMessage);
     }
 
+    const userId = user._id;
     if (
       userId === null ||
-      !(await verifyAuthJWT(req.headers.token, userId, user.password))
+      !(await verifyAuthJWT(
+        req.headers.token,
+        userId,
+        req.body.currentPassword
+      ))
     ) {
       // error in decrypting JWT, so we can send back an invalid JWT message
       // could be expired or something else
+      console.log(userId);
+      console.log(user.password);
+      console.log(
+        await verifyAuthJWT(req.headers.token, userId, req.body.currentPassword)
+      );
       sendResponse(res, 400, "Invalid JWT token");
     } else if (user) {
       const oldPasswordMatches = await bcrypt.compare(
