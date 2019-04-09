@@ -8,13 +8,11 @@ const {
   verifyAuthJWT,
   decryptAuthJWT
 } = require("../utils/jwtHelpers");
+const { verifyUser } = require("./../utils/userVerification");
 
 router.post(
   "/changePassword",
   [
-    check("token")
-      .custom(value => decryptAuthJWT(value) !== null)
-      .withMessage("Invalid JWT"),
     check("currentPassword")
       .isString()
       .isLength({ min: 1 }),
@@ -32,18 +30,23 @@ router.post(
       });
     }
 
-    var userId = decryptAuthJWT(req.headers.token);
-    // Do a lookup by the decrypted user id
-    let user;
-    try {
-      user = await User.findOne({ _id: userId });
-    } catch (e) {
-      return sendResponse(res, 500, e.message);
+    // var userId = decryptAuthJWT(req.headers.token);
+    // // Do a lookup by the decrypted user id
+    // let user;
+    // try {
+    //   user = await User.findOne({ _id: userId });
+    // } catch (e) {
+    //   return sendResponse(res, 500, e.message);
+    // }
+
+    const user = await verifyUser();
+    if (user.errorMessage != null) {
+      return sendResponse(res, 400, user.errorMessage);
     }
 
     if (
       userId === null ||
-      !verifyAuthJWT(req.headers.token, userId, user.password)
+      !(await verifyAuthJWT(req.headers.token, userId, user.password))
     ) {
       // error in decrypting JWT, so we can send back an invalid JWT message
       // could be expired or something else
@@ -56,7 +59,7 @@ router.post(
       if (oldPasswordMatches) {
         user.password = await bcrypt.hash(req.body.newPassword, 10);
         await user.save();
-        var new_token = signAuthJWT(userId, user.password);
+        var new_token = await signAuthJWT(userId, user.password);
         sendResponse(res, 200, "Successful change of password!", {
           token: new_token
         });

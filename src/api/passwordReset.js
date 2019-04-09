@@ -85,7 +85,7 @@ router.post(
     user.password = await bcrypt.hash(req.body.password, 10);
     await user.save();
     sendResponse(res, 200, "Password successfully reset", {
-      token: signAuthJWT(user._id, user.password)
+      token: await signAuthJWT(user._id, user.password)
     });
   }
 );
