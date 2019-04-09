@@ -63,7 +63,11 @@ router.post(
         to: user.email,
         subject: "New User Verification",
         text:
+<<<<<<< HEAD
           "Thanks for signing up! Please enter the following PIN on the new user confirmation page" +
+=======
+          "Thanks for signing up! Please enter the following PIN on the new user confirmation page: " +
+>>>>>>> a26c9bd7d7a36a970f5a75191a0319e6b12b8598
           user.pin
       };
       try {
