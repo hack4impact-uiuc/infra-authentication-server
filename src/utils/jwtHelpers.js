@@ -64,7 +64,7 @@ async function decryptAuthJWT(token) {
     const { userId } = jwt.verify(token, String(SECRET_TOKEN[0]));
     return userId;
   } catch (err) {
-    if (SECRET_TOKEN.length == 2) {
+    if (SECRET_TOKEN.length > 1) {
       try {
         const SECRET_TOKEN = await getSecretToken();
         const { userId } = jwt.verify(token, String(SECRET_TOKEN[1]));
