@@ -12,19 +12,14 @@ before(async () => {
   // Make a DB connection before starting the tests so the first test
   // doesn't throw off timing if doing performance testing TTFB
   User.startSession();
-
   var options = {
     useNewUrlParser: true
   };
-
-  console.log(await getTestURI());
   // connect test_db and clear it before starting
   await mongoose.connect(await getTestURI(), options);
-
-  // await mongoose.connection.db
-  //   .dropDatabase()
-  //   .catch((error) => console.log("Trying to drop", error));
-
+  await mongoose.connection.db
+    .dropDatabase()
+    .catch(error => console.log("Trying to drop", error));
   server = app.listen(8000);
 });
 
@@ -142,7 +137,6 @@ describe("POST /login", function() {
       .post("/login")
       .type("form")
       .send(valid_login_test);
-    // .expect(200, '{"status":200,"message":"Successful login!"}');
     assert.equal(200, response.body.status);
     assert.equal("Successful login!", response.body.message);
   });
