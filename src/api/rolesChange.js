@@ -4,6 +4,7 @@ const User = require("../models/User");
 const { sendResponse } = require("./../utils/sendResponse");
 const { getRolesForUser } = require("./../utils/getConfigFile");
 const bcrypt = require("bcrypt");
+const handleAsyncErrors = require("../utils/errorHandler");
 const { verifyUser } = require("./../utils/userVerification");
 
 router.post(
@@ -14,7 +15,7 @@ router.post(
       .isString()
       .isLength({ min: 1 })
   ],
-  async function(req, res) {
+  handleAsyncErrors(async function(req, res) {
     // Input validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -56,7 +57,7 @@ router.post(
     } else {
       return sendResponse(res, 400, "Incorrect Permission Levels");
     }
-  }
+  })
 );
 
 module.exports = router;

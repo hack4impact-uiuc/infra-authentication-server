@@ -3,8 +3,9 @@ const User = require("../models/User");
 const { check, validationResult } = require("express-validator/check");
 const { sendResponse } = require("./../utils/sendResponse");
 const bcrypt = require("bcrypt");
-
+const handleAsyncErrors = require("../utils/errorHandler");
 const { verifyUser } = require("./../utils/userVerification");
+
 router.post(
   "/addSecurityQuestion",
   [
@@ -15,7 +16,7 @@ router.post(
       .isString()
       .isLength({ min: 1 })
   ],
-  async function(req, res) {
+  handleAsyncErrors(async function(req, res) {
     // Input validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -29,12 +30,7 @@ router.post(
       return sendResponse(res, 400, user.errorMessage);
     }
 
-    let authenticated = false;
-    if (await bcrypt.compare(req.body.password, user.password)) {
-      // hash matches! sign a JWT with an expiration 1 day in the future and send back to the user
-      authenticated = true;
-    }
-    if (!authenticated) {
+    if (!(await bcrypt.compare(req.body.password, user.password))) {
       return sendResponse(res, 400, "Incorrect Password");
     }
     await User.updateOne(
@@ -45,7 +41,7 @@ router.post(
       }
     );
     sendResponse(res, 200, "Succesfully added the security question");
-  }
+  })
 );
 
 module.exports = router;

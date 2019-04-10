@@ -4,6 +4,7 @@ const User = require("../models/User");
 const { sendResponse } = require("./../utils/sendResponse");
 const { getRolesForUser } = require("./../utils/getConfigFile");
 const fetch = require("node-fetch");
+const handleAsyncErrors = require("../utils/errorHandler");
 const { verifyUser } = require("./../utils/userVerification");
 
 router.get(
@@ -11,7 +12,7 @@ router.get(
   check("token")
     .isString()
     .isLength({ min: 1 }),
-  async function(req, res) {
+  handleAsyncErrors(async function(req, res) {
     // Input validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -64,7 +65,7 @@ router.get(
       message: "Users succesfully returned",
       user_emails: users
     });
-  }
+  })
 );
 
 module.exports = router;

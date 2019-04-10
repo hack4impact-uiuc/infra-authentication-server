@@ -2,6 +2,8 @@ const router = require("express").Router();
 const bcrypt = require("bcrypt");
 const { check, validationResult } = require("express-validator/check");
 const { sendResponse } = require("../utils/sendResponse");
+
+const handleAsyncErrors = require("../utils/errorHandler");
 const { signAuthJWT, verifyAuthJWT } = require("../utils/jwtHelpers");
 const { verifyUser } = require("./../utils/userVerification");
 
@@ -15,7 +17,7 @@ router.post(
       .isString()
       .isLength({ min: 1 })
   ],
-  async function(req, res) {
+  handleAsyncErrors(async function(req, res) {
     // Input validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -53,7 +55,7 @@ router.post(
     } else {
       sendResponse(res, 400, "User does not exist.");
     }
-  }
+  })
 );
 
 module.exports = router;
