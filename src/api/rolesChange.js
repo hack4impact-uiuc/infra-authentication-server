@@ -25,20 +25,17 @@ router.post(
     }
 
     let user = await verifyUser(req.headers.token);
-    console.log(user);
     if (user.errorMessage != null) {
       return sendResponse(res, 400, user.errorMessage);
     }
 
     let authenticated = false;
 
-    if (req.headers.google === undefined) {
-      console.log("HERE");
+    if (req.headers.google === "undefined") {
       if (await bcrypt.compare(req.body.password, user.password)) {
         authenticated = true;
       }
     } else {
-      console.log("HERE2");
       const tokenInfoRes = await fetch(
         `https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${
           req.headers.token
@@ -52,13 +49,9 @@ router.post(
       }
       authenticated = true;
     }
-    console.log("authenticated");
-    console.log(authenticated);
-    console.log(req.headers.google);
+
     const roles = await getRolesForUser(user.role);
-    console.log(req.body.userEmail);
     let userToBePromoted = await User.find({ email: req.body.userEmail });
-    console.log(userToBePromoted);
     if (userToBePromoted.length === 0) {
       return sendResponse(res, 400, "User with that email doesn't exist");
     }
