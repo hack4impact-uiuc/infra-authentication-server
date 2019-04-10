@@ -1,8 +1,7 @@
 const router = require("express").Router();
-const { check, validationResult } = require("express-validator/check");
 const User = require("../models/User");
 const { sendResponse } = require("./../utils/sendResponse");
-const { decryptAuthJWT, verifyAuthJWT } = require("./../utils/jwtHelpers");
+const { signAuthJWT, shouldUpdateJWT } = require("./../utils/jwtHelpers");
 const { googleAuth } = require("./../utils/getConfigFile");
 const fetch = require("node-fetch");
 const { verifyUser } = require("./../utils/userVerification");
@@ -22,7 +21,7 @@ router.post(
     //   });
     // }
     // conol
-    console.log(req.headers.token);
+    // console.log(req.headers.token);
 
     const useGoogle = await googleAuth();
 
@@ -44,11 +43,30 @@ router.post(
       }
     }
     const user = await verifyUser(req.headers.token);
-    console.log(user);
+    // console.log(user);
     if (user.errorMessage != undefined) {
       console.log(user.errorMesage);
       return sendResponse(res, 400, user.errorMessage);
     }
+
+    // tokenUpdated
+    if (await shouldUpdateJWT(req.headers.token, user._id, user.password)) {
+      // console.log("TOKEN UPDATED")
+      var newToken = await signAuthJWT(user._id, user.password);
+      // console.log("NEW TOKEN")
+      // console.log(newToken)
+      // console.log(req.headers.token)
+      // if (String(newToken) !== String(req.headers.token) ) {
+      // console.log("HHERE")
+      return res.status(200).send({
+        status: 200,
+        message: "Valid JWT token",
+        role: user.role,
+        newToken
+      });
+      // }
+    }
+
     return res.status(200).send({
       status: 200,
       message: "Valid JWT token",

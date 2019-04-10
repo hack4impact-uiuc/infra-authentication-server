@@ -6,7 +6,7 @@ async function verifyUser(token) {
     return { errorMessage: "Token not provided" };
   }
   const userId = await decryptAuthJWT(token);
-  console.log(userId);
+  // console.log(userId);
   if (userId === null) {
     return { errorMessage: "Invalid Token" };
   }
