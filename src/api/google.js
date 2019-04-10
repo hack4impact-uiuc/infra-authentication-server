@@ -4,6 +4,7 @@ const User = require("../models/User");
 const fetch = require("node-fetch");
 const { googleAuth } = require("./../utils/getConfigFile");
 const { sendResponse } = require("./../utils/sendResponse");
+const handleAsyncErrors = require("../utils/errorHandler");
 require("dotenv").config();
 
 router.post(
@@ -11,7 +12,7 @@ router.post(
   check("tokenId")
     .isString()
     .isLength({ min: 1 }),
-  async function(req, res) {
+  handleAsyncErrors(async function(req, res) {
     // Input validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -50,7 +51,7 @@ router.post(
         sendResponse(res, 200, "New Google user: " + payload.email);
       }
     }
-  }
+  })
 );
 
 module.exports = router;

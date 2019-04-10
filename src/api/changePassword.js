@@ -1,20 +1,15 @@
 const router = require("express").Router();
 const bcrypt = require("bcrypt");
 const { check, validationResult } = require("express-validator/check");
-const User = require("../models/User");
 const { sendResponse } = require("../utils/sendResponse");
-const {
-  signAuthJWT,
-  verifyAuthJWT,
-  decryptAuthJWT
-} = require("../utils/jwtHelpers");
+
+const handleAsyncErrors = require("../utils/errorHandler");
+const { signAuthJWT, verifyAuthJWT } = require("../utils/jwtHelpers");
+const { verifyUser } = require("./../utils/userVerification");
 
 router.post(
   "/changePassword",
   [
-    check("token")
-      .custom(value => decryptAuthJWT(value) !== null)
-      .withMessage("Invalid JWT"),
     check("currentPassword")
       .isString()
       .isLength({ min: 1 }),
@@ -22,31 +17,25 @@ router.post(
       .isString()
       .isLength({ min: 1 })
   ],
-  async function(req, res) {
+  handleAsyncErrors(async function(req, res) {
     // Input validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log(errors);
       return sendResponse(res, 400, "Invalid request", {
         errors: errors.array({ onlyFirstError: true })
       });
     }
 
-    var userId = decryptAuthJWT(req.headers.token);
-    // Do a lookup by the decrypted user id
-    let user;
-    try {
-      user = await User.findOne({ _id: userId });
-    } catch (e) {
-      return sendResponse(res, 500, e.message);
+    const user = await verifyUser(req.headers.token);
+    if (user.errorMessage != null) {
+      return sendResponse(res, 400, user.errorMessage);
     }
 
+    const userId = user._id;
     if (
       userId === null ||
-      !verifyAuthJWT(req.headers.token, userId, user.password)
+      !(await verifyAuthJWT(req.headers.token, userId, user.password))
     ) {
-      // error in decrypting JWT, so we can send back an invalid JWT message
-      // could be expired or something else
       sendResponse(res, 400, "Invalid JWT token");
     } else if (user) {
       const oldPasswordMatches = await bcrypt.compare(
@@ -56,7 +45,7 @@ router.post(
       if (oldPasswordMatches) {
         user.password = await bcrypt.hash(req.body.newPassword, 10);
         await user.save();
-        var new_token = signAuthJWT(userId, user.password);
+        var new_token = await signAuthJWT(userId, user.password);
         sendResponse(res, 200, "Successful change of password!", {
           token: new_token
         });
@@ -66,7 +55,7 @@ router.post(
     } else {
       sendResponse(res, 400, "User does not exist.");
     }
-  }
+  })
 );
 
 module.exports = router;

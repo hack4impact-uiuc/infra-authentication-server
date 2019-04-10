@@ -1,19 +1,16 @@
 const router = require("express").Router();
-const User = require("../models/User");
-const { header, validationResult } = require("express-validator/check");
+const { validationResult } = require("express-validator/check");
 const { sendResponse } = require("./../utils/sendResponse");
-const { decryptAuthJWT } = require("../utils/jwtHelpers");
 const { isGmailEnabled } = require("../utils/getConfigFile");
 const { generatePIN } = require("../utils/pinHelpers");
 const { sendMail } = require("../utils/sendMail");
+const handleAsyncErrors = require("../utils/errorHandler");
+
+const { verifyUser } = require("./../utils/userVerification");
 router.post(
   "/resendVerificationEmail",
-  [
-    header("token")
-      .custom(value => decryptAuthJWT(value) !== null)
-      .withMessage("Invalid JWT")
-  ],
-  async function(req, res) {
+  [],
+  handleAsyncErrors(async function(req, res) {
     // Input validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -26,16 +23,11 @@ router.post(
     if (!usingGmail) {
       return sendResponse(res, 500, "Endpoint invalid. Gmail is not enabled.");
     }
-    const userId = decryptAuthJWT(req.headers.token);
-    let user;
-    try {
-      user = await User.findOne({ _id: userId });
-    } catch (e) {
-      return sendResponse(res, 500, e.message);
+    const user = await verifyUser(req.headers.token);
+    if (user.errorMessage != null) {
+      return sendResponse(res, 400, user.errorMessage);
     }
-    if (!user) {
-      return sendResponse(res, 400, "User doesn't exist in the DB");
-    }
+
     if (user.verified) {
       sendResponse(res, 400, "User is already verified");
     }
@@ -64,7 +56,7 @@ router.post(
         "Verification email could not be sent despite Gmail being enabled. User not added to DB"
       );
     }
-  }
+  })
 );
 
 module.exports = router;

@@ -5,6 +5,7 @@ const { sendResponse } = require("./../utils/sendResponse");
 const { isGmailEnabled } = require("../utils/getConfigFile");
 const { sendMail } = require("../utils/sendMail");
 const { generatePIN } = require("../utils/pinHelpers");
+const handleAsyncErrors = require("../utils/errorHandler");
 
 router.post(
   "/forgotPassword",
@@ -14,7 +15,7 @@ router.post(
       .isString()
       .isLength({ min: 1 })
   ],
-  async function(req, res) {
+  handleAsyncErrors(async function(req, res) {
     // Input validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -58,7 +59,7 @@ router.post(
     } else {
       sendResponse(res, 400, "Answer to security question doesn't match");
     }
-  }
+  })
 );
 
 module.exports = router;

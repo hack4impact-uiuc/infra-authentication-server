@@ -3,10 +3,10 @@ const { check, validationResult } = require("express-validator/check");
 const User = require("../models/User");
 const { sendResponse } = require("./../utils/sendResponse");
 const { getRolesForUser } = require("./../utils/getConfigFile");
-const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const { SECRET_TOKEN } = require("../utils/secret-token");
 const fetch = require("node-fetch");
+const handleAsyncErrors = require("../utils/errorHandler");
+const { verifyUser } = require("./../utils/userVerification");
 
 router.post(
   "/roleschange",
@@ -16,8 +16,7 @@ router.post(
       .isString()
       .isLength({ min: 1 })
   ],
-  async function(req, res) {
-    // Input validation
+  handleAsyncErrors(async function(req, res) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return sendResponse(res, 400, "Invalid request", {
@@ -25,29 +24,21 @@ router.post(
       });
     }
 
-    if (!req.headers.token) {
-      return sendResponse(res, 400, "Token not provided");
+    let user = await verifyUser(req.headers.token);
+    console.log(user);
+    if (user.errorMessage != null) {
+      return sendResponse(res, 400, user.errorMessage);
     }
-    let user = null;
-    let authenticated = false;
-    if (req.headers.google === "undefined") {
-      let authenticationStatus = {};
-      try {
-        authenticationStatus = jwt.verify(req.headers.token, SECRET_TOKEN);
-      } catch (e) {
-        return sendResponse(res, 400, "Invalid Token");
-      }
 
-      user = await User.findById(authenticationStatus.userId);
-      if (!user) {
-        sendResponse(res, 400, "User does not exist in the database");
-        return;
-      }
+    let authenticated = false;
+
+    if (req.headers.google === undefined) {
+      console.log("HERE");
       if (await bcrypt.compare(req.body.password, user.password)) {
-        // hash matches! sign a JWT with an expiration 1 day in the future and send back to the user
         authenticated = true;
       }
     } else {
+      console.log("HERE2");
       const tokenInfoRes = await fetch(
         `https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${
           req.headers.token
@@ -61,8 +52,13 @@ router.post(
       }
       authenticated = true;
     }
+    console.log("authenticated");
+    console.log(authenticated);
+    console.log(req.headers.google);
     const roles = await getRolesForUser(user.role);
+    console.log(req.body.userEmail);
     let userToBePromoted = await User.find({ email: req.body.userEmail });
+    console.log(userToBePromoted);
     if (userToBePromoted.length === 0) {
       return sendResponse(res, 400, "User with that email doesn't exist");
     }
@@ -83,7 +79,7 @@ router.post(
     } else {
       return sendResponse(res, 400, "Incorrect Permission Levels");
     }
-  }
+  })
 );
 
 module.exports = router;
