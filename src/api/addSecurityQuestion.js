@@ -29,23 +29,6 @@ router.post(
       return sendResponse(res, 400, user.errorMessage);
     }
 
-    // if (!req.headers.token) {
-    //   return sendResponse(res, 400, "Token not provided");
-    // }
-    // const userId = await decryptJWT(req.headers.token);
-    // if (userId === null) {
-    //   return sendResponse(res, 400, "Invalid Token");
-    // }
-    // const user = await User.findById(userId);
-    // if (!user) {
-    //   sendResponse(res, 400, "User does not exist in the database");
-    //   return;
-    // }
-    // if (user.verified == false) {
-    //   sendResponse(res, 400, "User not verified");
-    //   return;
-    // }
-
     let authenticated = false;
     if (await bcrypt.compare(req.body.password, user.password)) {
       // hash matches! sign a JWT with an expiration 1 day in the future and send back to the user

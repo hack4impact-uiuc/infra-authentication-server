@@ -6,8 +6,6 @@ async function signAuthJWT(id, password) {
     throw "Cannot create hash without both id && password";
   }
   const SECRET_TOKEN = await getSecretToken();
-  console.log(SECRET_TOKEN);
-
   return jwt.sign(
     { userId: id, hashedPassword: password },
     String(SECRET_TOKEN[0]),
@@ -21,63 +19,38 @@ async function signAuthJWT(id, password) {
 async function verifyAuthJWT(token, id, password) {
   const SECRET_TOKEN = await getSecretToken();
   try {
-    console.log(SECRET_TOKEN);
     let { userId, hashedPassword } = jwt.verify(token, String(SECRET_TOKEN[0]));
     if (String(userId) === String(id) && hashedPassword == password) {
       return true;
     }
-    // if (SECRET_TOKEN.length == 2) {
-    //   let { userId, hashedPassword } = jwt.verify(
-    //     token,
-    //     String(SECRET_TOKEN[1])
-    //   );
-    //   return (String(userId) === String(id) && hashedPassword == password)
-    // }
-    // return false;
   } catch (err) {
-    // return false;
+    console.log("Token was updated");
   }
   try {
-    // const SECRET_TOKEN = await getSecretToken();
-    console.log(SECRET_TOKEN);
     let { userId, hashedPassword } = jwt.verify(token, String(SECRET_TOKEN[1]));
     if (String(userId) === String(id) && hashedPassword == password) {
       return true;
     }
-    // if (SECRET_TOKEN.length == 2) {
-    //   let { userId, hashedPassword } = jwt.verify(
-    //     token,
-    //     String(SECRET_TOKEN[1])
-    //   );
-    //   return (String(userId) === String(id) && hashedPassword == password)
-    // }
-    // return false;
   } catch (err) {
-    // return false;
+    return false;
   }
   return false;
 }
 
 async function shouldUpdateJWT(token, id, password) {
-  console.log("YUOOOOO");
   const SECRET_TOKEN = await getSecretToken();
   try {
     let { userId, hashedPassword } = jwt.verify(token, String(SECRET_TOKEN[0]));
     if (String(userId) === String(id) && hashedPassword == password) {
-      console.log("FIRT ONE MATCHED");
       return false;
     }
-
-    console.log("WTF");
     return false;
   } catch (err) {
-    console.log("ERROR");
     if (SECRET_TOKEN.length > 1) {
       let { userId, hashedPassword } = jwt.verify(
         token,
         String(SECRET_TOKEN[1])
       );
-      console.log("SECOND ONE MATCHED");
       return String(userId) === String(id) && hashedPassword == password;
     }
     return false;
@@ -87,7 +60,6 @@ async function shouldUpdateJWT(token, id, password) {
 // Returns the auth JWT if it's valid, else return null if it's invalid
 async function decryptAuthJWT(token) {
   const SECRET_TOKEN = await getSecretToken();
-  console.log(SECRET_TOKEN);
   try {
     const { userId } = jwt.verify(token, String(SECRET_TOKEN[0]));
     return userId;

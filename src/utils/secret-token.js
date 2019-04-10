@@ -20,7 +20,7 @@ async function getSecretToken() {
   } else if (tokens.length == 1) {
     console.log("ONE TOKEN");
     // if it was issued more than 1 hours ago create a new token, but dont delete the last token
-    if (Date.now() - tokens[0].issued > 1000 * 60) {
+    if (Date.now() - tokens[0].issued > 1000 * 60 * 60) {
       const newToken = await createToken();
       return [newToken._id, tokens[0]._id];
     } else {
@@ -30,8 +30,7 @@ async function getSecretToken() {
     console.log("TWO  TOKEN");
     //delete all tokens older than 2 hours
     for (let i in tokens) {
-      // console.log(tokens[i]._id);
-      if (Date.now() - tokens[i].issued > 1000 * 60 * 2) {
+      if (Date.now() - tokens[i].issued > 1000 * 60 * 60 * 2) {
         await tokens[i].delete();
       }
     }
