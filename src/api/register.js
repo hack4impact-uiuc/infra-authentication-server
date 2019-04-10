@@ -55,7 +55,7 @@ router.post(
       );
     }
 
-    const jwt_token = signAuthJWT(user._id, user.password);
+    const jwt_token = await signAuthJWT(user._id, user.password);
     if (usingGmail) {
       // using gmail so it should send generate a PIN and send a verification email.
       generatePIN(user);

@@ -5,25 +5,21 @@ const request = require("supertest");
 const User = require("../test/models/User.js");
 const mongoose = require("mongoose");
 const assert = require("assert");
-const test_uri =
-  "mongodb://product:infra28@ds111441.mlab.com:11441/auth-infra-server-test";
+const { getTestURI } = require("../src/utils/getConfigFile");
 let server;
 
 before(async () => {
   // Make a DB connection before starting the tests so the first test
   // doesn't throw off timing if doing performance testing TTFB
   User.startSession();
-
   var options = {
     useNewUrlParser: true
   };
-
   // connect test_db and clear it before starting
-  await mongoose.connect(test_uri, options);
-
+  await mongoose.connect(await getTestURI(), options);
   await mongoose.connection.db
     .dropDatabase()
-    .catch(() => console.log("Trying to drop"));
+    .catch(error => console.log("Trying to drop", error));
   server = app.listen(8000);
 });
 
@@ -34,7 +30,6 @@ after(async () => {
     .catch(() => console.log("Trying to drop"));
   await server.close();
   await mongoose.connection.close();
-  // await Promise.all([server.close(), mongoose.connection.close()]);
 });
 
 describe("connection test", function() {
@@ -142,7 +137,6 @@ describe("POST /login", function() {
       .post("/login")
       .type("form")
       .send(valid_login_test);
-    // .expect(200, '{"status":200,"message":"Successful login!"}');
     assert.equal(200, response.body.status);
     assert.equal("Successful login!", response.body.message);
   });
