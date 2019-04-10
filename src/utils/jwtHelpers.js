@@ -1,31 +1,78 @@
 const jwt = require("jsonwebtoken");
-const { SECRET_TOKEN } = require("./secret-token");
+const { getSecretToken } = require("./secret-token");
 
-function signAuthJWT(id, password) {
+async function signAuthJWT(id, password) {
   if (!password || !id) {
     throw "Cannot create hash without both id && password";
   }
-  return jwt.sign({ userId: id, hashedPassword: password }, SECRET_TOKEN, {
-    expiresIn: "1d"
-  });
+  const SECRET_TOKEN = await getSecretToken();
+  return jwt.sign(
+    { userId: id, hashedPassword: password },
+    String(SECRET_TOKEN[0]),
+    {
+      expiresIn: "1d"
+    }
+  );
 }
 
 // Return true if the JWT is valid and matches the parameters
-function verifyAuthJWT(token, id, password) {
+async function verifyAuthJWT(token, id, password) {
+  const SECRET_TOKEN = await getSecretToken();
   try {
-    const { userId, hashedPassword } = jwt.verify(token, SECRET_TOKEN);
-    return userId === id && hashedPassword == password;
+    let { userId, hashedPassword } = jwt.verify(token, String(SECRET_TOKEN[0]));
+    if (String(userId) === String(id) && hashedPassword == password) {
+      return true;
+    }
   } catch (err) {
+    console.log("Token was updated");
+  }
+  try {
+    let { userId, hashedPassword } = jwt.verify(token, String(SECRET_TOKEN[1]));
+    if (String(userId) === String(id) && hashedPassword == password) {
+      return true;
+    }
+  } catch (err) {
+    return false;
+  }
+  return false;
+}
+
+async function shouldUpdateJWT(token, id, password) {
+  const SECRET_TOKEN = await getSecretToken();
+  try {
+    let { userId, hashedPassword } = jwt.verify(token, String(SECRET_TOKEN[0]));
+    if (String(userId) === String(id) && hashedPassword == password) {
+      return false;
+    }
+    return false;
+  } catch (err) {
+    if (SECRET_TOKEN.length > 1) {
+      let { userId, hashedPassword } = jwt.verify(
+        token,
+        String(SECRET_TOKEN[1])
+      );
+      return String(userId) === String(id) && hashedPassword == password;
+    }
     return false;
   }
 }
 
 // Returns the auth JWT if it's valid, else return null if it's invalid
-function decryptAuthJWT(token) {
+async function decryptAuthJWT(token) {
+  const SECRET_TOKEN = await getSecretToken();
   try {
-    const { userId } = jwt.verify(token, SECRET_TOKEN);
+    const { userId } = jwt.verify(token, String(SECRET_TOKEN[0]));
     return userId;
   } catch (err) {
+    if (SECRET_TOKEN.length == 2) {
+      try {
+        const SECRET_TOKEN = await getSecretToken();
+        const { userId } = jwt.verify(token, String(SECRET_TOKEN[1]));
+        return userId;
+      } catch (err) {
+        return null;
+      }
+    }
     return null;
   }
 }
@@ -33,5 +80,6 @@ function decryptAuthJWT(token) {
 module.exports = {
   signAuthJWT,
   verifyAuthJWT,
-  decryptAuthJWT
+  decryptAuthJWT,
+  shouldUpdateJWT
 };

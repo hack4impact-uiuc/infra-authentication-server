@@ -14,6 +14,7 @@ router.post(
       .isLength({ min: 1 })
   ],
   async function(req, res) {
+    console.log("HERE");
     // Input validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -21,6 +22,7 @@ router.post(
         errors: errors.array({ onlyFirstError: true })
       });
     }
+    console.log("HERE");
 
     // un-jwt-ify the given password, see if it's a match with the token associated with the email.
     var user = await User.findOne({ email: req.body.email });
@@ -33,7 +35,7 @@ router.post(
       }
       if (await bcrypt.compare(req.body.password, user.password)) {
         // hash matches! sign a JWT with an expiration 1 day in the future and send back to the user
-        const jwt_token = signAuthJWT(user._id, user.password);
+        const jwt_token = await signAuthJWT(user._id, user.password);
         return res.status(200).send({
           status: 200,
           message: "Successful login!",
