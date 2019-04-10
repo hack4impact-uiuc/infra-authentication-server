@@ -6,6 +6,7 @@ const { getRolesForUser } = require("./../utils/getConfigFile");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { SECRET_TOKEN } = require("../utils/secret-token");
+const fetch = require("node-fetch");
 
 router.post(
   "/roleschange",
@@ -27,25 +28,39 @@ router.post(
     if (!req.headers.token) {
       return sendResponse(res, 400, "Token not provided");
     }
-    let authenticationStatus = {};
-    try {
-      authenticationStatus = jwt.verify(req.headers.token, SECRET_TOKEN);
-    } catch (e) {
-      return sendResponse(res, 400, "Invalid Token");
-    }
-
-    const user = await User.findById(authenticationStatus.userId);
-    if (!user) {
-      sendResponse(res, 400, "User does not exist in the database");
-      return;
-    }
-
+    let user = null;
     let authenticated = false;
-    if (await bcrypt.compare(req.body.password, user.password)) {
-      // hash matches! sign a JWT with an expiration 1 day in the future and send back to the user
+    if (req.headers.google === "undefined") {
+      let authenticationStatus = {};
+      try {
+        authenticationStatus = jwt.verify(req.headers.token, SECRET_TOKEN);
+      } catch (e) {
+        return sendResponse(res, 400, "Invalid Token");
+      }
+
+      user = await User.findById(authenticationStatus.userId);
+      if (!user) {
+        sendResponse(res, 400, "User does not exist in the database");
+        return;
+      }
+      if (await bcrypt.compare(req.body.password, user.password)) {
+        // hash matches! sign a JWT with an expiration 1 day in the future and send back to the user
+        authenticated = true;
+      }
+    } else {
+      const tokenInfoRes = await fetch(
+        `https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${
+          req.headers.token
+        }`
+      );
+      const payload = await tokenInfoRes.json();
+      user = await User.findOne({ email: payload.email, googleAuth: true });
+      if (!user) {
+        sendResponse(res, 400, "User does not exist in the database");
+        return;
+      }
       authenticated = true;
     }
-
     const roles = await getRolesForUser(user.role);
     let userToBePromoted = await User.find({ email: req.body.userEmail });
     if (userToBePromoted.length === 0) {
@@ -64,7 +79,7 @@ router.post(
           String(userToBePromoted.role)
       );
     } else if (roles.indexOf(req.body.newRole) >= 0 && !authenticated) {
-      return sendResponse(res, 400, "Incorrect Password");
+      return sendResponse(res, 400, "Incorrect Authentication");
     } else {
       return sendResponse(res, 400, "Incorrect Permission Levels");
     }
