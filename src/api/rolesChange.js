@@ -3,9 +3,8 @@ const { check, validationResult } = require("express-validator/check");
 const User = require("../models/User");
 const { sendResponse } = require("./../utils/sendResponse");
 const { getRolesForUser } = require("./../utils/getConfigFile");
-const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const { SECRET_TOKEN } = require("../utils/secret-token");
+const { verifyUser } = require("./../utils/userVerification");
 
 router.post(
   "/roleschange",
@@ -24,21 +23,25 @@ router.post(
       });
     }
 
-    if (!req.headers.token) {
-      return sendResponse(res, 400, "Token not provided");
-    }
-    let authenticationStatus = {};
-    try {
-      authenticationStatus = jwt.verify(req.headers.token, SECRET_TOKEN);
-    } catch (e) {
-      return sendResponse(res, 400, "Invalid Token");
+    // if (!req.headers.token) {
+    //   return sendResponse(res, 400, "Token not provided");
+    // }
+    // let authenticationStatus = {};
+    // try {
+    //   authenticationStatus = jwt.verify(req.headers.token, SECRET_TOKEN);
+    // } catch (e) {
+    //   return sendResponse(res, 400, "Invalid Token");
+    // }
+    let user = await verifyUser(req.headers.token);
+    if (user.errorMessage != null) {
+      return sendResponse(res, 400, user.errorMessage);
     }
 
-    const user = await User.findById(authenticationStatus.userId);
-    if (!user) {
-      sendResponse(res, 400, "User does not exist in the database");
-      return;
-    }
+    // const user = await User.findById(authenticationStatus.userId);
+    // if (!user) {
+    //   sendResponse(res, 400, "User does not exist in the database");
+    //   return;
+    // }
 
     let authenticated = false;
     if (await bcrypt.compare(req.body.password, user.password)) {

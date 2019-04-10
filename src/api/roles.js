@@ -19,14 +19,18 @@ router.get(
         errors: errors.array({ onlyFirstError: true })
       });
     }
-    let user = null;
+    // let user = null;
+    let user = await verifyUser(req.headers.token);
+    if (user.errorMessage != null) {
+      return sendResponse(res, 400, user.errorMessage);
+    }
 
-    if (req.headers.google === "undefined") {
-      const user = await verifyUser(req.headers.token);
-      if (user.errorMessage != null) {
-        return sendResponse(res, 400, user.errorMessage);
-      }
-    } else {
+    if (req.headers.google !== "undefined") {
+      //   const user = await verifyUser(req.headers.token);
+      //   if (user.errorMessage != null) {
+      //     return sendResponse(res, 400, user.errorMessage);
+      //   }
+      // } else {
       const tokenInfoRes = await fetch(
         `https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${
           req.headers.token
@@ -39,6 +43,8 @@ router.get(
         return;
       }
     }
+    console.log(user);
+    console.log(req.headers.google);
     const roles = await getRolesForUser(user.role);
     let users = [];
     await Promise.all(

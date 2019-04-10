@@ -14,6 +14,7 @@ router.post(
       .isLength({ min: 1 })
   ],
   async function(req, res) {
+    console.log("HERE");
     // Input validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -21,6 +22,7 @@ router.post(
         errors: errors.array({ onlyFirstError: true })
       });
     }
+    console.log("HERE");
 
     // un-jwt-ify the given password, see if it's a match with the token associated with the email.
     var user = await User.findOne({ email: req.body.email });
