@@ -19,7 +19,6 @@ router.post(
     // Input validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log(errors);
       return sendResponse(res, 400, "Invalid request", {
         errors: errors.array({ onlyFirstError: true })
       });
@@ -35,13 +34,6 @@ router.post(
       userId === null ||
       !(await verifyAuthJWT(req.headers.token, userId, user.password))
     ) {
-      // error in decrypting JWT, so we can send back an invalid JWT message
-      // could be expired or something else
-      console.log(userId);
-      console.log(user.password);
-      console.log(
-        await verifyAuthJWT(req.headers.token, userId, user.password)
-      );
       sendResponse(res, 400, "Invalid JWT token");
     } else if (user) {
       const oldPasswordMatches = await bcrypt.compare(
