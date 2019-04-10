@@ -28,7 +28,7 @@ async function getSecretToken() {
         await tokens[i].delete();
       }
     }
-    if (tokens.length == 2) {
+    if (tokens.length >= 2) {
       if (tokens[0].issued - tokens[1].issued > 0) {
         return [tokens[0]._id, tokens[1]._id];
       } else {
