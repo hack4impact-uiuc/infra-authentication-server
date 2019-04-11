@@ -8,7 +8,8 @@
   },
   "devDependencies": {
     "docz": "latest",
-    "docz-theme-default": "latest"
+    "docz-theme-default": "latest",
+    "webpack": "^4.28.4"
   },
   "dependencies": {
     "now": "^14.2.2"
