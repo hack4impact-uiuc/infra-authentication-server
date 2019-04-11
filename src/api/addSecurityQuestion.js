@@ -71,8 +71,8 @@ router.post(
       }
       await User.update(
         { _id: user._id },
+
         {
-          email: req.body.email,
           question: question,
           answer: req.body.answer.toLowerCase().replace(/\s/g, "")
         }
