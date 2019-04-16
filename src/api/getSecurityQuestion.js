@@ -26,8 +26,10 @@ router.get(
       try {
         authenticationStatus = jwt.verify(req.headers.token, SECRET_TOKEN);
       } catch (e) {
+        console.log("nit", e);
         return sendResponse(res, 400, "Invalid Token");
       }
+
       let user = await User.findById(authenticationStatus.userId);
       if (!user) {
         sendResponse(res, 400, "User does not exist in the database");

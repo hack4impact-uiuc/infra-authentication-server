@@ -2,17 +2,15 @@ const router = require("express").Router();
 const { check, validationResult } = require("express-validator/check");
 const User = require("../models/User");
 const { sendResponse } = require("./../utils/sendResponse");
-const { getRolesForUser } = require("./../utils/getConfigFile");
 const fetch = require("node-fetch");
-const handleAsyncErrors = require("../utils/errorHandler");
 const { verifyUser } = require("./../utils/userVerification");
 
 router.get(
-  "/roles",
+  "/getUser",
   check("token")
     .isString()
     .isLength({ min: 1 }),
-  handleAsyncErrors(async function(req, res) {
+  async function(req, res) {
     // Input validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -39,26 +37,14 @@ router.get(
         return;
       }
     }
-    const roles = await getRolesForUser(user.role);
-    let users = [];
-    await Promise.all(
-      roles.map(async role => {
-        let usersWithRoles = await User.find({ role });
-        for (let i in usersWithRoles) {
-          let newUser = {
-            email: usersWithRoles[i].email,
-            role: usersWithRoles[i].role
-          };
-          users = users.concat(newUser);
-        }
-      })
-    );
     return res.status(200).send({
       status: 200,
-      message: "Users succesfully returned",
-      user_emails: users
+      message: "User succesfully returned",
+      user_email: user.email,
+      user_verified: user.verified || req.headers.google,
+      user_role: user.role
     });
-  })
+  }
 );
 
 module.exports = router;

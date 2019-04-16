@@ -2,10 +2,12 @@ const router = require("express").Router();
 const User = require("../models/User");
 const { check, validationResult } = require("express-validator/check");
 const { sendResponse } = require("./../utils/sendResponse");
-const { decryptAuthJWT } = require("../utils/jwtHelpers");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 const { getSecurityQuestions } = require("../utils/getConfigFile");
+const handleAsyncErrors = require("../utils/errorHandler");
+const { decryptAuthJWT } = require("./jwtHelpers");
+const { verifyUser } = require("./../utils/userVerification");
+const jwt = require("jsonwebtoken");
 const { SECRET_TOKEN } = require("../utils/secret-token");
 
 router.post(
@@ -18,7 +20,7 @@ router.post(
       .isString()
       .isLength({ min: 1 })
   ],
-  async function(req, res) {
+  handleAsyncErrors(async function(req, res) {
     // Input validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -26,16 +28,18 @@ router.post(
         errors: errors.array({ onlyFirstError: true })
       });
     }
-    if (!req.headers.token) {
-      return sendResponse(res, 400, "Token not provided");
+
+    let user = await verifyUser(req.headers.token);
+    if (user.errorMessage != null) {
+      return sendResponse(res, 400, user.errorMessage);
     }
-    let authenticationStatus = {};
-    try {
-      authenticationStatus = jwt.verify(req.headers.token, SECRET_TOKEN);
-    } catch (e) {
-      return sendResponse(res, 400, "Invalid Token");
+
+    if (!(await bcrypt.compare(req.body.password, user.password))) {
+      return sendResponse(res, 400, "Incorrect Password");
     }
-    const user = await User.findById(authenticationStatus.userId);
+    let authenticationStatus;
+    authenticationStatus = jwt.verify(req.headers.token, SECRET_TOKEN);
+    user = await User.findById(authenticationStatus.userId);
     if (!user) {
       sendResponse(res, 400, "User does not exist in the database");
       return;
@@ -52,22 +56,18 @@ router.post(
         return sendResponse(res, 400, "Incorrect Password");
       }
       const securityQuestionsResponse = await getSecurityQuestions();
-      let question;
-      const { answer } = req.body;
+
       if (!securityQuestionsResponse.success) {
-        sendResponse(res, 500, "something went wrong on our end");
-        return;
-      } else {
-        question =
-          securityQuestionsResponse.securityQuestions[req.body.questionIdx];
-        if (!question || !answer) {
-          sendResponse(
-            res,
-            400,
-            "user entered wrong security question or no answer"
-          );
-          return;
-        }
+        return sendResponse(res, 500, "something went wrong on our end");
+      }
+      const question =
+        securityQuestionsResponse.securityQuestions[req.body.questionIdx];
+      if (!question || !req.body.answer) {
+        return sendResponse(
+          res,
+          400,
+          "user entered wrong security question or no answer"
+        );
       }
       await User.update(
         { _id: user._id },
@@ -77,9 +77,9 @@ router.post(
           answer: req.body.answer.toLowerCase().replace(/\s/g, "")
         }
       );
-      sendResponse(res, 200, "Succesfully added the security question");
+      return sendResponse(res, 200, "Succesfully added the security question");
     }
-  }
+  })
 );
 
 module.exports = router;
