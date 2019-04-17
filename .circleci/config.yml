@@ -9,13 +9,10 @@ jobs:
       steps:
         - checkout
         - run:
-            name: checkout testing directory 
-            command: cd test
-        - run:
-            name: install dependencies 
+            name: Install Dependencies 
             command: yarn install
         - run:
-            name: run tests
+            name: Run Backend Tests
             command: yarn test
         
 workflows:
