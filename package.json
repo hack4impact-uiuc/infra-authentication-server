@@ -5,6 +5,7 @@
     "docs": "docz dev",
     "test": "mocha"
   },
+  "license": "MIT",
   "dependencies": {
     "@sendgrid/mail": "^6.3.1",
     "bcrypt": "3.0.0",
@@ -31,7 +32,10 @@
     "node-pre-gyp": "^0.12.0",
     "nodemailer": "^5.1.1",
     "nodemon": "^1.18.10",
-    "supertest": "^3.4.2"
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "supertest": "^3.4.2",
+    "typescript": "^3.4.3"
   },
   "husky": {
     "hooks": {
