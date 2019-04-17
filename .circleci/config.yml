@@ -9,10 +9,15 @@ jobs:
       steps:
         - checkout
         - run:
-            command: |
-              cd test
-              yarn install
-              npm run test
+            name: checkout testing directory 
+            command: cd test
+        - run:
+            name: install dependencies 
+            command: yarn install
+        - run:
+            name: run tests
+            command: yarn test
+        
 workflows:
   version: 2
   build-test:
