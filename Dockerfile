@@ -1,17 +1,23 @@
-FROM node:11.14.0
+FROM node:alpine as builder
 
 # Create app directory
 WORKDIR /usr/src/app
 
+# Add build support for node-gyp since bcrypt requires some 
+# additional installation
+RUN apk add --no-cache --virtual .gyp python make g++
+
 # Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
-COPY package.json .
-COPY yarn.lock .
+COPY . .
+# Run the install 
 RUN yarn install
 
-# Bundle app source
-COPY . .
+# Spin up a lighter version without all the build dependencies
+FROM node:alpine as app
 
-EXPOSE 8000
-CMD [ "npm", "start" ]
+WORKDIR /usr/src/app
+
+# Copy everything over
+COPY --from=builder /usr/src/app .
+
+CMD [ "yarn","start" ]
