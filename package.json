@@ -5,6 +5,10 @@
     "docs": "docz dev",
     "test": "mocha"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hack4impact-uiuc/infra-authentication-server.git"
+  },
   "license": "MIT",
   "dependencies": {
     "@sendgrid/mail": "^6.3.1",
