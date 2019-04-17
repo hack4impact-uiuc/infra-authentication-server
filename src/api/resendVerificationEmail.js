@@ -53,7 +53,7 @@ router.post(
       return sendResponse(
         res,
         500,
-        "Verification email could not be sent despite Gmail being enabled. User not added to DB"
+        "Verification email could not be sent despite Gmail being enabled. This is likely due to incorrect gmail keys in the .env file. User not added to DB."
       );
     }
   })
