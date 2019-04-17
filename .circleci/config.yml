@@ -2,7 +2,7 @@ version: 2
 jobs:
   backend_test:
       docker:
-        - image: node:8.4.0
+        - image: node:11.14.0
       dependencies:
         override:
           - echo $PATH
@@ -11,7 +11,7 @@ jobs:
         - run:
             command: |
               cd test
-              npm install
+              npm ci
               npm run test
 workflows:
   version: 2
