@@ -77,7 +77,11 @@ describe("POST /register", function() {
       .post("/register")
       .type("form")
       .send(valid_register_test);
-    assert.equal(200, response.body.status);
+    assert.equal(
+      200,
+      response.body.status,
+      "Failed with message: " + response.body.message
+    );
     assert.equal("User added successfully!", response.body.message);
     console.log("response.body.message: " + response.body.message);
   }).timeout(5000); // add a longer timeout since there's a lot that has to get done when adding a user
