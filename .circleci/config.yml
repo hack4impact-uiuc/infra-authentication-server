@@ -11,7 +11,7 @@ jobs:
         - run:
             command: |
               cd test
-              npm ci
+              yarn install
               npm run test
 workflows:
   version: 2
