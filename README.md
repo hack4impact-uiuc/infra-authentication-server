@@ -21,7 +21,7 @@ yarn start
 
 **AWS Elastic Beanstalk:**
 
-1. Create an AWS account and go to the [Elastic Beanstalk website](https://aws.amazon.com/elasticbeanstalk/) (note that you may be charged)
+1. Create an AWS account and go to the [Elastic Beanstalk website](https://console.aws.amazon.com/elasticbeanstalk/home) (note that you may be charged)
 2. Create a new Elastic Beanstalk application, along with a web server environment
    ![](./docs/src/images/eb1.png)
 3. Select Docker as the configuration and upload Dockerized server code as a .zip file
