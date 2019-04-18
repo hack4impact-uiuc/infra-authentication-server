@@ -17,3 +17,15 @@ yarn
 yarn start
 ```
 
+# Deployment
+
+AWS Elastic Beanstalk:
+
+1. Create an AWS account (note that you may be charged)
+2. Create a new Elastic Beanstalk application, along with a web server environment
+3. Select Docker as the configuration and upload Dockerized server code as a .zip file
+   Tips:
+
+- Remember to EXPOSE the server port in the Dockerfile
+- Ensure the uploaded .zip contains the source code files directly (i.e. the Dockerfile should be visible as soon as the zip is uncompressed).
+- Ensure the uploaded .zip contains your .env file
