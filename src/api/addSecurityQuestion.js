@@ -7,8 +7,6 @@ const { getSecurityQuestions } = require("../utils/getConfigFile");
 const handleAsyncErrors = require("../utils/errorHandler");
 const { decryptAuthJWT } = require("../utils/jwtHelpers");
 const { verifyUser } = require("./../utils/userVerification");
-const jwt = require("jsonwebtoken");
-const { SECRET_TOKEN } = require("../utils/secret-token");
 
 router.post(
   "/addSecurityQuestionAnswer",
@@ -37,14 +35,8 @@ router.post(
     if (!(await bcrypt.compare(req.body.password, user.password))) {
       return sendResponse(res, 400, "Incorrect Password");
     }
-    console.log("wuh");
-    let authenticationStatus;
-    try {
-      authenticationStatus = jwt.verify(req.headers.token, SECRET_TOKEN);
-    } catch (e) {
-      return sendResponse(res, 400, "Wrong token");
-    }
-    user = await User.findById(authenticationStatus.userId);
+
+    user = await User.findById(user.id);
     if (!user) {
       return sendResponse(res, 400, "User does not exist in the database");
     } else {

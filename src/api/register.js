@@ -33,28 +33,26 @@ router.post(
         errors: errors.array({ onlyFirstError: true })
       });
     }
-
     const usingGmail = await isGmailEnabled();
-    if (await User.findOne({ email: req.body.email })) {
+    if (await User.findOne({ email: String(req.body.email).toLowerCase() })) {
       return sendResponse(res, 400, "User already exists. Please try again.");
     }
-
     const encodedPassword = await bcrypt.hash(req.body.password, 10);
     const securityQuestionsResponse = await getSecurityQuestions();
     if (!securityQuestionsResponse.success) {
       return sendResponse(res, 500, "something went wrong on our end");
     }
-
     const userData = {
-      email: req.body.email,
+      email: String(req.body.email).toLowerCase(),
       password: encodedPassword,
-      questionIdx: req.body.questionIdx,
+      question:
+        securityQuestionsResponse.securityQuestions[req.body.questionIdx],
+      answer: req.body.answer,
       role: req.body.role,
       verified: false
     };
     const user = new User(userData);
     const requiredAuthFrom = await getRolesForUser(req.body.role);
-
     if (requiredAuthFrom != null) {
       return sendResponse(
         res,
