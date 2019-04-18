@@ -12,6 +12,9 @@ COPY . .
 # Run the install 
 RUN yarn install
 
+# run the tests
+RUN yarn test
+
 # Spin up a lighter version without all the build dependencies
 FROM node:alpine as app
 
@@ -20,4 +23,5 @@ WORKDIR /usr/src/app
 # Copy everything over
 COPY --from=builder /usr/src/app .
 
+EXPOSE 8000
 CMD [ "yarn","start" ]
