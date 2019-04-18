@@ -19,7 +19,7 @@ yarn start
 
 # Deployment
 
-AWS Elastic Beanstalk:
+**AWS Elastic Beanstalk:**
 
 ```
 1. Create an AWS account (note that you may be charged)
