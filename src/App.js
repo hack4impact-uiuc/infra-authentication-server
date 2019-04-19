@@ -27,17 +27,4 @@ app.use(function(err, req, res, next) {
   next();
 });
 
-const mongoose = require("mongoose");
-const { getProdURI } = require("./utils/getConfigFile");
-
-async function setupDB() {
-  const prodURI = await getProdURI();
-  mongoose.connect(prodURI, { useNewUrlParser: true });
-}
-setupDB();
-
-app.listen(8000, function() {
-  console.log("Listening on http://localhost:8000");
-});
-
-// module.exports = app;
+module.exports = app;
