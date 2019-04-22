@@ -19,7 +19,7 @@ yarn start
 
 # Deployment
 
-**AWS Elastic Beanstalk:**
+## AWS Elastic Beanstalk
 
 1. Create an AWS account and go to the [Elastic Beanstalk website](https://console.aws.amazon.com/elasticbeanstalk/home) (note that you may be charged)
 2. Create a new Elastic Beanstalk application, along with a web server environment
@@ -29,21 +29,34 @@ yarn start
 4. After a few minutes (and resolving any potential errors), your server should be deployed
    ![](./docs/src/images/eb3.png)
 
-```
 Tips:
+
 - Remember to EXPOSE the server port in the Dockerfile
 - Ensure the uploaded .zip contains the source code files directly (i.e. the Dockerfile should be visible as soon as the zip is uncompressed).
 - Ensure the uploaded .zip contains your .env file
-```
 
-**AWS Amplify:**
+---
+
+## AWS Amplify:
 
 - [Amplify](https://aws-amplify.github.io/docs/) already has amazing documentation and detailed step-by-step instructions for how to set up
 - Note that React applications must be created with [create-react-app](https://github.com/facebook/create-react-app)
 
-**Heroku:**
+---
+
+## Heroku
 
 1. Create a [Heroku account](https://www.heroku.com/) and [a new project](https://dashboard.heroku.com/apps).
 2. Select a deployment method of your choice.
    - If you choose to use Heroku Git, you will have to install the [Heroku CLI tool](https://devcenter.heroku.com/articles/heroku-cli) and follow the given instructions to deploy your code to Heroku.
    - Alternatively, you can choose to use GitHub directly and link Heroku to your GitHub project.
+
+Tips:
+
+- In your startServer.js file, insert process.env.PORT as an additional port. Heroku gives you a random port, so inserting this allows you to deploy on Heroku and locally. For example, the following allows you to test your code locally on localhost:8000 and retains the functionality of your Heroku deployment:
+
+```
+app.listen(process.env.PORT || 8000)
+```
+
+- Note that syncing changes using the CLI tool can be tedious if you are deploying mid-development, so it is recommended to deploy either at the very beginning or end. You have to clone the Heroku repository and make/commit your changes there for them to reflect on the deployment.
