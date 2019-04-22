@@ -35,3 +35,15 @@ Tips:
 - Ensure the uploaded .zip contains the source code files directly (i.e. the Dockerfile should be visible as soon as the zip is uncompressed).
 - Ensure the uploaded .zip contains your .env file
 ```
+
+**AWS Amplify:**
+
+- [Amplify](https://aws-amplify.github.io/docs/) already has amazing documentation and detailed step-by-step instructions for how to set up
+- Note that React applications must be created with [create-react-app](https://github.com/facebook/create-react-app)
+
+**Heroku:**
+
+1. Create a [Heroku account](https://www.heroku.com/) and [a new project](https://dashboard.heroku.com/apps).
+2. Select a deployment method of your choice.
+   - If you choose to use Heroku Git, you will have to install the [Heroku CLI tool](https://devcenter.heroku.com/articles/heroku-cli) and follow the given instructions to deploy your code to Heroku.
+   - Alternatively, you can choose to use GitHub directly and link Heroku to your GitHub project.
