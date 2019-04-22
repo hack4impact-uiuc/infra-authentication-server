@@ -42,11 +42,19 @@ router.post(
     if (!securityQuestionsResponse.success) {
       return sendResponse(res, 500, "something went wrong on our end");
     }
+    const question =
+      securityQuestionsResponse.securityQuestions[req.body.questionIdx];
+    if (!question || !req.body.answer) {
+      return sendResponse(
+        res,
+        400,
+        "user entered wrong security question or no answer"
+      );
+    }
     const userData = {
       email: String(req.body.email).toLowerCase(),
       password: encodedPassword,
-      question:
-        securityQuestionsResponse.securityQuestions[req.body.questionIdx],
+      question,
       answer: req.body.answer,
       role: req.body.role,
       verified: false

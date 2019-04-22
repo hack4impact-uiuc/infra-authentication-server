@@ -5,15 +5,13 @@ const { sendResponse } = require("./../utils/sendResponse");
 const bcrypt = require("bcrypt");
 const { getSecurityQuestions } = require("../utils/getConfigFile");
 const handleAsyncErrors = require("../utils/errorHandler");
-const { decryptAuthJWT } = require("../utils/jwtHelpers");
 const { verifyUser } = require("./../utils/userVerification");
 
 router.post(
   "/addSecurityQuestionAnswer",
   [
-    check("token")
-      .custom(value => decryptAuthJWT(value) !== null)
-      .withMessage("Invalid JWT"),
+    check("token"),
+    check("questionIdx").isNumeric(),
     check("answer")
       .isString()
       .isLength({ min: 1 })
@@ -53,7 +51,7 @@ router.post(
       }
       const securityQuestionsResponse = await getSecurityQuestions();
       if (!securityQuestionsResponse.success) {
-        return sendResponse(res, 500, "something went wrong on our end");
+        return sendResponse(res, 500, "Security question unable to set");
       }
       const question =
         securityQuestionsResponse.securityQuestions[req.body.questionIdx];

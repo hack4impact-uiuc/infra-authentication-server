@@ -20,7 +20,7 @@ before(async () => {
   await mongoose.connection.db
     .dropDatabase()
     .catch(error => console.log("Trying to drop", error));
-  server = app.listen(5000);
+  server = app.listen(8000);
 });
 
 after(async () => {
