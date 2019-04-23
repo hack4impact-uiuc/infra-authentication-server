@@ -51,12 +51,26 @@ Tips:
    - If you choose to use Heroku Git, you will have to install the [Heroku CLI tool](https://devcenter.heroku.com/articles/heroku-cli) and follow the given instructions to deploy your code to Heroku.
    - Alternatively, you can choose to use GitHub directly and link Heroku to your GitHub project.
 
+![](./docs/src/images/h1.png)
+
 Tips:
 
-- In your startServer.js file, insert process.env.PORT as an additional port. Heroku gives you a random port, so inserting this allows you to deploy on Heroku and locally. For example, the following allows you to test your code locally on localhost:8000 and retains the functionality of your Heroku deployment:
+- In your startServer.js file, insert process.env.PORT as an additional port. Heroku uses a random port, so inserting this allows you to deploy both on Heroku and locally. For example, the following allows you to test your code locally on localhost:8000 while retaining the functionality of your Heroku deployment:
 
 ```
 app.listen(process.env.PORT || 8000)
 ```
 
+![](./docs/src/images/h3.png)
+
 - Note that syncing changes using the CLI tool can be tedious if you are deploying mid-development, so it is recommended to deploy either at the very beginning or end. You have to clone the Heroku repository and make/commit your changes there for them to reflect on the deployment.
+  ![](./docs/src/images/h2.png)
+- You can turn the deployment offline/online with the following command:
+
+```
+Offline:
+heroku ps:scale web=0
+
+Online:
+heroku ps:scale web=1
+```
