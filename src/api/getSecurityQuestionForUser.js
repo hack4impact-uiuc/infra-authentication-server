@@ -7,7 +7,6 @@ router.post(
   "/getSecurityQuestionForUser",
   check("email").isEmail(),
   async function(req, res) {
-    // Input validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return sendResponse(res, 400, "Invalid request", {
