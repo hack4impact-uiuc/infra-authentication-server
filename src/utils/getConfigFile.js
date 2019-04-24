@@ -28,11 +28,10 @@ const getTestURI = async () => {
 };
 
 const getProdURI = async () => {
-  const config = await getConfigFile();
-  if (config["prod_db"] != undefined) {
-    return config["prod_db"];
+  if (!process.env.INFRA_MONGO_URI) {
+    throw "No Mongo URI set up in the .env file. Did you go through the CLI mlab setup?";
   }
-  return null;
+  return process.env.INFRA_MONGO_URI;
 };
 
 const googleAuth = async () => {
@@ -54,6 +53,17 @@ const isSecurityQuestionEnabled = async () => {
   return config["security_question"];
 };
 
+const getSecurityQuestions = async () => {
+  const config = await getConfigFile();
+  if (config["security_questions"] === null) {
+    return { success: false, error: "no questions specified in config" };
+  } else if (!config["security_questions"]) {
+    return { success: false, error: "no security_questions field in config" };
+  } else {
+    return { success: true, securityQuestions: config["security_questions"] };
+  }
+};
+
 const isGmailEnabled = async () => {
   const config = await getConfigFile();
   if (config["gmail"] != true && config["security_question"] != true) {
@@ -73,5 +83,6 @@ module.exports = {
   googleAuth,
   isSecurityQuestionEnabled,
   isGmailEnabled,
-  getProdURI
+  getProdURI,
+  getSecurityQuestions
 };
