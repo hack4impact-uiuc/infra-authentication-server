@@ -2,8 +2,7 @@
   "name": "infra-authentication-server",
   "scripts": {
     "start": "nodemon src/startServer.js",
-    "docs": "docz dev",
-    "test": "mocha"
+    "docs": "docz dev"
   },
   "repository": {
     "type": "git",
