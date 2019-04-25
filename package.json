@@ -9,14 +9,6 @@
     "type": "git",
     "url": "https://github.com/hack4impact-uiuc/infra-authentication-server.git"
   },
-  "standard": {
-    "globals": [
-      "before",
-      "after",
-      "it",
-      "describe"
-    ]
-  },
   "license": "MIT",
   "dependencies": {
     "@sendgrid/mail": "^6.3.1",
