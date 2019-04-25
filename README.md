@@ -24,14 +24,14 @@ yarn start
 1. Create an AWS account and go to the [Elastic Beanstalk website](https://console.aws.amazon.com/elasticbeanstalk/home) (note that you may be charged)
 2. Create a new Elastic Beanstalk application, along with a web server environment
    ![](./docs/src/images/eb1.png)
-3. Select Docker as the configuration and upload Dockerized server code as a .zip file
+3. Select Docker as the configuration and upload Dockerized server code as a .zip file. Since there's a Dockerfile already, all you need to do is save the authentication server project folder as a zip file and upload it here.
    ![](./docs/src/images/eb2.png)
 4. After a few minutes (and resolving any potential errors), your server should be deployed
    ![](./docs/src/images/eb3.png)
 
 Tips:
 
-- Remember to EXPOSE the server port in the Dockerfile
+- Remember to EXPOSE the server port in the Dockerfile by adding: `EXPOSE 8000`
 - Ensure the uploaded .zip contains the source code files directly (i.e. the Dockerfile should be visible as soon as the zip is uncompressed).
 - Ensure the uploaded .zip contains your .env file
 
