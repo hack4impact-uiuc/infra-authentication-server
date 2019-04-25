@@ -6,13 +6,18 @@ module.exports = {
       jsx: true
     }
   },
+  plugins: [
+    "mocha"
+  ],
   extends: "eslint:recommended",
   env: {
     amd: true,
     node: true,
-    es6: true
+    es6: true,
+    mocha: true
   },
   rules: {
-    "no-console": "off"
+    "no-console": "off",
+    "mocha/no-exclusive-tests": "error"
   }
 };
