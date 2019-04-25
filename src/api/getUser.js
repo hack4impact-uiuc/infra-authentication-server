@@ -37,14 +37,6 @@ router.get(
         return;
       }
     }
-    console.log({
-      status: 200,
-      message: "User succesfully returned",
-      user_email: user.email,
-      user_verified: user.verified || req.headers.google,
-      user_role: user.role,
-      user_id: user._id
-    });
     return res.status(200).send({
       status: 200,
       message: "User succesfully returned",
