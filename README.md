@@ -31,7 +31,7 @@ yarn start
 
 Tips:
 
-- Remember to EXPOSE the server port in the Dockerfile by adding: `EXPOSE 8000`
+- Remember to EXPOSE the server port in the Dockerfile by adding: `EXPOSE 8000`. You can replace `8000` with whatever local port you're using.
 - Ensure the uploaded .zip contains the source code files directly (i.e. the Dockerfile should be visible as soon as the zip is uncompressed).
 - Ensure the uploaded .zip contains your .env file
 
