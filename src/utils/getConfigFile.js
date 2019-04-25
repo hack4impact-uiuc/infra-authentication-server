@@ -76,6 +76,14 @@ const isGmailEnabled = async () => {
   return config["gmail"];
 };
 
+const getExpiryTime = async () => {
+  const config = await getConfigFile();
+  if (config["expire_after_hrs"] === undefined) {
+    return 1;
+  }
+  return config["expire_after_hrs"];
+};
+
 module.exports = {
   getConfigFile,
   getRolesForUser,
@@ -84,5 +92,6 @@ module.exports = {
   isSecurityQuestionEnabled,
   isGmailEnabled,
   getProdURI,
-  getSecurityQuestions
+  getSecurityQuestions,
+  getExpiryTime
 };
