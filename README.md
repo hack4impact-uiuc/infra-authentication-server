@@ -17,3 +17,32 @@ yarn
 yarn start
 ```
 
+# <<<<<<< HEAD
+
+Documentation: https://h4i-auth-infra-docs.now.sh/
+
+API: https://github.com/hack4impact-uiuc/infra-authentication-api/
+
+Client Example: https://github.com/hack4impact-uiuc/infra-authentication-client
+
+# To Run Locally
+
+```
+yarn
+yarn start
+```
+
+> > > > > > > a26c9bd7d7a36a970f5a75191a0319e6b12b8598
+
+Documentation: https://h4i-auth-infra-docs.now.sh/
+
+API: https://github.com/hack4impact-uiuc/infra-authentication-api/
+
+Client Example: https://github.com/hack4impact-uiuc/infra-authentication-client
+
+# To Run Locally
+
+```
+yarn
+yarn start
+```
