@@ -1,0 +1,22 @@
+roles:
+    root: 
+        - admin
+        - supervisor
+        - guest
+    admin: 
+        - supervisor
+        - guest
+    supervisor: 
+        - guest
+    guest: 
+security_questions:
+    - Do you love this shit?
+    - Are you high right now?
+    - Do you ever get nervous?
+    - Are you single?
+    - I heard you fucked your girl, is it true?
+useGoogleAuth: true
+security_question: true
+gmail: true
+test_db:
+    "mongodb://product:infra28@ds111441.mlab.com:11441/auth-infra-server-test"

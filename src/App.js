@@ -1,29 +1,30 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const cors = require("cors");
-
-const User = require("./models/User");
+const bodyParser = require("body-parser");
+const morgan = require("morgan");
+const { sendResponse } = require("./utils/sendResponse");
+const router = require("./api/index");
 
 const app = express();
+require("dotenv").config();
+
+// var SECRET_TOKEN = process.env.SECRET_TOKEN;
+
 app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(morgan("dev"));
 
-app.get("/", function(req, res) {
-  res.send("Hello World");
+app.use("/", router);
+app.use(function(err, req, res, next) {
+  console.error(err);
+  console.log(err.stack);
+  sendResponse(
+    res,
+    500,
+    "An uncaught exception occured on the server. Please run `now logs [DEPLOYMENT_URL]` on the commandline to debug."
+  );
+  next();
 });
 
-app.get("/users", async function(req, res) {
-  const allUsers = await User.find();
-  const names = allUsers.map(user => user.name);
-  res.send(names);
-});
-
-app.get("/put/:name", function(req, res) {
-  var user = new User({ username: req.params.name, passord:"demo" });
-  user.save();
-  console.log("Added User " + req.params.name);
-  res.send("Added User " + req.params.name);
-});
-
-app.listen(8000, function() {
-  console.log("Listening on http://localhost:8000");
-});
+module.exports = app;
