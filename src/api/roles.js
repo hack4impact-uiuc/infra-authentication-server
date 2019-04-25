@@ -21,7 +21,7 @@ router.get(
       });
     }
     let user = null;
-    if (req.headers.google === "undefined") {
+    if (!JSON.parse(req.headers.google)) {
       user = await verifyUser(req.headers.token);
       if (user.errorMessage != null) {
         return sendResponse(res, 400, user.errorMessage);
