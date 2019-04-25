@@ -74,3 +74,71 @@ heroku ps:scale web=0
 Online:
 heroku ps:scale web=1
 ```
+
+# DigitalOcean Setup
+
+Note that much of the following is adapted from this [Medium.com](https://blog.machinebox.io/deploy-machine-box-in-digital-ocean-385265fbeafd) article, so please feel free to check that out if you would like additional clarification on any of these steps.
+
+## Step 1: Digital Ocean Account and Token Creation
+
+Head over to https://www.digitalocean.com/ and create an account for your project. You may need to enter in a credit card. Droplets generally begin at \$5/month.
+
+Once you've done this, go ahead and create a personal access token.
+
+[Insert image here]
+
+Make sure to copy this down somewhere safe, as this will be hidden on the portal due to security reasons after creation.
+
+## Step 2: Droplet Creation
+
+In DigitalOcean, a "droplet" is essentially a mini virtual machine that generally runs some flavor of Linux and has its own IP address. You can almost think of it as your own, always on, SSH-only computer that has its IP address exposed to the world so people can access it anywhere, anytime.
+
+Make sure that you have already installed [Docker](https://docs.docker.com/install/) on your computer. If you already have you can run
+
+```bash
+docker-machine --version
+```
+
+In order to make sure it's installed properly. We'll be using `docker-machine` to help us deploy to our droplet.
+
+In the below command, be sure to replace `YOUR_TOKEN` with the access token you copied down from step 1, and `NAME_OF_MACHINE` with what you want to call your Droplet. This name choice is arbitrary, but we'll use it to let `docker-machine` know in the future which Droplet we want to install our Docker image to.
+
+```bash
+docker-machine create --digitalocean-size "s-1vcpu-1gb" --driver digitalocean --digitalocean-access-token YOUR_TOKEN NAME_OF_MACHINE
+```
+
+Once you run this command, it may take a bit for it to get everything set up. When it's done, run:
+
+```
+docker-machine ls
+```
+
+You should see the name of your machine and it should be running.
+
+When this is done, move on to the next step.
+
+## Step 3: Build and Export Docker Image
+
+Now that we've done this, we want to create the actual Docker image that we'll be using to run the server. If you already have a Docker image pushed up to a remote such as DockerHub, you can essentially skip this step. I don't recommend this, considering you will most likely have your `.env` file built with your Docker image, and that contains very sensitive information.
+
+`cd` into your the root directory of the server that you set up using the CLI tool or manually configured.
+
+Run the following, changing `DOCKER_IMAGE_NAME` to what you whatever you want to call this image:
+
+```bash
+docker build -t DOCKER_IMAGE_NAME .
+```
+
+Note, this may take a while, especially if you're running it for the first time. Subsequent builds will be much faster, as Docker caches assets that haven't changed since the previous build.
+
+Once this is done, go ahead and run the following, replacing `DOCKER_IMAGE_NAME` with what you wrote in the previous step.
+
+```bash
+docker save -o test.tar DOCKER_IMAGE_NAME
+```
+
+This will essentially create a zipped up version of your image that you can then copy to another machine, which is exactly what we will do.
+
+## Step 4: Running Docker on Remote Machine
+
+Now that you have the local, zipped version of your Docker image from step 3, you're ready to proceed to transfer it to your remote machine.
