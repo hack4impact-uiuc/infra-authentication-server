@@ -5,7 +5,7 @@ route: /roles
 
 # Roles
 
-## Roles
+## Roles - get all users below user's role
 
 | Endpoint | /roles [GET] |
 | ------ | ----------- |
@@ -13,6 +13,17 @@ route: /roles
 | header | google: whether or not the user is a google user (true/false) |
 | Response 200 | security question |
 | Response 400 | error message |
+
+Example:
+```
+{
+    url: "localhost:8000/"
+    headers: {
+        "token": "gianttokenblobwithabunchofnumbershere"
+        "google": "false"
+    }
+}
+```
 
 (1) If the token isn't provided, it returns the error message "Token not provided"
 
@@ -24,7 +35,7 @@ route: /roles
 
 
 
-## Role Change
+## Roles Change - change another user's role
 
 | Endpoint | /roleschange [POST] |
 | ------ | ----------- |
@@ -35,6 +46,38 @@ route: /roles
 | body   | password: user's password (only required if user is not a google user) |
 | Response 200 | success message |
 | Response 400 | error message |
+
+Example (regular user):
+```
+{
+    url: "localhost:8000/"
+    headers: {
+        "token": "gianttokenblobwithabunchofnumbershere"
+        "google": "false"
+    }
+    body:
+    {
+        "userEmail": "otheruser@gmail.com",
+        "newRole": "supervisor",
+        "password": "yourpassword"
+    }
+}
+```
+Example (google user):
+```
+{
+    url: "localhost:8000/"
+    headers: {
+        "token": "gianttokenblobwithabunchofnumbershere"
+        "google": "true"
+    }
+    body:
+    {
+        "userEmail": "otheruser@gmail.com",
+        "newRole": "supervisor"
+    }
+}
+```
 
 (1) If it doesn't have a token in the header, it returns the error message "Token not provided"
 
@@ -48,7 +91,7 @@ route: /roles
 
 (6) If the user doesn't have the permission level to promote the user, it returns the error message "Incorrect Permission Levels"
 
-(7) Otherwise the user promotes the role of the user and sends te success message "Sucessfully set new permission level for [userEmail] to [newRole]"
+(7) Otherwise the user promotes the role of the user and sends the success message "Sucessfully set new permission level for [userEmail] to [newRole]"
 
 
 
