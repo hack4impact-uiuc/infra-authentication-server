@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const { check, validationResult } = require("express-validator/check");
 const User = require("../models/User");
 const { sendResponse } = require("./../utils/sendResponse");
+const { sendPasswordChangeEmail } = require("../utils/sendMail");
 const { signAuthJWT } = require("../utils/jwtHelpers");
 const {
   isGmailEnabled,
@@ -85,9 +86,23 @@ router.post(
     expirePIN(user);
     user.password = await bcrypt.hash(req.body.password, 10);
     await user.save();
-    sendResponse(res, 200, "Password successfully reset", {
-      token: await signAuthJWT(user._id, user.password)
-    });
+    if (gmailEnabled) {
+      try {
+        await sendPasswordChangeEmail(user.email);
+        return sendResponse(res, 200, "Password successfully reset!");
+      } catch (e) {
+        console.log(e);
+        return sendResponse(
+          res,
+          500,
+          "Confirm email could not be sent despite Gmail being enabled. This is likely due to incorrect Gmail keys set as environment variables. Password still reset."
+        );
+      }
+    } else {
+      sendResponse(res, 200, "Password successfully reset", {
+        token: await signAuthJWT(user._id, user.password)
+      });
+    }
   })
 );
 
