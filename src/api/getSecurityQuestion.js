@@ -1,21 +1,11 @@
 const router = require("express").Router();
-const { check, validationResult } = require("express-validator/check");
+const handleAsyncErrors = require("../utils/errorHandler");
 const { sendResponse } = require("./../utils/sendResponse");
 const { getSecurityQuestions } = require("../utils/getConfigFile");
 
 router.get(
   "/getSecurityQuestions",
-  check("token")
-    .isString()
-    .isLength({ min: 1 }),
-  async function(req, res) {
-    // Input validation
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return sendResponse(res, 400, "Invalid request", {
-        errors: errors.array({ onlyFirstError: true })
-      });
-    }
+  handleAsyncErrors(async function(req, res) {
     const questionsResponse = await getSecurityQuestions();
     if (!questionsResponse.success) {
       return sendResponse(
@@ -28,7 +18,7 @@ router.get(
         questions: questionsResponse.securityQuestions
       });
     }
-  }
+  })
 );
 
 module.exports = router;
