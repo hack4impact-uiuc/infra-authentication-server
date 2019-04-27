@@ -24,14 +24,14 @@ router.post(
       });
     }
 
-    let user = await verifyUser(req.headers.token);
-    if (user.errorMessage != null) {
-      return sendResponse(res, 400, user.errorMessage);
-    }
-
+    let user = null;
     let authenticated = false;
 
     if (!JSON.parse(req.headers.google)) {
+      user = await verifyUser(req.headers.token);
+      if (user.errorMessage != null) {
+        return sendResponse(res, 400, user.errorMessage);
+      }
       if (await bcrypt.compare(req.body.password, user.password)) {
         authenticated = true;
       }
