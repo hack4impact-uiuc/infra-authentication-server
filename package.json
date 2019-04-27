@@ -1,8 +1,7 @@
 {
   "name": "infra-authentication-server",
   "scripts": {
-    "start": "nodemon src/startServer.js",
-    "docs": "docz dev"
+    "start": "nodemon src/startServer.js"
   },
   "repository": {
     "type": "git",
@@ -15,8 +14,6 @@
     "body-parser": "^1.18.3",
     "chai": "^4.2.0",
     "cors": "^2.8.5",
-    "docz": "^0.13.7",
-    "docz-theme-default": "^0.13.7",
     "dotenv": "^6.2.0",
     "eslint": "^5.15.1",
     "eslint-config-airbnb-base": "^13.1.0",
