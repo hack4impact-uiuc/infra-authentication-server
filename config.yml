@@ -18,3 +18,4 @@ security_questions:
 useGoogleAuth: true
 security_question: true
 gmail: true
+expire_after_hrs: 1
