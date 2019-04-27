@@ -36,7 +36,7 @@ router.post(
       userId === null ||
       !(await verifyAuthJWT(req.headers.token, userId, user.password))
     ) {
-      sendResponse(res, 400, "Invalid JWT token");
+      sendResponse(res, 400, user.errorMessage);
     } else if (user) {
       const oldPasswordMatches = await bcrypt.compare(
         req.body.currentPassword,
