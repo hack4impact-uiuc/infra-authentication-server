@@ -8,8 +8,6 @@ const router = require("./api/index");
 const app = express();
 require("dotenv").config();
 
-// var SECRET_TOKEN = process.env.SECRET_TOKEN;
-
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -26,4 +24,5 @@ app.use(function(err, req, res, next) {
   );
   next();
 });
+
 module.exports = app;

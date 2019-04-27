@@ -34,12 +34,15 @@ router.post(
       return sendResponse(res, 400, user.errorMessage);
     }
 
+    console.log("HERE");
     if (await shouldUpdateJWT(req.headers.token, user._id, user.password)) {
       var newToken = await signAuthJWT(user._id, user.password);
       return res.status(200).send({
         status: 200,
         message: "Valid JWT token",
         role: user.role,
+        authId: user._id,
+        emailVerified: user.verified,
         newToken
       });
     }
@@ -47,7 +50,10 @@ router.post(
     return res.status(200).send({
       status: 200,
       message: "Valid JWT token",
-      role: user.role
+      role: user.role,
+      authId: user._id,
+      emailVerified: user.verified,
+      newToken
     });
   })
 );

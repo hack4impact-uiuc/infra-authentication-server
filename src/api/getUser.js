@@ -19,7 +19,7 @@ router.get(
       });
     }
     let user = null;
-    if (req.headers.google === "undefined") {
+    if (!JSON.parse(req.headers.google)) {
       user = await verifyUser(req.headers.token);
       if (user.errorMessage != null) {
         return sendResponse(res, 400, user.errorMessage);
@@ -42,7 +42,8 @@ router.get(
       message: "User succesfully returned",
       user_email: user.email,
       user_verified: user.verified || req.headers.google,
-      user_role: user.role
+      user_role: user.role,
+      user_id: user._id
     });
   }
 );

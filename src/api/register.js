@@ -3,7 +3,10 @@ const bcrypt = require("bcrypt");
 const { check, validationResult } = require("express-validator/check");
 const User = require("../models/User");
 const { sendResponse } = require("./../utils/sendResponse");
-const { getRolesForUser } = require("./../utils/getConfigFile");
+const {
+  getRolesForUser,
+  getSecurityQuestions
+} = require("./../utils/getConfigFile");
 const { signAuthJWT } = require("../utils/jwtHelpers");
 const { generatePIN } = require("../utils/pinHelpers");
 const { isGmailEnabled } = require("../utils/getConfigFile");
@@ -30,23 +33,34 @@ router.post(
         errors: errors.array({ onlyFirstError: true })
       });
     }
-
     const usingGmail = await isGmailEnabled();
-    if (await User.findOne({ email: req.body.email })) {
+    if (await User.findOne({ email: String(req.body.email).toLowerCase() })) {
       return sendResponse(res, 400, "User already exists. Please try again.");
     }
-
     const encodedPassword = await bcrypt.hash(req.body.password, 10);
-
+    const securityQuestionsResponse = await getSecurityQuestions();
+    if (!securityQuestionsResponse.success) {
+      return sendResponse(res, 500, "something went wrong on our end");
+    }
+    const question =
+      securityQuestionsResponse.securityQuestions[req.body.questionIdx];
+    if (!question || !req.body.answer) {
+      return sendResponse(
+        res,
+        400,
+        "user entered wrong security question or no answer"
+      );
+    }
     const userData = {
-      email: req.body.email,
+      email: String(req.body.email).toLowerCase(),
       password: encodedPassword,
+      question,
+      answer: req.body.answer,
       role: req.body.role,
       verified: false
     };
     const user = new User(userData);
     const requiredAuthFrom = await getRolesForUser(req.body.role);
-
     if (requiredAuthFrom != null) {
       return sendResponse(
         res,
@@ -72,6 +86,7 @@ router.post(
       try {
         await sendMail(body);
       } catch (e) {
+        console.log(e);
         return sendResponse(
           res,
           500,

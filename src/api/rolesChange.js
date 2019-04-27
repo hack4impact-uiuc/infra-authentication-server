@@ -31,7 +31,7 @@ router.post(
 
     let authenticated = false;
 
-    if (req.headers.google === "undefined") {
+    if (!JSON.parse(req.headers.google)) {
       if (await bcrypt.compare(req.body.password, user.password)) {
         authenticated = true;
       }

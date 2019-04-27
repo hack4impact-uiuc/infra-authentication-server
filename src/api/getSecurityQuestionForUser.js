@@ -1,31 +1,24 @@
 const router = require("express").Router();
 const { check, validationResult } = require("express-validator/check");
 const { sendResponse } = require("./../utils/sendResponse");
-const { getSecurityQuestions } = require("../utils/getConfigFile");
+const User = require("../models/User");
 
-router.get(
-  "/getSecurityQuestions",
-  check("token")
-    .isString()
-    .isLength({ min: 1 }),
+router.post(
+  "/getSecurityQuestionForUser",
+  check("email").isEmail(),
   async function(req, res) {
-    // Input validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return sendResponse(res, 400, "Invalid request", {
         errors: errors.array({ onlyFirstError: true })
       });
     }
-    const questionsResponse = await getSecurityQuestions();
-    if (!questionsResponse.success) {
-      return sendResponse(
-        res,
-        500,
-        "No security question could be parsed from config file"
-      );
+    const user = await User.find({ email: req.body.email });
+    if (!user || !user.length) {
+      return sendResponse(res, 400, "User is not registered!");
     } else {
       return res.status(200).send({
-        questions: questionsResponse.securityQuestions
+        question: user[0].question
       });
     }
   }
