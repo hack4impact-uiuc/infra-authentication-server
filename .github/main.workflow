@@ -3,6 +3,7 @@ workflow "Deploy on Now" {
   resolves = ["release"]
 }
 
+
 # Deploy, and write deployment to file
 action "deploy" {
   uses = "actions/zeit-now@master"
