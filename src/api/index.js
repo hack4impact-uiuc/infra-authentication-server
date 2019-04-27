@@ -13,7 +13,7 @@ router.use("/", require("./roles"));
 router.use("/", require("./rolesChange"));
 router.use("/", require("./verify"));
 router.use("/", require("./resendVerificationEmail"));
-router.use("/", require("./getSecurityQuestionForUser"));
+router.use("/", require("./securityQuestionForUser"));
 router.use("/", require("./getUser"));
 
 module.exports = router;

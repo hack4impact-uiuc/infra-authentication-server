@@ -1,10 +1,10 @@
 const router = require("express").Router();
 const { check, validationResult } = require("express-validator/check");
-const { sendResponse } = require("./../utils/sendResponse");
+const { sendResponse } = require("../utils/sendResponse");
 const User = require("../models/User");
 
 router.post(
-  "/getSecurityQuestionForUser",
+  "/securityQuestionForUser",
   check("email").isEmail(),
   async function(req, res) {
     const errors = validationResult(req);
