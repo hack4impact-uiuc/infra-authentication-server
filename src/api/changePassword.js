@@ -2,10 +2,11 @@ const router = require("express").Router();
 const bcrypt = require("bcrypt");
 const { check, validationResult } = require("express-validator/check");
 const { sendResponse } = require("../utils/sendResponse");
-
+const { sendPasswordChangeEmail } = require("../utils/sendMail");
 const handleAsyncErrors = require("../utils/errorHandler");
 const { signAuthJWT, verifyAuthJWT } = require("../utils/jwtHelpers");
 const { verifyUser } = require("./../utils/userVerification");
+const { isGmailEnabled } = require("../utils/getConfigFile");
 
 router.post(
   "/changePassword",
@@ -46,9 +47,24 @@ router.post(
         user.password = await bcrypt.hash(req.body.newPassword, 10);
         await user.save();
         var new_token = await signAuthJWT(userId, user.password);
-        sendResponse(res, 200, "Successful change of password!", {
-          token: new_token
-        });
+        const usingGmail = await isGmailEnabled();
+        if (usingGmail) {
+          try {
+            await sendPasswordChangeEmail(user.email);
+            return sendResponse(res, 200, "Successful change of password!");
+          } catch (e) {
+            console.log(e);
+            return sendResponse(
+              res,
+              500,
+              "Confirm email could not be sent despite Gmail being enabled. This is likely due to incorrect Gmail keys set as environment variables. Password still reset."
+            );
+          }
+        } else {
+          sendResponse(res, 200, "Successful change of password!", {
+            token: new_token
+          });
+        }
       } else {
         sendResponse(res, 400, "Current password is incorrect");
       }
