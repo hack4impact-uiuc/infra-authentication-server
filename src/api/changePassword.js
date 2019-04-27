@@ -4,7 +4,7 @@ const { check, validationResult } = require("express-validator/check");
 const { sendResponse } = require("../utils/sendResponse");
 
 const handleAsyncErrors = require("../utils/errorHandler");
-const { signAuthJWT, verifyAuthJWT } = require("../utils/jwtHelpers");
+const { signAuthJWT } = require("../utils/jwtHelpers");
 const { verifyUser } = require("./../utils/userVerification");
 
 // this endpoint is only hit when a user has his/her password and wants to change it
@@ -29,14 +29,11 @@ router.post(
 
     const user = await verifyUser(req.headers.token);
     if (user.errorMessage != null) {
-      return sendResponse(res, 400, user.errorMessage);
+      return sendResponse(res, 400, "invalid token");
     }
 
     const userId = user._id;
-    if (
-      userId === null ||
-      !(await verifyAuthJWT(req.headers.token, userId, user.password))
-    ) {
+    if (userId === null) {
       sendResponse(res, 400, "Invalid JWT token");
     } else if (user) {
       const oldPasswordMatches = await bcrypt.compare(
