@@ -12,25 +12,25 @@ action "deploy" {
   secrets = ["ZEIT_TOKEN"]
 }
 
-# Always create an alias using the SHA
-action "--target production" {
-  needs = "deploy"
-  uses = "actions/zeit-now@master"
-  args = "--target production `cat /github/home/deploy.txt` $GITHUB_SHA"
-  secrets = ["ZEIT_TOKEN"]
-}
+# # Always create an alias using the SHA
+# action "--target production" {
+#   needs = "deploy"
+#   uses = "actions/zeit-now@master"
+#   args = "--target production `cat /github/home/deploy.txt` $GITHUB_SHA"
+#   secrets = ["ZEIT_TOKEN"]
+# }
 
-# Filter for master branch
-action "master-branch-filter" {
-  needs = "--target production"
-  uses = "actions/bin/filter@master"
-  args = "branch master"
-}
+# # Filter for master branch
+# action "master-branch-filter" {
+#   needs = "--target production"
+#   uses = "actions/bin/filter@master"
+#   args = "branch master"
+# }
 
-# Requires now.json in repository
-action "release" {
-  needs = "master-branch-filter"
-  uses = "actions/zeit-now@master"
-  secrets = ["ZEIT_TOKEN"]
-  args = "--target production --local-config=./now.json"
-}
+# # Requires now.json in repository
+# action "release" {
+#   needs = "master-branch-filter"
+#   uses = "actions/zeit-now@master"
+#   secrets = ["ZEIT_TOKEN"]
+#   args = "--target production --local-config=./now.json"
+# }
