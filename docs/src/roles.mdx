@@ -9,7 +9,8 @@ route: /roles
 
 | Endpoint | /roles [GET] |
 | ------ | ----------- |
-| header   | token |
+| header   | token: JWT token of the user (must log in to find) |
+| header | google: whether or not the user is a google user (true/false) |
 | Response 200 | security question |
 | Response 400 | error message |
 
@@ -27,8 +28,11 @@ route: /roles
 
 | Endpoint | /roleschange [POST] |
 | ------ | ----------- |
-| header   | token |
-| body   | userEmail, newROle |
+| header   | token: JWT token of the user (must log in to find) |
+| header | google: whether or not the user is a google user (true/false) |
+| body   | userEmail: email of the user to be promoted/demoted |
+| body   | newRole: new role for the other user |
+| body   | password: user's password (only required if user is not a google user) |
 | Response 200 | success message |
 | Response 400 | error message |
 
@@ -40,9 +44,11 @@ route: /roles
 
 (4) If a user with the userEmail doesn't exist, it returns the error message "User with that email doesn't exist"
 
-(4) If the user doesn't have the permission level to promote the user, it returns the error message "Incorrect Permission Levels"
+(5) If the user doesn't provide the correct password, it returns the error message "Incorrect Authentication"
 
-(5) Otherwise the user promotes the role of the user and sends te success message "Sucessfully set new permission level for [userEmail] to [newRole]"
+(6) If the user doesn't have the permission level to promote the user, it returns the error message "Incorrect Permission Levels"
+
+(7) Otherwise the user promotes the role of the user and sends te success message "Sucessfully set new permission level for [userEmail] to [newRole]"
 
 
 
