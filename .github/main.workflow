@@ -31,5 +31,5 @@ action "release" {
   needs = "master-branch-filter"
   uses = "actions/zeit-now@master"
   secrets = ["ZEIT_TOKEN"]
-  args = "alias --local-config=./site/now.json"
+  args = "alias --local-config=./now.json"
 }
