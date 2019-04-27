@@ -37,6 +37,7 @@ router.get(
         return;
       }
     }
+
     return res.status(200).send({
       status: 200,
       message: "User succesfully returned",
