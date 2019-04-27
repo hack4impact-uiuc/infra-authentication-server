@@ -6,7 +6,7 @@ workflow "Deploy on Now" {
 # Deploy, and write deployment to file
 action "deploy" {
   uses = "actions/zeit-now@master"
-  args = "--public --no-clipboard deploy ./site > $HOME/$GITHUB_ACTION.txt"
+  args = "--public --no-clipboard deploy . > $HOME/$GITHUB_ACTION.txt"
   secrets = ["INFRA_CLIENT_ID", "INFRA_CLIENT_SECRET", "INFRA_EMAIL", "INFRA_REFRESH_TOKEN"]
   secrets = ["ZEIT_TOKEN"]
 }
