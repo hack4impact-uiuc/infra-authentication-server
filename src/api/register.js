@@ -9,7 +9,10 @@ const {
 } = require("./../utils/getConfigFile");
 const { signAuthJWT } = require("../utils/jwtHelpers");
 const { generatePIN } = require("../utils/pinHelpers");
-const { isGmailEnabled } = require("../utils/getConfigFile");
+const {
+  isGmailEnabled,
+  isSecurityQuestionEnabled
+} = require("../utils/getConfigFile");
 const { sendMail } = require("./../utils/sendMail");
 const handleAsyncErrors = require("../utils/errorHandler");
 
@@ -25,41 +28,54 @@ router.post(
       .isLength({ min: 1 })
   ],
   handleAsyncErrors(async function(req, res) {
-    // Input validation
-
+    // Checks that the request has the required fields (email, password, and role)
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return sendResponse(res, 400, "Invalid Request", {
         errors: errors.array({ onlyFirstError: true })
       });
     }
-    const usingGmail = await isGmailEnabled();
+
+    // Ensures the user doesn't already have an account
     if (await User.findOne({ email: String(req.body.email).toLowerCase() })) {
       return sendResponse(res, 400, "User already exists. Please try again.");
     }
+
+    // Encrypts the password and creates the user's data
     const encodedPassword = await bcrypt.hash(req.body.password, 10);
-    const securityQuestionsResponse = await getSecurityQuestions();
-    if (!securityQuestionsResponse.success) {
-      return sendResponse(res, 500, "something went wrong on our end");
-    }
-    const question =
-      securityQuestionsResponse.securityQuestions[req.body.questionIdx];
-    if (!question || !req.body.answer) {
-      return sendResponse(
-        res,
-        400,
-        "user entered wrong security question or no answer"
-      );
-    }
-    const userData = {
+    let userData = {
       email: String(req.body.email).toLowerCase(),
       password: encodedPassword,
-      question,
-      answer: req.body.answer,
       role: req.body.role,
       verified: false
     };
-    const user = new User(userData);
+
+    // If the security question is enabled, checks that the security question index is valid and that there is an answer
+    const securityQuestionEnabled = await isSecurityQuestionEnabled();
+    console.log(securityQuestionEnabled);
+    if (securityQuestionEnabled) {
+      const securityQuestionsResponse = await getSecurityQuestions();
+      if (!securityQuestionsResponse.success) {
+        return sendResponse(
+          res,
+          500,
+          "Can not read the security questions from the config file"
+        );
+      }
+      const question =
+        securityQuestionsResponse.securityQuestions[req.body.questionIdx];
+      if (!question || !req.body.answer) {
+        return sendResponse(
+          res,
+          400,
+          "Invalid security question index or answer"
+        );
+      }
+      userData["question"] = question;
+      userData["answer"] = req.body.answer;
+    }
+
+    // Checks the permission level of the user using the config file
     const requiredAuthFrom = await getRolesForUser(req.body.role);
     if (requiredAuthFrom != null) {
       return sendResponse(
@@ -68,12 +84,12 @@ router.post(
         "User needs a higher permission level for that role"
       );
     }
+    const user = new User(userData);
 
-    const jwt_token = await signAuthJWT(user._id, user.password);
+    // If gmail is enabled, it sends an email with a generated PIN to verify the user
+    const usingGmail = await isGmailEnabled();
     if (usingGmail) {
-      // using gmail so it should send generate a PIN and send a verification email.
       generatePIN(user);
-      // expire it since we don't want it able to be used to change password
       user.expiration = 0;
       const body = {
         from: "hack4impact.infra@gmail.com",
@@ -95,7 +111,8 @@ router.post(
       }
     }
 
-    // success, so save the user to the DB and send back the JWT
+    // Signs the jwt token, and the sends the signed token to the user along with the user's id and permission level
+    const jwt_token = await signAuthJWT(user._id, user.password);
     await user.save();
     return res.status(200).send({
       status: 200,
