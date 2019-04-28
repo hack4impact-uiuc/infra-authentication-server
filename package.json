@@ -32,6 +32,7 @@
     "node-pre-gyp": "^0.12.0",
     "nodemailer": "^5.1.1",
     "nodemon": "^1.18.10",
+    "prettier": "^1.17.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "supertest": "^3.4.2",
