@@ -12,6 +12,9 @@ router.post(
   check("tokenId")
     .isString()
     .isLength({ min: 1 }),
+  check("role")
+    .isString()
+    .isLength({ min: 1 }),
   handleAsyncErrors(async function(req, res) {
     // Check that there is a tokenId in the body of the request
     const errors = validationResult(req);
@@ -21,11 +24,12 @@ router.post(
       });
     }
 
-    // Check that google hhas been enabled
+    // Check that google has been enabled
     const useGoogle = await googleAuth();
     if (!useGoogle)
       return sendResponse(res, 400, "Google authentication has not be enabled");
 
+    // Sends the tokenId to the Google API to get  the payload, which conatins the user's email
     const tokenInfoRes = await fetch(
       `https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${
         req.body.tokenId
@@ -33,20 +37,22 @@ router.post(
     );
     const payload = await tokenInfoRes.json();
 
+    //  If a user already exists with this email and is a google user it responds withh a success message.
     const user = await User.findOne({ email: payload.email, googleAuth: true });
     if (user) {
       return sendResponse(res, 200, "Successful login!");
     } else {
       const userCheck = await User.findOne({ email: payload.email });
+      // Respond with an error message if the user is not a google user
       if (userCheck) {
         return sendResponse(res, 400, "User is not a Google user");
       } else {
+        // Creates a new user with that email, role, no password, and with google authentication set the true, and sends a success message
         const user = new User({
           email: payload.email,
-          //username: payload.name,
           password: null,
           googleAuth: true,
-          role: "guest"
+          role: req.body.role
         });
         await user.save();
         sendResponse(res, 200, "New Google user: " + payload.email);
