@@ -74,3 +74,22 @@ heroku ps:scale web=0
 Online:
 heroku ps:scale web=1
 ```
+
+## Zeit Now
+
+This server already comes preconfigured to work with Now, so minimal setup is needed.
+Make sure that first you have [Now](https://zeit.co/download) installed on your machine. The current version as of writing this documentation is 15.0.8, and as it's in very rapid development, some of the instructions may change.
+
+Once you create an account and log in via the CLI tool (using `now login`), you must add the secret keys from your environment file.
+
+Open up your `.env` file. In a terminal window, execute the following command, replacing the email value with the email in the `.env` file:
+
+```bash
+now secrets add INFRA_EMAIL 'abc.def@gmail.com'
+```
+
+Repeat this for every other entry in the `.env` file, but replacing `INFRA_EMAIL` with `INFRA_CLIENT_ID`, `INFRA_CLIENT_SECRET`, etc. and their corresponding values. Make sure you include the single quotes in the command like above!
+
+When you're ready to deploy, run `now` in the repo root and you will be given a link to your deployed docs.
+
+Learn how to alias a deployment [here](https://zeit.co/docs/v2/domains-and-aliases/aliasing-a-deployment).
