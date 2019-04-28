@@ -20,11 +20,16 @@ router.post(
   ],
   handleAsyncErrors(async function(req, res) {
     // Input validation
+
+    // Check that the request hahs a token in the header and a current and new password in the body
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return sendResponse(res, 400, "Invalid request", {
         errors: errors.array({ onlyFirstError: true })
       });
+    }
+    if (!req.headers.token) {
+      return sendResponse(res, 400, "Invalid Token");
     }
 
     const user = await verifyUser(req.headers.token);
