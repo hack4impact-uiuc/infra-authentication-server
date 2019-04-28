@@ -1,5 +1,4 @@
 const router = require("express").Router();
-const { validationResult } = require("express-validator/check");
 const { sendResponse } = require("./../utils/sendResponse");
 const { isGmailEnabled } = require("../utils/getConfigFile");
 const { generatePIN } = require("../utils/pinHelpers");
@@ -9,30 +8,23 @@ const handleAsyncErrors = require("../utils/errorHandler");
 const { verifyUser } = require("./../utils/userVerification");
 router.post(
   "/resendVerificationEmail",
-  [],
   handleAsyncErrors(async function(req, res) {
-    // Input validation
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return sendResponse(res, 400, "Invalid request", {
-        errors: errors.array({ onlyFirstError: true })
-      });
-    }
-
+    // If gmail is not enabled, it returns an error message
     const usingGmail = await isGmailEnabled();
     if (!usingGmail) {
       return sendResponse(res, 500, "Endpoint invalid. Gmail is not enabled.");
     }
+
+    // Verify that the token is valid and the user exists in the database. Will return you an error message if the user is already verified
     const user = await verifyUser(req.headers.token);
     if (user.errorMessage != null) {
       return sendResponse(res, 400, user.errorMessage);
     }
-
     if (user.verified) {
       sendResponse(res, 400, "User is already verified");
     }
 
-    // All the validation checks passed, so let's try and send the email
+    // Will generate a pin and send it in an email to the user. Sends a success or error message based on if the email is succesfully sent.
     generatePIN(user);
     const body = {
       from: "hack4impact.infra@gmail.com",
@@ -44,8 +36,6 @@ router.post(
     };
     try {
       await sendMail(body);
-      // success, so save the user to the DB and send back the JWT
-      // note that the PIN does not change if the email can't be sent
       await user.save();
       return sendResponse(res, 200, "Verification email successfully resent");
     } catch (e) {
@@ -53,7 +43,7 @@ router.post(
       return sendResponse(
         res,
         500,
-        "Email could not be sent despite Gmail being enabled. This is likely due to incorrect Gmail keys set as environment variables. Verification email not resent."
+        "Email could not be sent despite Gmail being enabled. This is likely due to incorrect gmail credentials or an invalid email. Verification email not resent."
       );
     }
   })

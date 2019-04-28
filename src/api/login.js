@@ -15,7 +15,7 @@ router.post(
       .isLength({ min: 1 })
   ],
   handleAsyncErrors(async function(req, res) {
-    // Input validation
+    // Checks that the request has the required fields (email, password)
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return sendResponse(res, 400, "Invalid Request", {
@@ -23,36 +23,28 @@ router.post(
       });
     }
 
-    // un-jwt-ify the given password, see if it's a match with the token associated with the email.
-    var user = await User.findOne({ email: req.body.email });
-    if (user) {
-      if (user.googleAuth) {
-        return res.status(400).send({
-          status: 400,
-          message: "Please login using Google."
-        });
-      }
-      if (await bcrypt.compare(req.body.password, user.password)) {
-        // hash matches! sign a JWT with an expiration 1 day in the future and send back to the user
-        const jwt_token = await signAuthJWT(user._id, user.password);
-
-        return res.status(200).send({
-          status: 200,
-          message: "Successful login!",
-          token: jwt_token,
-          uid: user._id,
-          permission: user.role
-        });
-      } else {
-        // password doesn't match the hashed
-        return sendResponse(res, 400, "Password incorrect. Please try again.");
-      }
-    } else {
+    // Find a user with the associated email and check that he/she isn't a google user
+    var user = await User.findOne({ email: req.body.email, googleAuth: null });
+    if (!user) {
       return sendResponse(
         res,
         400,
         "The information you provided does not match our database. Please check your inputs again."
       );
+    }
+
+    // Compares the encrypted passwords and either returns the appropriate error message or a a success status along with the user's token, id, and permission level
+    if (await bcrypt.compare(req.body.password, user.password)) {
+      const jwt_token = await signAuthJWT(user._id, user.password);
+      return res.status(200).send({
+        status: 200,
+        message: "Successful login!",
+        token: jwt_token,
+        uid: user._id,
+        permission: user.role
+      });
+    } else {
+      return sendResponse(res, 400, "Password incorrect. Please try again.");
     }
   })
 );
