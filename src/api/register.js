@@ -52,7 +52,6 @@ router.post(
 
     // If the security question is enabled, checks that the security question index is valid and that there is an answer
     const securityQuestionEnabled = await isSecurityQuestionEnabled();
-    console.log(securityQuestionEnabled);
     if (securityQuestionEnabled) {
       const securityQuestionsResponse = await getSecurityQuestions();
       if (!securityQuestionsResponse.success) {
@@ -72,7 +71,7 @@ router.post(
         );
       }
       userData["question"] = question;
-      userData["answer"] = req.body.answer;
+      userData["answer"] = req.body.answer.toLowerCase().replace(/\s/g, "");
     }
 
     // Checks the permission level of the user using the config file

@@ -2,7 +2,7 @@ const router = require("express").Router();
 const { check, validationResult } = require("express-validator/check");
 const User = require("../models/User");
 const fetch = require("node-fetch");
-const { googleAuth } = require("./../utils/getConfigFile");
+const { googleAuth, getRolesForUser } = require("./../utils/getConfigFile");
 const { sendResponse } = require("./../utils/sendResponse");
 const handleAsyncErrors = require("../utils/errorHandler");
 require("dotenv").config();
@@ -47,6 +47,15 @@ router.post(
       if (userCheck) {
         return sendResponse(res, 400, "User is not a Google user");
       } else {
+        // If the config file allows the permissions to create a user with this role, it registers the google user.
+        const requiredAuthFrom = await getRolesForUser(req.body.role);
+        if (requiredAuthFrom != null) {
+          return sendResponse(
+            res,
+            400,
+            "User needs a higher permission level for that role"
+          );
+        }
         // Creates a new user with that email, role, no password, and with google authentication set the true, and sends a success message
         const user = new User({
           email: payload.email,

@@ -28,36 +28,33 @@ router.post(
       .optional()
   ],
   handleAsyncErrors(async function(req, res) {
-    // Input validation
+    // Checks that the email, password, and pin or answer (depending on the config file) is in the body of the request
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return sendResponse(res, 400, "Invalid request", {
         errors: errors.array({ onlyFirstError: true })
       });
     }
+
+    // If gmail is enabled it is expecting a pin, but if gmail is not enabled and the security question is enabled, it is expecting an answer.
     const gmailEnabled = await isGmailEnabledForForgotPassword();
     const securityQuestionEnabled = await isSecurityQuestionEnabled();
     if (
       (gmailEnabled && !req.body.pin) ||
-      (securityQuestionEnabled && !req.body.answer)
+      (!gmailEnabled && securityQuestionEnabled && !req.body.answer)
     ) {
-      sendResponse(
-        res,
-        400,
-        "Gmail enabled/not enabled but PIN/security answer not provided"
-      );
+      sendResponse(res, 400, "Missing pin or answer to the security question");
       return;
     }
-    let user;
-    try {
-      user = await User.findOne({ email: req.body.email });
-    } catch (e) {
-      return sendResponse(res, 500, e.message);
-    }
+
+    // Finds the user that corresponds to that email, or returns an error message
+    let user = await User.findOne({ email: req.body.email });
     if (!user) {
       sendResponse(res, 400, "User does not exist in the database");
       return;
     }
+
+    // If gmail is enabled, it cehcks that the pin sent with the request is not expired and matches the one issued
     if (gmailEnabled) {
       if (user.pin && user.pin != req.body.pin) {
         sendResponse(res, 400, "PIN does not match");
@@ -75,6 +72,7 @@ router.post(
         return;
       }
     } else {
+      // If gmail is not enabled, it checks that the answer to the security question matches the on associated with the user
       if (
         req.body.answer &&
         user.answer !== req.body.answer.toLowerCase().replace(/\s/g, "")
@@ -83,13 +81,15 @@ router.post(
         return;
       }
     }
+
+    // Expire the pin, encrypt the passwword, and update the user model
     expirePIN(user);
     user.password = await bcrypt.hash(req.body.password, 10);
     await user.save();
     if (gmailEnabled) {
       try {
+        // Send an email to the user to alert them that the password has been updated
         await sendPasswordChangeEmail(user.email);
-        return sendResponse(res, 200, "Password successfully reset!");
       } catch (e) {
         console.log(e);
         return sendResponse(
@@ -98,11 +98,12 @@ router.post(
           "Confirm email could not be sent despite Gmail being enabled. This is likely due to incorrect Gmail keys set as environment variables. Password still reset."
         );
       }
-    } else {
-      sendResponse(res, 200, "Password successfully reset", {
-        token: await signAuthJWT(user._id, user.password)
-      });
     }
+
+    // Responds to the request with a success message and a JWT token
+    sendResponse(res, 200, "Password successfully reset", {
+      token: await signAuthJWT(user._id, user.password)
+    });
   })
 );
 

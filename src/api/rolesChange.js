@@ -59,6 +59,11 @@ router.post(
       authenticated = true;
     }
 
+    // Check that the user is verified, and if not return an error message
+    if (!user.verified) {
+      sendResponse(res, 400, "Unverified users can not promote/demote anyone");
+    }
+
     // Find the user that is being promoted and he or she is in the database
     let userToBePromoted = await User.find({ email: req.body.userEmail });
     if (userToBePromoted.length === 0) {
