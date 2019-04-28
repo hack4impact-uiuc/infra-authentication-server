@@ -2,7 +2,7 @@ const router = require("express").Router();
 const User = require("../models/User");
 const { check, validationResult } = require("express-validator/check");
 const { sendResponse } = require("./../utils/sendResponse");
-const { isGmailEnabled } = require("../utils/getConfigFile");
+const { isGmailEnabledForForgotPassword } = require("../utils/getConfigFile");
 const { sendMail } = require("../utils/sendMail");
 const { generatePIN } = require("../utils/pinHelpers");
 const handleAsyncErrors = require("../utils/errorHandler");
@@ -23,7 +23,7 @@ router.post(
         errors: errors.array({ onlyFirstError: true })
       });
     }
-    const usingGmail = await isGmailEnabled();
+    const usingGmail = await isGmailEnabledForForgotPassword();
     if (!usingGmail) {
       return sendResponse(
         res,

@@ -7,6 +7,7 @@ const bcrypt = require("bcrypt");
 const fetch = require("node-fetch");
 const handleAsyncErrors = require("../utils/errorHandler");
 const { verifyUser } = require("./../utils/userVerification");
+const { googleAuth } = require("./../utils/getConfigFile");
 
 router.post(
   "/roleschange",
@@ -27,7 +28,8 @@ router.post(
 
     let user = null;
     let authenticated = false;
-    if (!req.headers.google || !JSON.parse(req.headers.google)) {
+    const useGoogle = await googleAuth();
+    if (!useGoogle || !req.headers.google || !JSON.parse(req.headers.google)) {
       // If it is not a google user, it verifies the token is valid, the user exists, and verify the password
       user = await verifyUser(req.headers.token);
       if (user.errorMessage != null) {

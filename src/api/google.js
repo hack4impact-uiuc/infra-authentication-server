@@ -13,7 +13,7 @@ router.post(
     .isString()
     .isLength({ min: 1 }),
   handleAsyncErrors(async function(req, res) {
-    // Input validation
+    // Check that there is a tokenId in the body of the request
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return sendResponse(res, 400, "Invalid request", {
@@ -21,6 +21,7 @@ router.post(
       });
     }
 
+    // Check that google hhas been enabled
     const useGoogle = await googleAuth();
     if (!useGoogle)
       return sendResponse(res, 400, "Google authentication has not be enabled");

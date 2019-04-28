@@ -10,7 +10,7 @@ const {
 const { signAuthJWT } = require("../utils/jwtHelpers");
 const { generatePIN } = require("../utils/pinHelpers");
 const {
-  isGmailEnabled,
+  googleAuth,
   isSecurityQuestionEnabled
 } = require("../utils/getConfigFile");
 const { sendMail } = require("./../utils/sendMail");
@@ -87,8 +87,8 @@ router.post(
     const user = new User(userData);
 
     // If gmail is enabled, it sends an email with a generated PIN to verify the user
-    const usingGmail = await isGmailEnabled();
-    if (usingGmail) {
+    const googleEnabled = await googleAuth();
+    if (googleEnabled) {
       generatePIN(user);
       user.expiration = 0;
       const body = {

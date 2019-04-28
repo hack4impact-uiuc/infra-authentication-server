@@ -5,6 +5,7 @@ const { getRolesForUser } = require("./../utils/getConfigFile");
 const fetch = require("node-fetch");
 const handleAsyncErrors = require("../utils/errorHandler");
 const { verifyUser } = require("./../utils/userVerification");
+const { googleAuth } = require("./../utils/getConfigFile");
 
 router.get(
   "/roles",
@@ -14,7 +15,8 @@ router.get(
     }
 
     let user = null;
-    if (!req.headers.google || !JSON.parse(req.headers.google)) {
+    const useGoogle = await googleAuth();
+    if (!useGoogle || !req.headers.google || !JSON.parse(req.headers.google)) {
       // If it is not a google user, it verifies the token is valid and the user exists.
       user = await verifyUser(req.headers.token);
       if (user.errorMessage != null) {

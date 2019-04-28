@@ -6,7 +6,7 @@ const { sendResponse } = require("./../utils/sendResponse");
 const { sendPasswordChangeEmail } = require("../utils/sendMail");
 const { signAuthJWT } = require("../utils/jwtHelpers");
 const {
-  isGmailEnabled,
+  isGmailEnabledForForgotPassword,
   isSecurityQuestionEnabled
 } = require("../utils/getConfigFile");
 const { expirePIN } = require("../utils/pinHelpers");
@@ -35,7 +35,7 @@ router.post(
         errors: errors.array({ onlyFirstError: true })
       });
     }
-    const gmailEnabled = await isGmailEnabled();
+    const gmailEnabled = await isGmailEnabledForForgotPassword();
     const securityQuestionEnabled = await isSecurityQuestionEnabled();
     if (
       (gmailEnabled && !req.body.pin) ||

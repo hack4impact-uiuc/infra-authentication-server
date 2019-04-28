@@ -6,7 +6,7 @@ const { sendPasswordChangeEmail } = require("../utils/sendMail");
 const handleAsyncErrors = require("../utils/errorHandler");
 const { signAuthJWT } = require("../utils/jwtHelpers");
 const { verifyUser } = require("./../utils/userVerification");
-const { isGmailEnabled } = require("../utils/getConfigFile");
+const { googleAuth } = require("../utils/getConfigFile");
 
 router.post(
   "/changePassword",
@@ -42,8 +42,8 @@ router.post(
       user.password = await bcrypt.hash(req.body.newPassword, 10);
       await user.save();
       const new_token = await signAuthJWT(user._id, user.password);
-      const usingGmail = await isGmailEnabled();
-      if (usingGmail) {
+      const googleEnabled = await googleAuth();
+      if (googleEnabled) {
         try {
           await sendPasswordChangeEmail(user.email);
         } catch (e) {
