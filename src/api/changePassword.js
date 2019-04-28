@@ -4,7 +4,7 @@ const { check, validationResult } = require("express-validator/check");
 const { sendResponse } = require("../utils/sendResponse");
 const { sendPasswordChangeEmail } = require("../utils/sendMail");
 const handleAsyncErrors = require("../utils/errorHandler");
-const { signAuthJWT, verifyAuthJWT } = require("../utils/jwtHelpers");
+const { signAuthJWT } = require("../utils/jwtHelpers");
 const { verifyUser } = require("./../utils/userVerification");
 const { isGmailEnabled } = require("../utils/getConfigFile");
 
@@ -19,9 +19,7 @@ router.post(
       .isLength({ min: 1 })
   ],
   handleAsyncErrors(async function(req, res) {
-    // Input validation
-
-    // Check that the request hahs a token in the header and a current and new password in the body
+    // Checks that the token is in the header and the currentPassword and newPassword are in the body of the request
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return sendResponse(res, 400, "Invalid request", {
@@ -32,49 +30,37 @@ router.post(
       return sendResponse(res, 400, "Invalid Token");
     }
 
+    // Verifies the token and checks that the user is registered
     const user = await verifyUser(req.headers.token);
     if (user.errorMessage != null) {
       return sendResponse(res, 400, user.errorMessage);
     }
 
-    const userId = user._id;
-    if (
-      userId === null ||
-      !(await verifyAuthJWT(req.headers.token, userId, user.password))
-    ) {
-      sendResponse(res, 400, "Invalid JWT token");
-    } else if (user) {
-      const oldPasswordMatches = await bcrypt.compare(
-        req.body.currentPassword,
-        user.password
-      );
-      if (oldPasswordMatches) {
-        user.password = await bcrypt.hash(req.body.newPassword, 10);
-        await user.save();
-        var new_token = await signAuthJWT(userId, user.password);
-        const usingGmail = await isGmailEnabled();
-        if (usingGmail) {
-          try {
-            await sendPasswordChangeEmail(user.email);
-            return sendResponse(res, 200, "Successful change of password!");
-          } catch (e) {
-            console.log(e);
-            return sendResponse(
-              res,
-              500,
-              "Confirm email could not be sent despite Gmail being enabled. This is likely due to incorrect Gmail keys set as environment variables. Password still reset."
-            );
-          }
-        } else {
-          sendResponse(res, 200, "Successful change of password!", {
-            token: new_token
-          });
+    // Verifies that the current password is correct or sends teh appropriate error message.
+    if (await bcrypt.compare(req.body.currentPassword, user.password)) {
+      // Updates the password in the database, and sends an email to confirm the password change if gmail is enabled
+      user.password = await bcrypt.hash(req.body.newPassword, 10);
+      await user.save();
+      const new_token = await signAuthJWT(user._id, user.password);
+      const usingGmail = await isGmailEnabled();
+      if (usingGmail) {
+        try {
+          await sendPasswordChangeEmail(user.email);
+        } catch (e) {
+          console.log(e);
+          return sendResponse(
+            res,
+            500,
+            "Confirm email could not be sent despite Gmail being enabled. This is likely due to incorrect Gmail keys set as environment variables. Password still reset."
+          );
         }
-      } else {
-        sendResponse(res, 400, "Current password is incorrect");
+        // Sends a success message along with the new token.
+        sendResponse(res, 200, "Successful change of password!", {
+          token: new_token
+        });
       }
     } else {
-      sendResponse(res, 400, "User does not exist.");
+      sendResponse(res, 400, "Current password is incorrect");
     }
   })
 );

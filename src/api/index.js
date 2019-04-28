@@ -7,7 +7,7 @@ router.use("/", require("./passwordReset"));
 router.use("/", require("./forgotPassword"));
 router.use("/", require("./changePassword"));
 router.use("/", require("./google"));
-router.use("/", require("./addSecurityQuestion"));
+router.use("/", require("./updateSecurityQuestion"));
 router.use("/", require("./verifyEmail"));
 router.use("/", require("./roles"));
 router.use("/", require("./rolesChange"));
