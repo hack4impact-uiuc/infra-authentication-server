@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const { sendResponse } = require("./../utils/sendResponse");
-const { isGmailEnabled } = require("../utils/getConfigFile");
+const { googleAuth } = require("../utils/getConfigFile");
 const handleAsyncErrors = require("../utils/errorHandler");
 const { verifyUser } = require("./../utils/userVerification");
 const { check, validationResult } = require("express-validator/check");
@@ -14,8 +14,8 @@ router.post(
   ],
   handleAsyncErrors(async function(req, res) {
     // If gmail is not enabled, it returns an error message
-    const usingGmail = await isGmailEnabled();
-    if (!usingGmail) {
+    const googleEnabled = await googleAuth();
+    if (!googleEnabled) {
       return sendResponse(
         res,
         500,

@@ -10,7 +10,7 @@ const {
 const { signAuthJWT } = require("../utils/jwtHelpers");
 const { generatePIN } = require("../utils/pinHelpers");
 const {
-  isGmailEnabled,
+  googleAuth,
   isSecurityQuestionEnabled
 } = require("../utils/getConfigFile");
 const { sendMail } = require("./../utils/sendMail");
@@ -52,7 +52,6 @@ router.post(
 
     // If the security question is enabled, checks that the security question index is valid and that there is an answer
     const securityQuestionEnabled = await isSecurityQuestionEnabled();
-    console.log(securityQuestionEnabled);
     if (securityQuestionEnabled) {
       const securityQuestionsResponse = await getSecurityQuestions();
       if (!securityQuestionsResponse.success) {
@@ -72,7 +71,7 @@ router.post(
         );
       }
       userData["question"] = question;
-      userData["answer"] = req.body.answer;
+      userData["answer"] = req.body.answer.toLowerCase().replace(/\s/g, "");
     }
 
     // Checks the permission level of the user using the config file
@@ -87,8 +86,8 @@ router.post(
     const user = new User(userData);
 
     // If gmail is enabled, it sends an email with a generated PIN to verify the user
-    const usingGmail = await isGmailEnabled();
-    if (usingGmail) {
+    const googleEnabled = await googleAuth();
+    if (googleEnabled) {
       generatePIN(user);
       user.expiration = 0;
       const body = {

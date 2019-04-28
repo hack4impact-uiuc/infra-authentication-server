@@ -64,7 +64,7 @@ const getSecurityQuestions = async () => {
   }
 };
 
-const isGmailEnabled = async () => {
+const isGmailEnabledForForgotPassword = async () => {
   const config = await getConfigFile();
   if (config["gmail"] != true && config["security_question"] != true) {
     throw "Must have at least one of Gmail and security question enabled";
@@ -90,7 +90,7 @@ module.exports = {
   getTestURI,
   googleAuth,
   isSecurityQuestionEnabled,
-  isGmailEnabled,
+  isGmailEnabledForForgotPassword,
   getProdURI,
   getSecurityQuestions,
   getExpiryTime
