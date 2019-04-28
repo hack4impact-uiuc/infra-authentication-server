@@ -131,10 +131,10 @@ docker build -t DOCKER_IMAGE_NAME .
 
 Note, this may take a while, especially if you're running it for the first time. Subsequent builds will be much faster, as Docker caches assets that haven't changed since the previous build.
 
-Once this is done, go ahead and run the following, replacing `DOCKER_IMAGE_NAME` with what you wrote in the previous step.
+Once this is done, go ahead and run the following, replacing `DOCKER_IMAGE_NAME` with what you wrote in the previous step, and you can change `name_of_tar_file` to whatever you'd like.
 
 ```bash
-docker save -o test.tar DOCKER_IMAGE_NAME
+docker save -o name_of_tar_file.tar DOCKER_IMAGE_NAME
 ```
 
 This will essentially create a zipped up version of your image that you can then copy to another machine, which is exactly what we will do.
@@ -142,3 +142,30 @@ This will essentially create a zipped up version of your image that you can then
 ## Step 4: Running Docker on Remote Machine
 
 Now that you have the local, zipped version of your Docker image from step 3, you're ready to proceed to transfer it to your remote machine.
+
+Replace `name_of_tar_file` below with the name of the `.tar` file you created in the previous step.
+
+```bash
+docker image load < name_of_tar_file.tar
+```
+
+```bash
+docker run -d -p 80:8000 DOCKER_IMAGE_NAME
+```
+
+If successful, you'll get a hash back that gives you the id of the container.
+
+Now, if you run `docker ps`, you should see one container that is currently running.
+
+## Step 5: Verify It's Working
+
+Great! If you got the above working, congratulations! You've finished deploying the application to DigitalOcean!  
+Run, replacing `NAME_OF_MACHINE` with the name you created back in step 2:
+
+```bash
+docker-machine ip NAME_OF_MACHINE
+```
+
+To get the IP address of your DigitalOcean droplet. You should now be able to open up Postman and test your server using this IP!
+
+Note that if you visit the IP in a web browser and you get a message that it `Cannot GET /`, this is normal as the endpoint may not be configured for GET requests on the default URL.
