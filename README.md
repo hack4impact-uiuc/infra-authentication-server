@@ -115,6 +115,14 @@ docker-machine ls
 
 You should see the name of your machine and it should be running.
 
+**IMPORTANT:** After running this, in order for the next commands to work, you **MUST** run the following, replacing `NAME_OF_MACHINE` with what you created:
+
+```bash
+eval $(docker-machine env NAME_OF_MACHINE)
+```
+
+This tells Docker to execute commands on your remote machine. If you open a new terminal tab or window, you will need to execute this again for the following steps to work.
+
 When this is done, move on to the next step.
 
 ## Step 3: Build and Export Docker Image
@@ -148,6 +156,8 @@ Replace `name_of_tar_file` below with the name of the `.tar` file you created in
 ```bash
 docker image load < name_of_tar_file.tar
 ```
+
+This will copy the image to your remote machine. Once you do this and it has completed successfully, run the following to spin up a container using your image:
 
 ```bash
 docker run -d -p 80:8000 DOCKER_IMAGE_NAME
