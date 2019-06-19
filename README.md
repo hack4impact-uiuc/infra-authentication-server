@@ -4,7 +4,7 @@ Guide for integrating into your App: https://docs.google.com/document/d/1K6e9jar
 
 # Links
 
-Documentation: https://h4i-auth-infra-docs.now.sh/
+Documentation: https://www.notion.so/h4iuiuc/Authentication-Server-12c9fa26d1b9457bb84d7105caea530e
 
 API: https://github.com/hack4impact-uiuc/infra-authentication-api/
 
